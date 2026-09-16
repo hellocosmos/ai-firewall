@@ -2,7 +2,7 @@
 
 [English](../en/security.md) · [한국어](../ko/security.md) · [简体中文](../zh-CN/security.md) · [日本語](../ja/security.md) · [Español](../es/security.md) · [Français](../fr/security.md)
 
-의심되는 취약점은 리비전, 합성 재현 절차, 영향을 포함해 **hellocosmos@gmail.com**으로 비공개 제보하세요. 고객 데이터, 토큰, 실제 자격 증명을 공개 이슈에 넣지 마세요. 고정 응답 SLA는 제공하지 않습니다.
+의심되는 취약점은 리비전, 합성 재현 절차, 영향을 포함해 **hellocosmos@gmail.com** 으로 비공개 제보하세요. 고객 데이터, 토큰, 실제 자격 증명을 공개 이슈에 넣지 마세요. 고정 응답 SLA는 제공하지 않습니다.
 
 보호 범위는 신뢰할 수 있는 서명 홉에서 명시적으로 라우팅한 지원 HTTP/MCP 트래픽입니다. 로컬 예제는 합성 데모이며 강화된 운영 장비 구성이 아닙니다.
 

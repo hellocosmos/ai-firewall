@@ -22,7 +22,7 @@ cd ai-firewall
 ./scripts/run-console.sh
 ```
 
-Open **http://127.0.0.1:5176**. Sign in with `admin` / `1234`, then change the password in Settings. English is the default. Use the language selector before or after login; the browser remembers your choice.
+Open [http://127.0.0.1:5176](http://127.0.0.1:5176). Sign in with `admin` / `1234`, then change the password in Settings. English is the default. Use the language selector before or after login; the browser remembers your choice.
 
 ## What you can operate
 

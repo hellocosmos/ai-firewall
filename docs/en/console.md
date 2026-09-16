@@ -13,7 +13,7 @@ cd ai-firewall
 ./scripts/run-console.sh
 ```
 
-Open **http://127.0.0.1:5176**. The first account is **admin / 1234**. Change it in **Settings → Administrator password**; changing it revokes all sessions. The console binds to loopback and is a local evaluation installation, not an Internet-facing appliance. A port conflict stops startup without killing existing services. Stop with Ctrl+C; only this installation's labeled Envoy container is removed.
+Open [http://127.0.0.1:5176](http://127.0.0.1:5176). The first account is **admin / 1234** . Change it in **Settings → Administrator password** ; changing it revokes all sessions. The console binds to loopback and is a local evaluation installation, not an Internet-facing appliance. A port conflict stops startup without killing existing services. Stop with Ctrl+C; only this installation's labeled Envoy container is removed.
 
 ## Language
 
@@ -35,7 +35,7 @@ The sender simulates a trusted forwarding hop after TLS decryption. It signs exa
 1. **Dashboard:** run Read business notes, Redact customer data, Delete protected notes, injection, external transfer and response PII scenarios. Data is produced by real requests, not prefilled verdicts.
 2. **Traffic / Events:** filter decisions and open details. Check HTTP status, destination receipt, masking and policy version. CSV exports contain sanitized metadata.
 3. **Policies:** change `notes.read` to block, validate, apply, and rerun. Restore allow when finished. Updates apply to new streams; in-flight streams retain their policy snapshot.
-4. **Connections / System:** inspect component readiness and the actual path. **Audit:** review sign-in, policy and network changes.
+4. **Connections / System:** inspect component readiness and the actual path. ** Audit:** review sign-in, policy and network changes.
 5. **Settings:** inspect host interfaces and change the proxy listener port, timeout or body limit. Validate invokes Envoy's validator. Apply briefly restarts the owned container, checks the new listener and restores the previous configuration on failure.
 
 ## Network settings and NICs
@@ -55,7 +55,7 @@ Interface count is not physical NIC count: loopback, bridges and tunnels are inc
 
 ## Inspection and failure modes
 
-**Inline** allows, blocks or masks. Unmapped/unsigned requests are denied. An inspector communication failure fails closed. **Mirror in this console** observes the same synchronous proxy path without modifying content or consuming approvals; communication failures still block. The separate mirror collector in the lower-level inspector receives copies and cannot affect the original. Neither is unbounded streaming inspection. No direct-engine fallback is used when the proxy fails.
+**Inline** allows, blocks or masks. Unmapped/unsigned requests are denied. An inspector communication failure fails closed. ** Mirror in this console** observes the same synchronous proxy path without modifying content or consuming approvals; communication failures still block. The separate mirror collector in the lower-level inspector receives copies and cannot affect the original. Neither is unbounded streaming inspection. No direct-engine fallback is used when the proxy fails.
 
 ## Persistence and troubleshooting
 

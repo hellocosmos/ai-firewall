@@ -22,7 +22,7 @@ cd ai-firewall
 ./scripts/run-console.sh
 ```
 
-Ouvrez **http://127.0.0.1:5176**. Connectez-vous avec `admin` / `1234`, puis changez le mot de passe dans les paramètres. L’anglais est la langue par défaut. Le sélecteur fonctionne avant et après connexion ; le navigateur mémorise votre choix.
+Ouvrez [http://127.0.0.1:5176](http://127.0.0.1:5176). Connectez-vous avec `admin` / `1234`, puis changez le mot de passe dans les paramètres. L’anglais est la langue par défaut. Le sélecteur fonctionne avant et après connexion ; le navigateur mémorise votre choix.
 
 ## Fonctions opérationnelles
 

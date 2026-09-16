@@ -13,7 +13,7 @@ cd ai-firewall
 ./scripts/run-console.sh
 ```
 
-Ouvrez **http://127.0.0.1:5176**. Le compte initial est **admin / 1234**. Modifiez le mot de passe dans **Paramètres → Mot de passe administrateur** ; toutes les sessions sont révoquées. La console écoute uniquement sur la boucle locale : c’est une installation d’évaluation, pas une appliance exposée à Internet. Un conflit de port bloque le démarrage sans arrêter d’autres services. Ctrl+C arrête le service et retire uniquement son conteneur Envoy étiqueté.
+Ouvrez [http://127.0.0.1:5176](http://127.0.0.1:5176). Le compte initial est **admin / 1234** . Modifiez le mot de passe dans **Paramètres → Mot de passe administrateur** ; toutes les sessions sont révoquées. La console écoute uniquement sur la boucle locale : c’est une installation d’évaluation, pas une appliance exposée à Internet. Un conflit de port bloque le démarrage sans arrêter d’autres services. Ctrl+C arrête le service et retire uniquement son conteneur Envoy étiqueté.
 
 ## Langue
 
@@ -35,7 +35,7 @@ L’émetteur simule un relais de confiance après déchiffrement TLS et signe l
 1. **Tableau de bord :** lancez lecture, masquage client, suppression, injection, transfert externe et PII de réponse. Les données proviennent de vraies requêtes, pas de décisions préremplies.
 2. **Trafic / Événements :** filtrez et consultez statut HTTP, réception à destination, masquage et version de politique. Le CSV contient des métadonnées expurgées.
 3. **Politiques :** bloquez `notes.read`, validez, appliquez puis rejouez. Rétablissez l’autorisation ensuite. Les nouveaux flux prennent la mise à jour ; les flux en cours gardent leur politique.
-4. **Connexions / Système :** vérifiez composants et chemin. **Audit :** examinez les changements de connexion, politique et réseau.
+4. **Connexions / Système :** vérifiez composants et chemin. ** Audit :** examinez les changements de connexion, politique et réseau.
 5. **Paramètres :** consultez les interfaces et modifiez port, délai ou limite du corps. Le validateur Envoy contrôle la configuration. L’application redémarre brièvement le conteneur propre, vérifie la nouvelle écoute et restaure l’ancienne en cas d’échec.
 
 ## Réseau et cartes NIC
@@ -55,7 +55,7 @@ Le nombre d’interfaces n’est pas celui des cartes physiques : il inclut bouc
 
 ## Inspection et pannes
 
-**Inline** autorise, bloque ou masque. Les requêtes non déclarées ou non signées sont refusées ; une panne de communication avec l’inspecteur bloque le trafic. **Mirror dans cette console** observe le même chemin synchrone sans modifier le contenu ni consommer d’approbation ; les pannes de communication bloquent toujours. Le collecteur mirror indépendant reçoit des copies et ne peut agir sur l’original. Aucun mode n’offre de streaming illimité. Le proxy défaillant n’est jamais remplacé par un appel direct au moteur.
+**Inline** autorise, bloque ou masque. Les requêtes non déclarées ou non signées sont refusées ; une panne de communication avec l’inspecteur bloque le trafic. ** Mirror dans cette console** observe le même chemin synchrone sans modifier le contenu ni consommer d’approbation ; les pannes de communication bloquent toujours. Le collecteur mirror indépendant reçoit des copies et ne peut agir sur l’original. Aucun mode n’offre de streaming illimité. Le proxy défaillant n’est jamais remplacé par un appel direct au moteur.
 
 ## Persistance et dépannage
 

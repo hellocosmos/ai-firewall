@@ -13,7 +13,7 @@ cd ai-firewall
 ./scripts/run-console.sh
 ```
 
-Abra **http://127.0.0.1:5176**. La cuenta inicial es **admin / 1234**. Cámbiela en **Configuración → Contraseña de administrador**; se revocan todas las sesiones. La consola solo escucha en loopback: es una instalación local de evaluación, no un dispositivo expuesto a Internet. Los conflictos de puerto detienen el inicio sin terminar otros servicios. Ctrl+C detiene la aplicación y elimina únicamente el contenedor Envoy de esta instalación.
+Abra [http://127.0.0.1:5176](http://127.0.0.1:5176). La cuenta inicial es **admin / 1234** . Cámbiela en **Configuración → Contraseña de administrador** ; se revocan todas las sesiones. La consola solo escucha en loopback: es una instalación local de evaluación, no un dispositivo expuesto a Internet. Los conflictos de puerto detienen el inicio sin terminar otros servicios. Ctrl+C detiene la aplicación y elimina únicamente el contenedor Envoy de esta instalación.
 
 ## Idioma
 
@@ -35,7 +35,7 @@ El emisor simula un salto de confianza tras el descifrado TLS y firma solicitude
 1. **Panel:** ejecute lectura de notas, ocultación de datos, borrado, inyección, transferencia externa y PII de respuesta. Los datos proceden de solicitudes reales, no de decisiones precargadas.
 2. **Tráfico / Eventos:** filtre y revise el estado HTTP, recepción en destino, ocultación y versión de política. El CSV contiene metadatos depurados.
 3. **Políticas:** bloquee `notes.read`, valide, aplique y repita. Restaure permitir al terminar. Los cambios afectan a flujos nuevos; los ya iniciados conservan su política.
-4. **Conexiones / Sistema:** revise componentes y ruta. **Auditoría:** examine cambios de sesión, política y red.
+4. **Conexiones / Sistema:** revise componentes y ruta. ** Auditoría:** examine cambios de sesión, política y red.
 5. **Configuración:** vea las interfaces y cambie puerto, tiempo de espera o límite del cuerpo. La validación utiliza Envoy. Aplicar reinicia brevemente el contenedor propio, comprueba la nueva escucha y restaura la anterior si falla.
 
 ## Red y NIC
@@ -55,7 +55,7 @@ El número de interfaces no es el de NIC físicas: incluye loopback, puentes y t
 
 ## Modos de inspección y fallos
 
-**Inline** permite, bloquea u oculta. Rechaza solicitudes sin asignación o firma y bloquea si falla la comunicación del inspector. **Mirror en esta consola** observa la misma ruta síncrona sin modificar contenido ni consumir aprobaciones; los fallos de comunicación siguen bloqueando. El colector mirror independiente del inspector recibe copias y no puede afectar al original. Ninguno proporciona inspección de streaming ilimitado. No hay alternativa de llamada directa al motor si falla el proxy.
+**Inline** permite, bloquea u oculta. Rechaza solicitudes sin asignación o firma y bloquea si falla la comunicación del inspector. ** Mirror en esta consola** observa la misma ruta síncrona sin modificar contenido ni consumir aprobaciones; los fallos de comunicación siguen bloqueando. El colector mirror independiente del inspector recibe copias y no puede afectar al original. Ninguno proporciona inspección de streaming ilimitado. No hay alternativa de llamada directa al motor si falla el proxy.
 
 ## Persistencia y solución de problemas
 

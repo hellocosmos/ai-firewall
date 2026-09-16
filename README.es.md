@@ -22,7 +22,7 @@ cd ai-firewall
 ./scripts/run-console.sh
 ```
 
-Abra **http://127.0.0.1:5176**. Inicie sesión con `admin` / `1234` y cambie la contraseña en Configuración. El idioma predeterminado es inglés. Puede elegir idioma antes o después de entrar; el navegador recuerda la selección.
+Abra [http://127.0.0.1:5176](http://127.0.0.1:5176). Inicie sesión con `admin` / `1234` y cambie la contraseña en Configuración. El idioma predeterminado es inglés. Puede elegir idioma antes o después de entrar; el navegador recuerda la selección.
 
 ## Funciones operativas
 
