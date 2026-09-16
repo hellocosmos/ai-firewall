@@ -2,14 +2,17 @@
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-**在 TLS 解密后检查并控制受支持的 HTTP 和 MCP 操作。**
+**控制 AI 操作，保护数据。**
 
-TrapDefense Community 是带本地运维界面的自托管代理检查运行时。解密流量通过 Envoy 和检查器，实现请求/响应放行、阻断、脱敏和审计。旧 SDK 保留在 [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security)。
+TrapDefense Community 是带本地运维界面的自托管 AI 防火墙。检查受支持的 HTTP 和 MCP 工具调用，执行操作策略，对敏感数据脱敏并记录决策证据。旧 SDK 保留在 [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security)。
 
 ```text
-AI agent → TLS decryptor → trusted signing adapter → Envoy + inspector → destination
-                                                       ← response inspection ←
+AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
+            Action policy · Data protection · Audit
+          ← Inspected responses ←
 ```
+
+这是产品的逻辑流程。可信转发、流量可见性和强制路由要求请参阅[部署架构](docs/zh-CN/architecture.md)。
 
 ## 安装并打开控制台
 
@@ -34,7 +37,7 @@ cd ai-firewall
 
 Community 包含本地策略、显式 HTTP/MCP 映射、可信跳签名、有界响应/SSE 检查及净化本地证据。Enterprise Access Broker 实现单独分发；Community 不提供用户/代理身份、委派访问或审批。
 
-提供 NIC 清单和拓扑说明。回环演示不配置系统地址、双网卡路由、透明桥或物理出口。TLS 解密器需要可信签名适配器。inline 检查失败时阻断。控制台 Mirror 观察同步路径；独立 mirror 收集器不能阻断原始流量。
+提供 NIC 清单和拓扑说明。回环演示不配置系统地址、双网卡路由、透明桥或物理出口。inline 检查失败时阻断。控制台 Mirror 观察同步路径；独立 mirror 收集器不能阻断原始流量。
 
 ## 文档与验证
 

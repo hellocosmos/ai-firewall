@@ -2,6 +2,12 @@
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
+```text
+AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
+            Action policy · Data protection · Audit
+          ← Inspected responses ←
+```
+
 ## 데이터 경로와 관리 경로
 
 관리 API는 로컬 운영자를 인증하고 정책을 저장하며 UI를 제공합니다. Envoy는 지원하는 HTTP/MCP 요청을 전달하며 gRPC ExtProc로 요청·응답 검사를 호출합니다. 각 스트림은 적용 시점의 정책을 유지합니다. 무해한 합성 HTTP 목적지가 수신 증거를 제공합니다. [설치 안내](console.md)를 참고하세요.

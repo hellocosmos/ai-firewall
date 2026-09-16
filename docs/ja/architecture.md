@@ -2,6 +2,12 @@
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
+```text
+AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
+            Action policy · Data protection · Audit
+          ← Inspected responses ←
+```
+
 ## データ経路と管理経路
 
 管理 API はローカル運用者を認証し、ポリシーを保存して UI を提供します。Envoy は対応 HTTP/MCP 通信を転送し、gRPC ExtProc で要求・応答を検査します。各ストリームは開始時のポリシーを保持します。副作用のない合成 HTTP 宛先が受信証跡を提供します。[導入手順](console.md)を参照してください。

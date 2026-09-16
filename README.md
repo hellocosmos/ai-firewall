@@ -2,14 +2,17 @@
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-**Inspect and control supported HTTP and MCP actions after TLS decryption.**
+**Control AI actions. Protect your data.**
 
-TrapDefense Community is a self-hosted proxy inspection runtime with a local operations UI. Route decrypted traffic through Envoy and the inspector to allow, block, redact and audit supported requests and responses. This is the Community proxy product; the earlier SDK remains in [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
+TrapDefense Community is a self-hosted AI Firewall with a local operations UI. Inspect supported HTTP and MCP tool calls, enforce action policy, redact sensitive data and keep decision evidence. The earlier SDK remains in [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
 
 ```text
-AI agent → TLS decryptor → trusted signing adapter → Envoy + inspector → destination
-                                                       ← response inspection ←
+AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
+            Action policy · Data protection · Audit
+          ← Inspected responses ←
 ```
+
+Logical product flow. See [deployment architecture](docs/en/architecture.md) for trusted forwarding, transport visibility and routing requirements.
 
 ## Install and open the console
 
@@ -34,7 +37,7 @@ The synthetic requests traverse a real Envoy → gRPC inspector → HTTP destina
 
 Community includes local policy, explicit HTTP/MCP mappings, trusted-hop signatures, bounded response/SSE inspection and sanitized local evidence. Enterprise Access Broker implementation is separately distributed; Community does not claim human/agent identity, delegated access or approvals.
 
-NIC inventory and topology explanation are included. The loopback demo does not configure OS addresses, two-NIC routing, transparent bridges or physical egress. TLS decryptors need a trusted signing adapter; TLS termination alone is insufficient. Inline inspection failures block. Console Mirror observes its synchronous path; the separate mirror collector cannot block original traffic.
+NIC inventory and topology explanation are included. The loopback demo does not configure OS addresses, two-NIC routing, transparent bridges or physical egress. Inline inspection failures block. Console Mirror observes its synchronous path; the separate mirror collector cannot block original traffic.
 
 ## Documentation and verification
 

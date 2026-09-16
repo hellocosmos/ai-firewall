@@ -2,14 +2,17 @@
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-**TLS 복호화 이후 지원되는 HTTP·MCP 행위를 검사하고 통제합니다.**
+**AI의 행동을 통제하고 데이터를 보호합니다.**
 
-TrapDefense Community는 로컬 운영 UI를 제공하는 자체 호스팅 프록시 검사 런타임입니다. Envoy와 검사기를 통해 복호화 트래픽을 전달하여 요청·응답을 허용·차단·마스킹하고 감사합니다. 기존 SDK는 [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security)에 유지됩니다.
+TrapDefense Community는 로컬 운영 UI를 갖춘 자체 호스팅 AI 방화벽입니다. 지원되는 HTTP·MCP 도구 호출을 검사하고, 실행 정책을 적용하며, 민감정보를 마스킹하고 판단 근거를 기록합니다. 기존 SDK는 [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security)에 유지됩니다.
 
 ```text
-AI agent → TLS decryptor → trusted signing adapter → Envoy + inspector → destination
-                                                       ← response inspection ←
+AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
+            Action policy · Data protection · Audit
+          ← Inspected responses ←
 ```
+
+제품의 논리적 흐름입니다. 신뢰 전달, 트래픽 가시성, 경로 강제 조건은 [배치 아키텍처](docs/ko/architecture.md)를 확인하세요.
 
 ## 콘솔 설치와 실행
 
@@ -34,7 +37,7 @@ cd ai-firewall
 
 Community에는 로컬 정책, 명시적 HTTP/MCP 매핑, 신뢰 홉 서명, 제한된 응답/SSE 검사와 정제된 로컬 증거가 포함됩니다. Enterprise Access Broker 구현은 별도 배포하며 Community는 사용자·에이전트 신원, 위임 접근, 승인을 제공하지 않습니다.
 
-NIC 목록과 토폴로지 설명을 제공합니다. loopback 데모는 OS 주소, 2-NIC 라우팅, 투명 브리지, 물리 출구를 설정하지 않습니다. TLS 복호화기에는 신뢰 서명 어댑터가 필요합니다. inline 검사 실패는 차단합니다. 콘솔 Mirror는 동기 경로를 관찰하며 별도 mirror 수집기는 원본을 차단할 수 없습니다.
+NIC 목록과 토폴로지 설명을 제공합니다. loopback 데모는 OS 주소, 2-NIC 라우팅, 투명 브리지, 물리 출구를 설정하지 않습니다. inline 검사 실패는 차단합니다. 콘솔 Mirror는 동기 경로를 관찰하며 별도 mirror 수집기는 원본을 차단할 수 없습니다.
 
 ## 문서와 검증
 

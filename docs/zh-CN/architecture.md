@@ -2,6 +2,12 @@
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
+```text
+AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
+            Action policy · Data protection · Audit
+          ← Inspected responses ←
+```
+
 ## 数据平面与管理平面
 
 管理 API 认证本地操作员、保存策略并提供 UI。Envoy 转发支持的 HTTP/MCP 流量，通过 gRPC ExtProc 检查请求和响应。每条流保留自己的策略快照。无业务副作用的合成 HTTP 目标提供接收证据。参见[安装指南](console.md)。

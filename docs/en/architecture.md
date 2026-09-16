@@ -2,6 +2,12 @@
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
+```text
+AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
+            Action policy · Data protection · Audit
+          ← Inspected responses ←
+```
+
 ## Data plane and control plane
 
 The console's management API authenticates a local operator, persists policy and serves the UI. Envoy forwards supported HTTP/MCP traffic and calls the inspector through gRPC ExtProc for request and response inspection. Each stream snapshots its policy. A synthetic no-op HTTP destination provides receipt evidence. The console is installed with [these instructions](console.md).

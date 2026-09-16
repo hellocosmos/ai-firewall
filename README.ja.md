@@ -2,14 +2,17 @@
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-**TLS 復号後に、対応する HTTP と MCP の操作を検査・制御します。**
+**AI の行動を制御し、データを保護します。**
 
-TrapDefense Community はローカル運用 UI を備えたセルフホスト型プロキシ検査ランタイムです。復号通信を Envoy と検査器に通し、要求・応答の許可、遮断、マスキング、監査を行います。旧 SDK は [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security) に残ります。
+TrapDefense Community はローカル運用 UI を備えたセルフホスト型 AI ファイアウォールです。対応する HTTP・MCP ツール呼び出しを検査し、実行ポリシーを適用して機密データをマスキングし、判断の証跡を記録します。旧 SDK は [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security) に残ります。
 
 ```text
-AI agent → TLS decryptor → trusted signing adapter → Envoy + inspector → destination
-                                                       ← response inspection ←
+AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
+            Action policy · Data protection · Audit
+          ← Inspected responses ←
 ```
+
+製品の論理的な流れです。信頼済み転送、通信の可視性、経路の要件は[配置アーキテクチャ](docs/ja/architecture.md)を参照してください。
 
 ## コンソールのインストールと起動
 
@@ -34,7 +37,7 @@ cd ai-firewall
 
 Community はローカルポリシー、明示的 HTTP/MCP マッピング、信頼ホップ署名、上限付き応答/SSE 検査、機密情報を除いた証拠を含みます。Enterprise Access Broker は別配布です。Community はユーザー・エージェントの本人確認、委任アクセス、承認を提供しません。
 
-NIC 一覧と構成説明を含みます。ループバックのデモは OS アドレス、2 NIC ルーティング、透過ブリッジ、物理出口を設定しません。TLS 復号器には信頼できる署名アダプターが必要です。inline 検査失敗は遮断します。コンソール Mirror は同期経路を観察し、別の mirror コレクターは原本を遮断できません。
+NIC 一覧と構成説明を含みます。ループバックのデモは OS アドレス、2 NIC ルーティング、透過ブリッジ、物理出口を設定しません。inline 検査失敗は遮断します。コンソール Mirror は同期経路を観察し、別の mirror コレクターは原本を遮断できません。
 
 ## ドキュメントと検証
 

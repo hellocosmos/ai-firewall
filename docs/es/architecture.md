@@ -2,6 +2,12 @@
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
+```text
+AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
+            Action policy · Data protection · Audit
+          ← Inspected responses ←
+```
+
 ## Plano de datos y de control
 
 La API autentica al operador local, guarda políticas y sirve la UI. Envoy reenvía HTTP/MCP admitido y llama al inspector mediante gRPC ExtProc para solicitudes y respuestas. Cada flujo conserva una instantánea de política. Un destino HTTP sintético sin acciones empresariales aporta recibos. Consulte la [instalación](console.md).

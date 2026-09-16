@@ -2,14 +2,17 @@
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-**Inspeccione y controle acciones HTTP y MCP compatibles después del descifrado TLS.**
+**Controle las acciones de IA. Proteja sus datos.**
 
-TrapDefense Community es un runtime de inspección proxy autoalojado con consola local. El tráfico descifrado atraviesa Envoy y el inspector para permitir, bloquear, ocultar y auditar solicitudes y respuestas. El SDK anterior permanece en [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
+TrapDefense Community es un AI Firewall autoalojado con consola local. Inspeccione llamadas HTTP y MCP compatibles, aplique políticas de acción, oculte datos sensibles y conserve evidencias de las decisiones. El SDK anterior permanece en [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
 
 ```text
-AI agent → TLS decryptor → trusted signing adapter → Envoy + inspector → destination
-                                                       ← response inspection ←
+AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
+            Action policy · Data protection · Audit
+          ← Inspected responses ←
 ```
+
+Flujo lógico del producto. Consulte la [arquitectura de despliegue](docs/es/architecture.md) para los requisitos de reenvío de confianza, visibilidad del tráfico y enrutamiento.
 
 ## Instalar y abrir la consola
 
@@ -34,7 +37,7 @@ Las solicitudes sintéticas recorren Envoy → inspector gRPC → destino HTTP r
 
 Community incluye política local, mapeos HTTP/MCP explícitos, firmas del salto fiable, inspección limitada de respuestas/SSE y pruebas locales depuradas. Enterprise Access Broker se distribuye aparte; Community no acredita identidad humana/de agentes ni ofrece delegación o aprobaciones.
 
-Incluye inventario de interfaces y explicación de topología. La demo loopback no configura direcciones del SO, rutas de dos NIC, puentes transparentes ni salidas físicas. El descifrador TLS requiere un adaptador de firma fiable. Los fallos inline bloquean. Mirror de consola observa su ruta síncrona; el colector mirror separado no bloquea originales.
+Incluye inventario de interfaces y explicación de topología. La demo loopback no configura direcciones del SO, rutas de dos NIC, puentes transparentes ni salidas físicas. Los fallos inline bloquean. Mirror de consola observa su ruta síncrona; el colector mirror separado no bloquea originales.
 
 ## Documentación y verificación
 
