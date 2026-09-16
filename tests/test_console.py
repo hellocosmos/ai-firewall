@@ -157,3 +157,15 @@ def test_cancelled_partial_stream_keeps_incomplete_evidence(tmp_path, monkeypatc
     assert event['action']=='unknown' and event['coverage']=='incomplete'
     assert not event['enforcement_applied'] and not event['transport']['stream_completed']
   asyncio.run(exercise())
+
+def test_synthetic_receipt_id_cannot_look_like_personal_data(monkeypatch):
+  from types import SimpleNamespace
+  from asr_proxy.console import destination
+  from asr_proxy.inspection.pii import PresidioScanner
+  collision='d688a6576def415c96762d8aa2a7266a'
+  scanner=PresidioScanner()
+  assert scanner.analyze(collision)  # A random hex UUID can resemble a passport.
+  monkeypatch.setattr(destination,'uuid4',lambda:SimpleNamespace(hex=collision))
+  receipt=destination.receipt_id()
+  assert len(receipt)==32 and receipt.isalpha()
+  assert not scanner.analyze(receipt)

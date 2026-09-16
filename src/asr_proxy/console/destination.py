@@ -7,6 +7,11 @@ from asr_proxy.inspection.community_demo import _read_demo_body
 from asr_proxy.inspection.identity import reserved_header
 
 
+def receipt_id():
+  # Preserve UUID entropy while avoiding accidental numeric PII in demo metadata.
+  return uuid4().hex.translate(str.maketrans('0123456789abcdef','abcdefghijklmnop'))
+
+
 def create_destination(port=18090):
   lock=Lock()
   receipts={}
@@ -31,7 +36,7 @@ def create_destination(port=18090):
         if value['method']!='tools/call' or tool not in ('notes.read','notes.delete'):raise ValueError()
         message=args.get('message','')
         if not isinstance(message,str):raise ValueError()
-        receipt={'id':uuid4().hex,'tool':tool,'request_redacted':'[REDACTED]' in message,
+        receipt={'id':receipt_id(),'tool':tool,'request_redacted':'[REDACTED]' in message,
           'reserved_headers_leaked':any(reserved_header(k.lower()) for k in self.headers)}
         with lock:
           receipts[receipt['id']]=receipt
