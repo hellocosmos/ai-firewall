@@ -18,14 +18,17 @@ def free_port():
     sock.bind(('127.0.0.1',0));return sock.getsockname()[1]
 
 
-@pytest.mark.parametrize('mode',['passthrough','static_bearer','https_static_bearer'])
+@pytest.mark.parametrize('mode',['passthrough_bearer','static_bearer','static_api_key','https_static_bearer'])
 def test_package_lifecycle(tmp_path,mode):
   port,gateway_port=free_port(),free_port()
   origin=f'http://localhost:{port}'
   config=yaml.safe_load((ROOT/'deploy/selfhost/deployment.yaml').read_text())
   config['console_origin']=origin
-  static=mode!='passthrough'
-  if static:config.update(destination_auth='static_bearer',bearer_file='/state/destination.token')
+  static=mode!='passthrough_bearer'
+  if mode in ('static_bearer','https_static_bearer'):
+    config['target_auth']={'mode':'static_bearer','secret_file':'/state/destination.token'}
+  elif mode=='static_api_key':
+    config['target_auth']={'mode':'static_api_key','secret_file':'/state/destination.token','header':'x-api-key'}
   if mode.startswith('https'):
     config.update(upstream='https://fixture:8080',allow_plaintext_upstream=False)
   path=tmp_path/'deployment.yaml';path.write_text(yaml.safe_dump(config))
@@ -59,7 +62,7 @@ def test_package_lifecycle(tmp_path,mode):
       except httpx.HTTPError:pass
       time.sleep(.5)
     pytest.fail('Console did not become healthy')
-  password='synthetic-install-password-036'
+  password='synthetic-install-password-037'
   try:
     compose('build','app')
     compose('run','--rm','--no-deps','--entrypoint','python','app','-c',
@@ -99,7 +102,9 @@ def test_package_lifecycle(tmp_path,mode):
       assert admin.post('/demo-api/login',json={'username':'admin','password':password}).status_code==200
       data=admin.get('/demo-api/overview').json()
       assert data['synthetic'] is False and data['scenarios']==[]
-      assert data['deployment']['destination_auth']==('static_bearer' if static else 'passthrough')
+      expected='static_api_key' if mode=='static_api_key' else 'static_bearer' if static else 'passthrough_bearer'
+      assert data['deployment']['target_auth']['mode']==expected
+      assert 'secret_file' not in data['deployment']['target_auth']
       assert len(data['events'])>=(3 if static else 4)
       text=str(data['events'])
       assert key not in text and 'synthetic-target-token' not in text and 'alex@example.com' not in text
