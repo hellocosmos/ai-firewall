@@ -1,11 +1,16 @@
 """Self-hosted trust boundaries; all credentials and targets are synthetic."""
 import json
 from pathlib import Path
+from types import SimpleNamespace
+import time
 import httpx
+import jwt
 import pytest
 import yaml
+from cryptography.hazmat.primitives.asymmetric import rsa
 from fastapi.testclient import TestClient
 from asr_proxy.selfhost.config import Deployment, load, envoy_config
+from asr_proxy.selfhost.auth import GatewayAuthenticator
 from asr_proxy.selfhost.gateway import create_gateway
 from asr_proxy.selfhost.main import initialize
 from asr_proxy.console.store import Store
@@ -177,11 +182,68 @@ def test_static_bearer_and_conflict(config):
   def target(request):
     seen.append(request.headers['authorization'])
     return httpx.Response(200,stream=httpx.ByteStream(b'{}'))
-  client=TestClient(create_gateway(config,KEY,SIGN,bearer='synthetic-static',transport=httpx.MockTransport(target)))
+  data=deployment_data(config)
+  data['target_auth']={'mode':'static_bearer','secret_file':'/state/target.token'}
+  static=Deployment.model_validate(data)
+  client=TestClient(create_gateway(static,KEY,SIGN,target_secret='synthetic-static',
+    transport=httpx.MockTransport(target)))
   assert client.post('/api/notes',headers={'x-td-client-key':KEY},json={}).status_code==200
   assert seen==['Bearer synthetic-static']
   assert client.post('/api/notes',headers={'x-td-client-key':KEY,'authorization':'Bearer other'},json={}).status_code==400
   assert len(seen)==1
+
+
+def test_jwt_metadata_challenge_and_separate_target_credential(config):
+  signing_key=rsa.generate_private_key(public_exponent=65537,key_size=2048)
+  class Keys:
+    def get_signing_key_from_jwt(self,token):return SimpleNamespace(key=signing_key.public_key())
+  data=deployment_data(config)
+  data.update(gateway_auth=jwt_auth(),
+    target_auth={'mode':'static_bearer','secret_file':'/state/target.token'})
+  secured=Deployment.model_validate(data)
+  authenticator=GatewayAuthenticator(secured.gateway_auth,client_key=KEY,jwk_client=Keys())
+  calls=[]
+  def target(request):
+    calls.append(request)
+    assert request.headers['authorization']=='Bearer synthetic-target-token'
+    assert 'x-td-client-key' not in request.headers
+    return httpx.Response(200,headers={'content-type':'application/json'},stream=httpx.ByteStream(b'{}'))
+  client=TestClient(create_gateway(secured,KEY,SIGN,target_secret='synthetic-target-token',
+    authenticator=authenticator,transport=httpx.MockTransport(target)))
+  metadata=client.get('/.well-known/oauth-protected-resource/mcp')
+  assert metadata.status_code==200 and metadata.json()['resource']=='https://firewall.example/mcp'
+  assert calls==[]
+  missing=client.post('/api/notes',json={})
+  assert missing.status_code==401 and 'resource_metadata=' in missing.headers['www-authenticate']
+  assert calls==[]
+  now=int(time.time())
+  token=jwt.encode({'iss':'https://issuer.example/tenant','aud':'https://firewall.example/mcp',
+    'sub':'synthetic-agent','iat':now,'exp':now+300,'scope':'mcp.invoke'},signing_key,
+    algorithm='RS256',headers={'kid':'synthetic'})
+  response=client.post('/api/notes',headers={'authorization':'Bearer '+token},json={})
+  assert response.status_code==200 and len(calls)==1
+  assert token not in calls[0].headers.values()
+
+
+def test_jwt_insufficient_scope_returns_gateway_challenge(config):
+  signing_key=rsa.generate_private_key(public_exponent=65537,key_size=2048)
+  class Keys:
+    def get_signing_key_from_jwt(self,token):return SimpleNamespace(key=signing_key.public_key())
+  data=deployment_data(config)
+  data.update(gateway_auth=jwt_auth(required_scopes=['mcp.invoke','notes.write']),
+    target_auth={'mode':'none'})
+  secured=Deployment.model_validate(data)
+  authenticator=GatewayAuthenticator(secured.gateway_auth,client_key=KEY,jwk_client=Keys())
+  def forbidden(request):raise AssertionError('Must not reach Envoy')
+  client=TestClient(create_gateway(secured,KEY,SIGN,authenticator=authenticator,
+    transport=httpx.MockTransport(forbidden)))
+  now=int(time.time())
+  token=jwt.encode({'iss':'https://issuer.example/tenant','aud':'https://firewall.example/mcp',
+    'sub':'synthetic-agent','iat':now,'exp':now+300,'scope':'mcp.invoke'},signing_key,
+    algorithm='RS256',headers={'kid':'synthetic'})
+  response=client.post('/api/notes',headers={'authorization':'Bearer '+token},json={})
+  assert response.status_code==403 and response.json()=={'error':'insufficient_scope'}
+  assert 'scope="mcp.invoke notes.write"' in response.headers['www-authenticate']
 
 @pytest.mark.parametrize('status,headers,content,expected',[
  (302,{'location':'https://example.com'},b'',502),

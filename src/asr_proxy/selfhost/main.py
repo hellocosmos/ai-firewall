@@ -42,7 +42,7 @@ async def serve(args, config):
   runtime=SelfhostRuntime(state,config)
   client_key=secret(state/'client.key')
   if len(client_key)<32:raise ValueError('Invalid client key')
-  bearer=secret(config.bearer_file) if config.bearer_file else None
+  target_secret=secret(config.target_auth.secret_file) if config.target_auth.secret_file else None
   atomic_write(Path(args.generated)/'envoy.yaml',envoy_config(config),mode=0o644)
   grpc_server=grpc.aio.server(maximum_concurrent_rpcs=32)
   rpc.add_ExternalProcessorServicer_to_server(ConsoleProcessor(runtime),grpc_server)
@@ -59,7 +59,7 @@ async def serve(args, config):
   console=create_app(state,seed=False,runtime_factory=lambda *a,**k:runtime,
     lifespan=lifecycle,console_origin=config.console_origin)
   console.mount('/',StaticFiles(directory=args.assets,html=True),name='console')
-  gateway=create_gateway(config,client_key,runtime.key,bearer=bearer)
+  gateway=create_gateway(config,client_key,runtime.key,target_secret=target_secret)
   servers=[uvicorn.Server(uvicorn.Config(app,host='0.0.0.0',port=port,access_log=False,
     ws='none',timeout_graceful_shutdown=3,limit_concurrency=64)) for app,port in [(console,18080),(gateway,18084)]]
   # One signal handler coordinates both listeners and the gRPC service.

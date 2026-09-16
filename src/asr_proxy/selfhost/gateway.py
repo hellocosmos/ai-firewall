@@ -1,6 +1,5 @@
 """Bounded authenticated adapter. Never retries or bypasses Envoy."""
 import asyncio
-import hmac
 from uuid import uuid4
 from urllib.parse import urlsplit
 import httpx
@@ -9,12 +8,21 @@ from fastapi.responses import JSONResponse, Response
 from asr_proxy.inspection.contracts import HttpMessage, InspectionError
 from asr_proxy.inspection.identity import sign_attestation, reserved_header, TRANSPORT_HEADERS
 from asr_proxy.inspection.server import bounded_body
+from .auth import AuthError, GatewayAuthenticator
+from .credentials import CredentialError, TargetCredentialProvider
 
 
-def create_gateway(config, client_key, signing_key, *, bearer=None, transport=None):
+def create_gateway(config, client_key, signing_key, *, target_secret=None, authenticator=None, transport=None):
   app = FastAPI(openapi_url=None, docs_url=None, redoc_url=None)
   authority = urlsplit(config.upstream).netloc
   slots = asyncio.Semaphore(32)
+  authenticator=authenticator or GatewayAuthenticator(config.gateway_auth,client_key=client_key)
+  credentials=TargetCredentialProvider(config.target_auth,gateway_mode=config.gateway_auth.mode,
+    secret=target_secret)
+
+  if metadata:=authenticator.metadata():
+    async def protected_resource_metadata():return JSONResponse(metadata)
+    app.add_api_route(config.gateway_auth.metadata_path,protected_resource_metadata,methods=['GET'])
 
   @app.api_route('/{path:path}', methods=['GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS','CONNECT'])
   async def forward(request: Request):
@@ -24,9 +32,11 @@ def create_gateway(config, client_key, signing_key, *, bearer=None, transport=No
       name = key.decode('latin1').lower()
       if name in headers: return JSONResponse({'error':'duplicate_header'}, status_code=400)
       headers[name] = value.decode('latin1')
-    supplied = headers.get('x-td-client-key', '')
-    if not hmac.compare_digest(supplied.encode(), client_key.encode()):
-      return JSONResponse({'error':'invalid_client_key'}, status_code=401)
+    try:await asyncio.to_thread(authenticator.authenticate,headers)
+    except AuthError as error:
+      response_headers={}
+      if challenge:=authenticator.challenge(error):response_headers['WWW-Authenticate']=challenge
+      return JSONResponse({'error':error.code},status_code=error.status_code,headers=response_headers)
     if slots.locked(): return JSONResponse({'error':'gateway_busy'}, status_code=503)
     raw_path = request.scope.get('raw_path', b'/').decode('ascii')
     if (request.method, raw_path) not in {(r.method,r.path) for r in config.routes}:
@@ -35,23 +45,21 @@ def create_gateway(config, client_key, signing_key, *, bearer=None, transport=No
       return JSONResponse({'error':'unsupported_session_or_upgrade'}, status_code=400)
     if headers.get('content-encoding','identity').lower() != 'identity':
       return JSONResponse({'error':'unsupported_content_encoding'}, status_code=415)
-    if 'authorization' in headers and not headers['authorization'].startswith('Bearer '):
-      return JSONResponse({'error':'unsupported_destination_auth'},status_code=400)
-    if bearer and 'authorization' in headers:
-      return JSONResponse({'error':'destination_auth_conflict'}, status_code=400)
     try:
+      clean = {k:v for k,v in headers.items() if k not in TRANSPORT_HEADERS and not reserved_header(k)}
+      try:clean=credentials.apply(clean,headers.get('authorization'))
+      except CredentialError as error:
+        return JSONResponse({'error':str(error)},status_code=400)
       async with slots, asyncio.timeout(12):
         body = await bounded_body(request, config.max_body_bytes)
         if body and headers.get('content-type','').split(';')[0].strip() not in ('application/json','application/json-rpc'):
           return JSONResponse({'error':'unsupported_request_media_type'},status_code=415)
-        clean = {k:v for k,v in headers.items() if k not in TRANSPORT_HEADERS and not reserved_header(k)}
         # Reject connection-nominated application headers rather than silently changing semantics.
         nominated = {s.strip().lower() for s in headers.get('connection','').split(',')}
         if nominated - {'','close','keep-alive'}:
           return JSONResponse({'error':'unsupported_connection_header'}, status_code=400)
         clean['host'] = authority
         clean['accept-encoding'] = 'identity'
-        if bearer: clean['authorization'] = 'Bearer ' + bearer
         query = request.scope.get('query_string', b'')
         target = raw_path + ('?' + query.decode('ascii') if query else '')
         async with httpx.AsyncClient(timeout=8, trust_env=False, follow_redirects=False, transport=transport) as client:
