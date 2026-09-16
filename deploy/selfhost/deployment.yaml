@@ -1,0 +1,24 @@
+# Synthetic target for the optional smoke profile. Replace before real use.
+upstream: http://fixture:8080
+allow_plaintext_upstream: true
+console_origin: http://localhost:18080
+destination_auth: passthrough
+max_body_bytes: 1048576
+routes:
+  - authority: fixture:8080
+    path: /api/notes
+    method: POST
+    protocol: http
+    tool: notes.read
+    rule: {action: read, resource: notes, effect: allow}
+    redact_fields: [/message]
+  - authority: fixture:8080
+    path: /mcp
+    protocol: mcp
+    tools:
+      initialize: {action: initialize, resource: mcp, effect: allow}
+      notifications/initialized: {action: notify, resource: mcp, effect: allow}
+      tools/list: {action: discover, resource: mcp, effect: allow}
+      notes.read: {action: read, resource: notes, effect: allow}
+      notes.delete: {action: delete, resource: notes, effect: block}
+    redact_fields: [/params/arguments/message]

@@ -1,5 +1,7 @@
 # Installation et utilisation de la console
 
+> Docker 0.36: [Self-hosting / integration guide](self-hosting.md). This page describes the separate source-based synthetic demo.
+
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
 Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](identity.md).

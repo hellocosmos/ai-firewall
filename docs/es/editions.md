@@ -4,7 +4,7 @@
 
 ## Compatibilidad y disponibilidad
 
-Self-hosted Community es una versión preliminar desde el código fuente con ejemplos de proxy en Docker. El paquete Docker integrado está previsto. TrapDefense Cloud también está previsto, con la misma base de inspección; todavía no admite registros ni está disponible.
+0.36 ofrece un paquete preliminar Docker Compose con adaptador, Envoy, inspector y consola. La imagen se compila localmente desde el código fuente. TrapDefense Cloud sigue previsto y no admite registros.
 
 [Entrega y compatibilidad](deployment-fit.md)
 
@@ -27,3 +27,5 @@ La implementación piloto Enterprise distribuida por separado añade Access Brok
 El proveedor privado usa el punto de entrada Python `trapdefense.authorizers` / `enterprise`. `authorize(request)` aplica las decisiones; `evaluate(request)` evalúa mirror sin modificar estado. Elegir Enterprise sin proveedor impide iniciar. Los registros de tokens del Broker son pruebas de decisiones acotadas, no tokens OAuth de uso general.
 
 La gestión centralizada, HA distribuida, facturación alojada y almacenamiento de auditoría inmutable no se ofrecen. El alcance comercial puede incluir proveedor privado, despliegue, integración de políticas y soporte; precios y condiciones se acuerdan aparte. SQLite y JSONL locales siguen siendo modificables.
+
+[Docker 0.36](self-hosting.md)

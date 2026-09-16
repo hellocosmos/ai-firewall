@@ -4,7 +4,7 @@
 
 ## Deployment fit and availability
 
-Self-hosted Community is available as a source-based preview with Docker-backed proxy examples. A unified Docker installation package is planned. TrapDefense Cloud is planned, not available for sign-up: the intended managed offering uses the same inspection foundation.
+Self-hosted Community 0.36 includes a source-built Docker Compose package for the adapter, Envoy, inspector and console. TrapDefense Cloud remains planned and is not available for sign-up.
 
 [Delivery and compatibility](deployment-fit.md)
 
@@ -27,3 +27,5 @@ The separately distributed Enterprise pilot implementation adds the Access Broke
 The private provider connects through the `trapdefense.authorizers` / `enterprise` Python entry point. `authorize(request)` enforces decisions; `evaluate(request)` provides non-mutating mirror assessment. Selecting Enterprise without its provider fails startup. Broker token records are scoped decision evidence, not general-purpose OAuth access tokens.
 
 Central fleet management, distributed HA, hosted billing and immutable audit storage are not shipped features. Commercial scope can include the private provider, deployment, policy integration and support; pricing and support terms are separate. Local SQLite and JSONL storage remain mutable.
+
+[Docker 0.36](self-hosting.md)

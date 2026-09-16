@@ -4,7 +4,7 @@
 
 ## 導入条件と提供状況
 
-Self-hosted Community は Docker プロキシの例を含むソースベースのプレビューです。統合 Docker インストールパッケージは計画段階です。同じ検査基盤を使うマネージド TrapDefense Cloud も計画段階で、登録・利用はまだできません。
+0.36 はアダプター、Envoy、検査器、管理 UI をまとめた Docker Compose プレビューです。イメージはソースからローカルでビルドします。TrapDefense Cloud は計画段階で、登録はできません。
 
 [提供形態と互換性](deployment-fit.md)
 
@@ -27,3 +27,5 @@ Community は、このリポジトリの MIT ライセンスのプロキシラ�
 非公開プロバイダーは Python の `trapdefense.authorizers` / `enterprise` エントリーポイントに接続します。`authorize(request)` は判定を適用し、`evaluate(request)` は状態を変更しない mirror 評価を行います。プロバイダーなしで Enterprise を選ぶと起動に失敗します。Broker のトークン記録は範囲付きの判定証拠であり、汎用 OAuth アクセストークンではありません。
 
 集中管理、分散 HA、ホスティング課金、不変監査ストレージは未提供です。商用範囲には非公開プロバイダー、導入、ポリシー連携、サポートを含められます。価格と支援条件は別途定めます。ローカル SQLite と JSONL は変更可能です。
+
+[Docker 0.36](self-hosting.md)

@@ -443,5 +443,22 @@
   "unhealthy": "异常",
   "unresponsive": "无响应",
   "failed": "失败",
-  "stopped": "已停止"
+  "stopped": "已停止",
+  "Self-hosted Community": "自托管 Community",
+  "Use the administrator password chosen during setup.": "请使用初始设置时选择的管理员密码。",
+  "No default password": "无默认密码",
+  "Configured destination only": "仅连接已配置的目标",
+  "Deployment traffic": "部署流量",
+  "Only routed traffic is inspected. Target-service permissions still apply.": "仅检查经过此路径的流量。目标服务权限仍然适用。",
+  "Saved changes apply to new requests.": "保存的更改适用于新请求。",
+  "Client → TrapDefense → MCP / API": "客户端 → TrapDefense → MCP / API",
+  "Client authentication": "客户端认证",
+  "Destination authentication": "目标服务认证",
+  "Listener reachable": "监听器可访问",
+  "Body limit": "正文大小限制",
+  "The connection key verifies deployment access, not agent or user identity.": "连接密钥验证部署访问权限，而非代理或用户身份。",
+  "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.": "仅支持 JSON HTTP 和无状态 JSON MCP。此配置不支持 OAuth 登录代理、会话或长连接 SSE。",
+  "Configured routes": "已配置的路由",
+  "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.": "修改 deployment.yaml 中的目标和映射后重建服务。策略和密码在此管理。",
+  "Listener checks do not prove destination authentication or successful inspection. Send a test request and inspect its decision record.": "监听器检查不能证明目标认证或检查成功。请发送测试请求并查看决策记录。"
 }

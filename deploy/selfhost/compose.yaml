@@ -1,0 +1,56 @@
+name: trapdefense
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deploy/selfhost/Dockerfile
+    image: trapdefense-community:0.36
+    init: true
+    restart: unless-stopped
+    read_only: true
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    ports:
+      - "${TD_BIND_ADDRESS:-127.0.0.1}:${TD_CONSOLE_PORT:-18080}:18080"
+      - "${TD_BIND_ADDRESS:-127.0.0.1}:${TD_GATEWAY_PORT:-18084}:18084"
+    volumes:
+      - ${TD_CONFIG_FILE:-./deployment.yaml}:/config/deployment.yaml:ro
+      - state:/state
+      - generated:/generated
+    networks: [inspection, edge]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:18080/demo-api/health',timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 60s
+  envoy:
+    image: envoyproxy/envoy@sha256:57e14a549d7bd43c8d3f6d03e8cfa653e037d4b38e133acd9b54f38c524401b4
+    command: [-c, /generated/envoy.yaml, --log-level, warn]
+    user: "101:101"
+    restart: unless-stopped
+    read_only: true
+    tmpfs: ["/tmp:size=16m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    depends_on:
+      app: {condition: service_healthy}
+    volumes: [generated:/generated:ro]
+    networks: [inspection, egress]
+  fixture:
+    image: python:3.12-slim-bookworm
+    profiles: [smoke]
+    command: [python, /fixture/server.py]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    volumes: [./fixture.py:/fixture/server.py:ro]
+    networks: [egress]
+networks:
+  edge: {}
+  inspection: {internal: true}
+  egress: {}
+volumes:
+  state: {}
+  generated: {}

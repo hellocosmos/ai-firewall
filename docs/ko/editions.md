@@ -4,7 +4,7 @@
 
 ## 배포 적합성과 제공 상태
 
-Self-hosted Community는 Docker 프록시 예제를 포함한 소스 기반 Preview입니다. 통합 Docker 설치 패키지는 계획 중입니다. 같은 검사 기반을 사용하는 관리형 TrapDefense Cloud도 계획 중이며 아직 가입·사용할 수 없습니다.
+0.36은 어댑터·Envoy·검사기·운영 UI를 함께 실행하는 Docker Compose Preview입니다. 이미지는 소스에서 로컬 빌드합니다. TrapDefense Cloud는 계획 단계이며 가입할 수 없습니다.
 
 [제공 방식과 호환성](deployment-fit.md)
 
@@ -27,3 +27,5 @@ Community는 이 저장소의 MIT 라이선스 프록시 런타임과 로컬 운
 비공개 제공자는 Python `trapdefense.authorizers` / `enterprise` 진입점으로 연결합니다. `authorize(request)`는 접근을 집행하고, `evaluate(request)`는 상태를 변경하지 않는 mirror 평가를 수행합니다. 제공자 없이 Enterprise를 선택하면 시작이 실패합니다. Broker 토큰 기록은 범위가 정해진 판단 증거이며 범용 OAuth 접근 토큰이 아닙니다.
 
 중앙 장비 관리, 분산 HA, 호스팅 과금, 변경 불가능한 감사 저장소는 출시 기능이 아닙니다. 상용 범위에는 비공개 제공자, 구축, 정책 연동과 지원이 포함될 수 있으며 가격·지원 조건은 별도입니다. 로컬 SQLite와 JSONL은 수정 가능한 저장소입니다.
+
+[Docker 0.36](self-hosting.md)

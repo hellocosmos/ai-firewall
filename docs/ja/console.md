@@ -1,5 +1,7 @@
 # コンソールのインストールと運用
 
+> Docker 0.36: [Self-hosting / integration guide](self-hosting.md). This page describes the separate source-based synthetic demo.
+
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
 Community は単一テナントの Microsoft Entra ID コンソール SSO と管理者・閲覧者ロールを提供します。コンソール認証はエージェントの実行認可ではなく、委任と承認は Enterprise の機能です。 [Entra SSO](identity.md).

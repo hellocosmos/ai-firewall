@@ -1,0 +1,148 @@
+# Docker self-hosting (0.36 Community Preview)
+
+[English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
+
+## Start here: does your client fit?
+
+This package supports **one fixed destination origin per installation** and an explicit list of HTTP routes/MCP actions. The client must let you change its API/MCP URL **and** add `X-TD-Client-Key`. Existing service credentials remain separate. Use a server-side client or a separately configured same-origin application; this package does not enable permissive browser CORS. If either setting is unavailable, this package is not a drop-in integration for that client.
+
+```text
+Client -- connection key + service credentials --> bundled adapter
+       --> private Envoy --> inspector --> configured MCP / HTTP API
+       <-- inspected, bounded response <--
+Operator --> console login --> policies and sanitized decision records
+```
+
+The bundled adapter verifies the connection key, removes submitted forwarding identities, binds the actual request to a private signature and forwards only through Envoy. Clients never receive the signing key. `source_verified` means this trusted forwarding path was verified; it does **not** prove the user's or agent's identity.
+
+## What works, and what does not
+
+| Connection | Package contract | Customer changes |
+|---|---|---|
+| JSON HTTP API | Exact method/path mapping; bounded request/response; fixed origin | Change base URL; set connection key; define route/action/resource and redaction fields |
+| Remote MCP | Stateless JSON POST; explicitly mapped control methods and tools | Change MCP URL; add connection key; server must return JSON and not require sessions |
+| Existing Bearer token / API Key | Pass through Bearer and known API key headers (`X-API-Key`, `API-Key`, `X-Goog-Api-Key`) to the same destination; service validates credentials | Keep `Authorization: Bearer …` / API key header; acquire and refresh tokens outside TrapDefense |
+| Fixed service account bearer | `static_bearer` injects a token from a private file; inbound Authorization is rejected | Mount a secret file; rotate it and recreate the app; every holder of the connection key shares this service identity |
+| Console login | Locally initialized `admin`; password changes revoke sessions | Set a unique password during initialization |
+| Entra console SSO | Existing source-console capability; **not wired into this Docker profile** | See [identity guide](identity.md); never interpret console SSO as agent authorization |
+| OAuth discovery/login/token exchange, Basic auth | **Not supported by this profile**; target 401 stays 401, authentication challenges are not relayed | Use externally acquired service tokens or a separately validated integration |
+| SSE, stateful MCP, cookies, WebSocket, uploads/binary content | **Not supported by this profile** | Use another explicitly validated profile; do not assume HTTP implies compatibility |
+| stdio, shell, local files, direct DB or closed SaaS-internal calls | Outside this proxy's visibility | Not covered |
+
+A previously acquired OAuth access token can be forwarded as a Bearer token. That is **token passthrough**, not an OAuth-capable MCP authorization server. TrapDefense neither grants new service permissions nor translates arbitrary credentials. Target services must enforce their own authorization. Community's shared connection key is not an agent registry or per-agent IAM.
+
+## Fresh installation
+
+Prerequisites: Git and Docker Engine/Desktop with Compose v2. Python and Node run inside the build. This builds a local image; no hosted image registry or managed Cloud availability is implied. Allocate enough memory for dependency installation and inspection; measure your workload before sizing production.
+
+```bash
+git clone https://github.com/hellocosmos/ai-firewall.git
+cd ai-firewall/deploy/selfhost
+docker compose build app
+docker compose run --rm app init
+# Choose and confirm a unique 12+ character administrator password.
+docker compose --profile smoke up -d
+```
+
+The checked-in configuration targets the **synthetic fixture** enabled by `--profile smoke`. Do not mistake this for a real SaaS integration. Open `http://localhost:18080`, sign in as `admin` with your chosen password, and open Connections / System. No `admin / 1234` account is created in this mode. The source demo remains separate.
+
+Read the deployment connection key deliberately and store it as a secret:
+
+```bash
+docker compose run --rm app client-key
+```
+
+Do not put the key in URLs, issue reports or logs. Set it in your client's secret/header configuration. The separate administrator password does not authenticate agent traffic.
+
+## First request and negative checks
+
+For the synthetic fixture only, the destination credential is `Bearer synthetic-target-token`. Avoid entering real tokens into shell history. For this local test, read the connection key without echoing it:
+
+```bash
+read -r -s TD_CLIENT_KEY
+export TD_CLIENT_KEY
+curl -sS http://localhost:18084/api/notes \
+  -H "X-TD-Client-Key: $TD_CLIENT_KEY" \
+  -H 'Authorization: Bearer synthetic-target-token' \
+  -H 'Content-Type: application/json' \
+  --data '{"message":"Summarize the notes"}'
+```
+
+Expected: HTTP 200 and a new decision record in the console. Replace the message with `Contact alex@example.com`: permitted fields should be redacted. Omit the connection key: HTTP 401 before forwarding. Use the connection key but a wrong service token: destination HTTP 401. These are two different authentication failures.
+
+MCP action example:
+
+```bash
+curl -sS http://localhost:18084/mcp \
+  -H "X-TD-Client-Key: $TD_CLIENT_KEY" \
+  -H 'Authorization: Bearer synthetic-target-token' \
+  -H 'Content-Type: application/json' \
+  --data '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"notes.delete","arguments":{}}}'
+```
+
+Expected: blocked by the configured action policy. The optional fixture is a small synthetic protocol target, not proof of a particular MCP vendor. The [real MCP SDK pilot](mcp-pilot.md) remains a separate verification path.
+
+## Connect your own destination
+
+1. Stop the smoke stack with `docker compose --profile smoke down` (without `-v`).
+2. Edit `deployment.yaml`: replace `upstream`, each route's `authority`, exact paths, methods, tool/action/resource mappings and allowed redaction fields. Use a DNS HTTPS origin, for example `https://api.example.com`; no URL credentials, base path, query or fragment. Certificate-chain and hostname checks are enabled. For a private CA, mount the appropriate CA bundle into Envoy at `/etc/ssl/certs/ca-certificates.crt`; never disable verification.
+3. Plain HTTP requires `allow_plaintext_upstream: true`; use it only on an explicitly trusted segment. One installation cannot dynamically select destinations based on client URLs. Deploy separate instances for different origins.
+4. Select `passthrough` or configure `static_bearer` plus `bearer_file`. For static bearer, mount your file read-only into the app, readable by UID 10001 and mode 0600. Do not commit secret files. Restart the app after rotation. A supplied `Authorization` header in static mode is rejected to prevent ambiguous identity.
+5. If route/tool keys changed after initialization, explicitly migrate saved policies using the procedure below. Existing saved policies are never silently replaced by new YAML defaults.
+6. Run `docker compose run --rm app render` and `docker compose up -d --force-recreate` (without the smoke profile). Change the client's URL to your gateway and add its connection key. Send an allowed and blocked request; examine destination-side effects and console evidence.
+
+Example static-token override (create a private local Compose file):
+
+```yaml
+services:
+  app:
+    volumes:
+      - ./destination.secret:/run/secrets/destination:ro
+```
+
+Corresponding configuration:
+
+```yaml
+destination_auth: static_bearer
+bearer_file: /run/secrets/destination
+```
+
+## Integration acceptance checklist
+
+Before declaring a client/service integration supported, verify: configurable endpoint and headers; successful service authentication; mapped MCP initialization/discovery (if used); an allowed operation; a denied operation with no destination side effect; request/response PII behavior; target 401; and inspector-path failure with no bypass. Check the client does not silently fall back to a direct URL. A healthy container is not an acceptance test.
+
+## Policies, networking and limits
+
+The UI edits action/PII policies and passwords. Destinations, transport/auth modes, body limits and mappings are startup configuration in `deployment.yaml`. New requests use the applied policy; in-flight requests retain their original snapshot. Keys such as `1:notes.read` identify a route index and tool; do not reorder routes casually.
+
+Default listeners are host loopback only: console 18080, gateway 18084. Envoy 18082 and gRPC 18081 have **no host-published ports**. The inspection network is internal; the app also has an edge network for published listeners, while Envoy uses a separate egress network. The app has outbound connectivity but its forwarding implementation only sends to Envoy. No Docker socket or host network privileges are mounted. The local volumes contain credentials, policies and audit state; protect host access and backups.
+
+For remote use, front both public listeners with a trusted TLS reverse proxy, set the exact `console_origin`, and expose only the intended TLS endpoint. `TD_BIND_ADDRESS`, `TD_CONSOLE_PORT`, `TD_GATEWAY_PORT` change published listeners; they do not enable TLS. An HTTP management origin does not get secure cookies. Do not expose plaintext service credentials to an untrusted network. Prevent clients from bypassing the gateway using network controls appropriate to your environment.
+
+This profile buffers bodies up to 1 MiB, uses a five-second Envoy request/route budget and bounded inspection workers. It rejects unsupported streaming/session behavior; it is not for large uploads or indefinite streams. Mirror does not modify content or enforce action/PII verdicts, but adapter authentication, route admission and transport failure boundaries still apply. Test inline failure behavior before production use.
+
+## Operations and data lifecycle
+
+```bash
+docker compose ps
+docker compose logs --tail=100 app envoy
+docker compose restart
+# Stop without deleting state:
+docker compose down
+```
+
+A healthy app or reachable listener is not proof that target authentication or inspection works. Always use a known request and inspect its decision. No customer request payloads or credentials are intentionally written to console evidence. SQLite and replay state survive container replacement. Local audit records are mutable; this is not a central immutable audit service. Monitor disk usage; this preview has no automated retention scheduler.
+
+Backup: stop the stack, snapshot **both named volumes** (`<project>_state`, `<project>_generated`) and keep the exact source revision and configuration/secret mounts securely. Restore to an isolated instance and test sign-in plus one allow/block request. Do not copy a running SQLite file as your only backup. `docker compose down -v` destroys passwords, keys, policies and audit records.
+
+Upgrade: back up first, record the previous image ID/source revision, build the selected version, render configuration and recreate the stack. Review any policy migration before startup. Rollback restores the previous source/image **and its matching stopped-state backup**; restoring only an older image is not a database compatibility guarantee.
+
+Mapping migration: this preview deliberately refuses startup when saved policy keys no longer match route/tool mappings. Stop the stack and back up first. Use the `policy-reset` command to explicitly discard only saved policy settings and let the new YAML seed them on startup; accounts, keys and events remain. Existing rule changes will be lost, so export/review your old policy first.
+
+```bash
+docker compose run --rm app policy-reset
+docker compose run --rm app render
+docker compose up -d --force-recreate
+```
+
+Scale/HA, automatic credential rotation, per-agent identities, Cloud operations and universal MCP compatibility are outside this package. Validate these separately before making deployment commitments.

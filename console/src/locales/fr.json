@@ -443,5 +443,22 @@
   "unhealthy": "Défaillant",
   "unresponsive": "Sans réponse",
   "failed": "Échec",
-  "stopped": "Arrêté"
+  "stopped": "Arrêté",
+  "Self-hosted Community": "Community auto-hébergé",
+  "Use the administrator password chosen during setup.": "Utilisez le mot de passe administrateur choisi lors de la configuration.",
+  "No default password": "Aucun mot de passe par défaut",
+  "Configured destination only": "Destination configurée uniquement",
+  "Deployment traffic": "Trafic du déploiement",
+  "Only routed traffic is inspected. Target-service permissions still apply.": "Seul le trafic acheminé est inspecté. Les permissions du service cible restent applicables.",
+  "Saved changes apply to new requests.": "Les modifications enregistrées s’appliquent aux nouvelles requêtes.",
+  "Client → TrapDefense → MCP / API": "Client → TrapDefense → MCP / API",
+  "Client authentication": "Authentification du client",
+  "Destination authentication": "Authentification de la destination",
+  "Listener reachable": "Port d’écoute accessible",
+  "Body limit": "Limite du corps",
+  "The connection key verifies deployment access, not agent or user identity.": "La clé vérifie l’accès au déploiement, pas l’identité de l’agent ou de l’utilisateur.",
+  "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.": "JSON HTTP et MCP JSON sans état uniquement. Ce profil ne prend pas en charge la connexion OAuth intermédiaire, les sessions ou le SSE longue durée.",
+  "Configured routes": "Routes configurées",
+  "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.": "Modifiez deployment.yaml pour les destinations et correspondances, puis recréez le déploiement. Gérez les politiques et mots de passe ici.",
+  "Listener checks do not prove destination authentication or successful inspection. Send a test request and inspect its decision record.": "Le contrôle du port ne prouve ni l’authentification ni l’inspection. Envoyez une requête de test et consultez sa décision."
 }

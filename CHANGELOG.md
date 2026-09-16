@@ -6,6 +6,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Com
 
 ## [Unreleased]
 
+## [0.36] - 2026-09-17
+
+### Docker self-hosting preview
+
+- Source-built Compose package: authenticated signing adapter, private Envoy/inspector and persistent operations console. No host Docker socket.
+- Explicit fixed-destination JSON HTTP/stateless JSON MCP contract; separate deployment key and destination Bearer/API Key credentials, optional static bearer file.
+- Initial administrator password, persistent keys/policies/events, explicit mapping reset, HTTPS upstream validation and fail-closed forwarding.
+- Deployment-aware UI and six-language installation/integration guides. Existing synthetic demo remains available separately.
+- No claim of Cloud availability, universal OAuth/MCP compatibility, customer IAM validation, long-lived SSE support or HA.
+
 ## [0.35] - 2026-09-17
 
 ### Added

@@ -73,14 +73,16 @@ class StreamInspection:
     if not self.completed and verdict.action in ('allow','redact'):
       verdict=Verdict('unknown','inspection_stream_failed',self.policy['mode'],coverage='incomplete')
     case_id=self.identity.get('scenario')
-    case=CASES.get(case_id,{})
+    case=CASES.get(case_id,{}) if not getattr(self.runtime,'deployment',None) else {}
+    mapped=next((r for r in self.config.routes if self.message and r.authority==self.message.authority and r.path==self.message.path.split('?')[0] and r.method==self.message.method),None)
     tool=self.verdict.tool if self.verdict and self.verdict.tool else case.get('tool','unmapped')
+    mapped_rule=(mapped.tools.get(tool) if mapped.protocol=='mcp' else mapped.rule) if mapped else None
     base=self.verdict or verdict
     event={'ts':now(),'scenario':case_id or 'network','label':case.get('label','Proxy network request'),
-      'agent':self.identity.get('agent_id','unverified'),'tool':tool,'resource':TOOLS.get(tool,('','unmapped'))[1],
+      'agent':self.identity.get('agent_id','unverified'),'tool':tool,'resource':mapped_rule.resource if mapped_rule and mapped_rule.resource else TOOLS.get(tool,('','unmapped'))[1],
       'action':verdict.action,'reason':verdict.reason,'mode':self.policy['mode'],
       'latency_ms':round((time.perf_counter()-self.started)*1000,2),'policy_version':self.policy['version'],
-      'source':'demo-decryptor' if base.source_verified else 'unverified','synthetic':case_id in CASES,
+      'source':self.identity.get('source_id','unverified') if base.source_verified else 'unverified','synthetic':case_id in CASES,
       'enforcement_applied':self.completed and self.policy['mode']=='inline',
       'authorization_scope':base.authorization_scope,'approval_id':base.approval_id,
       'pii_policy_action':base.pii_policy_action,'pii_policy_scope':base.pii_policy_scope,
@@ -88,13 +90,13 @@ class StreamInspection:
       'request_digest':base.request_digest,'source_verified':base.source_verified,'identity_verified':False,
       'entities':sorted(set(base.entities+verdict.entities)),'coverage':verdict.coverage,
       'request':{'method':self.message.method if self.message and self.message.method in ('POST','GET','PUT','DELETE','PATCH','HEAD','OPTIONS') else 'unknown',
-        'authority':'tools.demo.test' if self.message and self.message.authority=='tools.demo.test' else '[UNMAPPED]',
-        'path':'/mcp' if self.message and self.message.path=='/mcp' else '[UNMAPPED]','tool':tool,'arguments':'[CONTENT OMITTED]'},
+        'authority':mapped.authority if mapped else '[UNMAPPED]',
+        'path':mapped.path if mapped else '[UNMAPPED]','tool':tool,'arguments':'[CONTENT OMITTED]'},
       'transport':{'kind':'envoy_http','run_id':self.run_id,'upstream_received':self.upstream_received,
         'stream_completed':self.completed,'http_status':None},
       'steps':[{'stage':'Envoy → gRPC','status':'actual network stream'},
         {'stage':'Inspection','status':base.reason},
-        {'stage':'Synthetic destination','status':'received' if self.upstream_received else 'not forwarded' if self.upstream_received is False else 'not confirmed'}]}
+        {'stage':'Destination' if getattr(self.runtime,'deployment',None) else 'Synthetic destination','status':'received' if self.upstream_received else 'not forwarded' if self.upstream_received is False else 'not confirmed'}]}
     self.runtime.store.add_event(event)
 
 

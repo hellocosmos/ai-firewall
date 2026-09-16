@@ -18,11 +18,16 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다. [Entra SSO](docs/ko/identity.md).
 
+## Docker 셀프호스팅 · 0.36
+
+[Docker 셀프호스팅: integration contract, installation and verification](docs/ko/self-hosting.md)
+
+
 ## 배포 적합성과 제공 상태
 
 지원하는 검사 경로로 전달할 수 있는 HTTP API·원격 MCP 호출을 보호합니다. MCP와 커넥터의 기존 서비스 인증을 활용하며 IAM을 대체하지 않습니다.
 
-Self-hosted Community는 Docker 프록시 예제를 포함한 소스 기반 Preview입니다. 통합 Docker 설치 패키지는 계획 중입니다. 같은 검사 기반을 사용하는 관리형 TrapDefense Cloud도 계획 중이며 아직 가입·사용할 수 없습니다.
+0.36은 어댑터·Envoy·검사기·운영 UI를 함께 실행하는 Docker Compose Preview입니다. 이미지는 소스에서 로컬 빌드합니다. TrapDefense Cloud는 계획 단계이며 가입할 수 없습니다.
 
 [제공 방식과 호환성](docs/ko/deployment-fit.md)
 

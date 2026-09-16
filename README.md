@@ -23,11 +23,25 @@ Logical product flow. See [deployment architecture](docs/en/architecture.md) for
 
 Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](docs/en/identity.md).
 
+## Docker self-hosting · 0.36
+
+[Docker self-hosting: integration contract, installation and verification](docs/en/self-hosting.md)
+
+```bash
+cd deploy/selfhost
+docker compose build app
+docker compose run --rm app init
+docker compose --profile smoke up -d
+```
+
+After cloning this repository, run the commands above. Open `http://localhost:18080` with `admin` and your chosen password. This starts the synthetic fixture; follow the guide to connect a real service. Clients need a configurable URL and a separate connection-key header. This profile supports bounded JSON HTTP and stateless JSON MCP; it does not broker OAuth or support long-lived SSE.
+
+
 ## Deployment fit and availability
 
 Protect the HTTP API and remote MCP calls you can route through a supported inspection path. Keep existing service authentication in your MCP servers and connectors; do not replace your IAM.
 
-Self-hosted Community is available as a source-based preview with Docker-backed proxy examples. A unified Docker installation package is planned. TrapDefense Cloud is planned, not available for sign-up: the intended managed offering uses the same inspection foundation.
+Self-hosted Community 0.36 includes a source-built Docker Compose package for the adapter, Envoy, inspector and console. TrapDefense Cloud remains planned and is not available for sign-up.
 
 [Delivery and compatibility](docs/en/deployment-fit.md)
 
@@ -38,7 +52,7 @@ TrapDefense governs the point where model output becomes a real action. It combi
 | Boundary | What TrapDefense makes explicit |
 |---|---|
 | **Independent enforcement point** | Supported HTTP and MCP calls traverse Envoy and the inspector before reaching a configured destination. Applications do not need to embed the earlier SDK. Deployment routing must prevent bypass. |
-| **Bidirectional data control** | Complete, bounded requests and responses—including supported SSE—can be allowed, blocked or redacted using action, PII and secret policies. |
+| **Bidirectional data control** | Complete, bounded requests and responses (the Docker profile uses JSON; bounded SSE is a separate engine capability)can be allowed, blocked or redacted using action, PII and secret policies. |
 | **Explicit identity boundary** | Community Entra ID SSO authenticates the console operator. The separate Enterprise pilot evaluates authority across user, agent, delegation, task, resource and action. |
 | **Honest failure semantics** | Inline inspection fails closed. Mirror records hypothetical `would_*` outcomes and never changes the original traffic or approval state. |
 | **Operational evidence** | The local console exposes decisions, policy coverage, destination receipts and sanitized evidence without copying protected content into audit records. |
@@ -58,7 +72,7 @@ TrapDefense governs the point where model output becomes a real action. It combi
 
 Screens show the local synthetic demo. They are not evidence of a production Entra tenant or customer traffic deployment.
 
-## 5-minute local evaluation
+## Developer demo (source installation)
 
 Requires Python 3.11+, Node.js 22.12+ (or 24), npm and local Docker Engine/Desktop. Source installation; no PyPI release is implied.
 

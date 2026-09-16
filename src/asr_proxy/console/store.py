@@ -20,10 +20,11 @@ def password_hash(password, salt):
 
 
 class Store:
-  def __init__(self, directory):
+  def __init__(self, directory, *, bootstrap_password="1234", require_existing=False):
     self.directory=Path(directory)
     self.directory.mkdir(parents=True,exist_ok=True,mode=0o700)
     self.path=self.directory/'console.sqlite'
+    if require_existing and not self.path.is_file():raise ValueError('Run selfhost init before starting the service')
     with self.connect() as db:
       db.executescript('''
         CREATE TABLE IF NOT EXISTS account(username TEXT PRIMARY KEY,salt TEXT,password_hash TEXT,changed INTEGER);
@@ -36,8 +37,9 @@ class Store:
       columns={row[1] for row in db.execute('PRAGMA table_info(sessions)')}
       if 'principal' not in columns:db.execute("ALTER TABLE sessions ADD COLUMN principal TEXT")
       if not db.execute('SELECT 1 FROM account').fetchone():
+        if require_existing:raise ValueError('Administrator has not been initialized')
         salt=secrets.token_hex(16)
-        db.execute('INSERT INTO account VALUES(?,?,?,0)',('admin',salt,password_hash('1234',salt)))
+        db.execute('INSERT INTO account VALUES(?,?,?,?)',('admin',salt,password_hash(bootstrap_password,salt),int(bootstrap_password!='1234')))
     os.chmod(self.path,0o600)
 
   @contextmanager

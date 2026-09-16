@@ -128,7 +128,7 @@ export function EventDetail({
           [t("Request masking at destination")]: event.transport.receipt?.request_redacted ? t("Redacted receipt confirmed") : t("Not applicable"),
           [t("Response masking")]: event.transport.response_redacted ? t("Redacted response confirmed") : t("Not applicable")
         } : {})
-      }).map(([key, value]) => <React.Fragment key={key}><dt>{key}</dt><dd>{value}</dd></React.Fragment>)}</dl><h3 className="td-section-title">{t("Decision path")}</h3><div className="td-timeline">{event.steps.map((step, index) => <div key={t(step.stage)}><span>{index + 1}</span><section><strong>{t(step.stage)}</strong><p>{t(step.status)}</p></section></div>)}</div><h3 className="td-section-title">{t("Sanitized request metadata")}</h3><pre>{JSON.stringify(event.request, null, 2)}</pre>{event.entities.length > 0 && <p className="td-note">{t("Detected types:")}{event.entities.join(', ')}</p>}<p className="td-note">{t("Original bodies and authentication keys are not stored.")}{" "}{event.transport ? t("The synthetic request traversed real Envoy. The destination is a test HTTP server; no external business tool ran.") : t("The engine evaluated synthetic input; no external tool ran.")}</p>{event.request_digest && <><h3 className="td-section-title">{t("Request digest")}</h3><code className="td-digest">{event.request_digest}</code></>}</Drawer>;
+      }).map(([key, value]) => <React.Fragment key={key}><dt>{key}</dt><dd>{value}</dd></React.Fragment>)}</dl><h3 className="td-section-title">{t("Decision path")}</h3><div className="td-timeline">{event.steps.map((step, index) => <div key={t(step.stage)}><span>{index + 1}</span><section><strong>{t(step.stage)}</strong><p>{t(step.status)}</p></section></div>)}</div><h3 className="td-section-title">{t("Sanitized request metadata")}</h3><pre>{JSON.stringify(event.request, null, 2)}</pre>{event.entities.length > 0 && <p className="td-note">{t("Detected types:")}{event.entities.join(', ')}</p>}<p className="td-note">{t("Original bodies and authentication keys are not stored.")}{" "}{event.synthetic===false ? t("Only routed traffic is inspected. Target-service permissions still apply.") : event.transport ? t("The synthetic request traversed real Envoy. The destination is a test HTTP server; no external business tool ran.") : t("The engine evaluated synthetic input; no external tool ran.")}</p>{event.request_digest && <><h3 className="td-section-title">{t("Request digest")}</h3><code className="td-digest">{event.request_digest}</code></>}</Drawer>;
 }
 export function EventTable({
   events,
@@ -139,6 +139,7 @@ export function EventTable({
   return !rows.length ? <Empty /> : <div className="td-table-wrap"><table><thead><tr><th>{t("Time")}</th><th>{t("Decision")}</th><th>{t("Agent / tool")}</th><th>{t("Detection / policy reason")}</th><th>{t("Latency")}</th><th></th></tr></thead><tbody>{rows.map(event => <tr key={event.id}><td className="td-nowrap">{date(event.ts)}</td><td><Badge value={event.action} />{event.mode === 'mirror' && <small className="td-muted td-block">{t("Observe")}</small>}</td><td><strong>{event.agent}</strong><small className="td-mono td-block">{event.tool}</small></td><td><span>{t(event.label)}</span><small className="td-muted td-block">{event.reason}</small></td><td className="td-mono td-nowrap">{event.latency_ms} ms</td><td><button className="td-icon" aria-label={t("Event {0} details", [event.id])} onClick={() => onSelect(event)}><ArrowUpRight size={16} /></button></td></tr>)}</tbody></table></div>;
 }
 export function TrafficChart({
+  synthetic = true,
   events
 }) {
   const now = Date.now();
@@ -155,7 +156,7 @@ export function TrafficChart({
     if (index >= 0 && index < 12) buckets[index][e.action === 'allow' ? 'allow' : 'risk']++;
   });
   const max = Math.max(1, ...buckets.map(b => b.allow + b.risk));
-  return <div className="td-chart" role="img" aria-label={t("Synthetic decisions over the last 24 hours")}><div className="td-chart-legend"><span><i className="blue" />{t("Allow")}</span><span><i className="orange" />{t("Block \xB7 redact \xB7 review")}</span><small>{t("Stored synthetic events \xB7 2-hour buckets")}</small></div><div className="td-bars">{buckets.map((b, i) => <div className="td-bar-cell" key={i}><div className="td-bar-stack" title={t("{0}: {1} records", [b.label, b.allow + b.risk])}><span className="risk" style={{
+  return <div className="td-chart" role="img" aria-label={synthetic ? t("Synthetic decisions over the last 24 hours") : t("Deployment traffic")}><div className="td-chart-legend"><span><i className="blue" />{t("Allow")}</span><span><i className="orange" />{t("Block \xB7 redact \xB7 review")}</span><small>{synthetic ? t("Stored synthetic events \xB7 2-hour buckets") : t("Deployment traffic")}</small></div><div className="td-bars">{buckets.map((b, i) => <div className="td-bar-cell" key={i}><div className="td-bar-stack" title={t("{0}: {1} records", [b.label, b.allow + b.risk])}><span className="risk" style={{
             height: `${b.risk / max * 125}px`
           }} /><span className="allow" style={{
             height: `${b.allow / max * 125}px`

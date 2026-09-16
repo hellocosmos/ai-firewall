@@ -18,11 +18,16 @@ Flujo lógico del producto. Consulte la [arquitectura de despliegue](docs/es/arc
 
 Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise. [Entra SSO](docs/es/identity.md).
 
+## Autoalojamiento con Docker · 0.36
+
+[Autoalojamiento con Docker: integration contract, installation and verification](docs/es/self-hosting.md)
+
+
 ## Compatibilidad y disponibilidad
 
 Proteja llamadas HTTP API y MCP remoto que pueda dirigir por una ruta de inspección compatible. Mantenga la autenticación existente en servidores MCP y conectores; no sustituya su IAM.
 
-Self-hosted Community es una versión preliminar desde el código fuente con ejemplos de proxy en Docker. El paquete Docker integrado está previsto. TrapDefense Cloud también está previsto, con la misma base de inspección; todavía no admite registros ni está disponible.
+0.36 ofrece un paquete preliminar Docker Compose con adaptador, Envoy, inspector y consola. La imagen se compila localmente desde el código fuente. TrapDefense Cloud sigue previsto y no admite registros.
 
 [Entrega y compatibilidad](docs/es/deployment-fit.md)
 

@@ -443,5 +443,22 @@
   "unhealthy": "異常",
   "unresponsive": "応答なし",
   "failed": "失敗",
-  "stopped": "停止中"
+  "stopped": "停止中",
+  "Self-hosted Community": "セルフホスト Community",
+  "Use the administrator password chosen during setup.": "初期設定時に指定した管理者パスワードを使用してください。",
+  "No default password": "既定のパスワードはありません",
+  "Configured destination only": "設定された宛先のみ",
+  "Deployment traffic": "導入環境のトラフィック",
+  "Only routed traffic is inspected. Target-service permissions still apply.": "この経路を通る通信のみ検査します。対象サービスの権限は引き続き適用されます。",
+  "Saved changes apply to new requests.": "保存した変更は新しいリクエストに適用されます。",
+  "Client → TrapDefense → MCP / API": "クライアント → TrapDefense → MCP / API",
+  "Client authentication": "クライアント認証",
+  "Destination authentication": "宛先サービス認証",
+  "Listener reachable": "リスナーに接続可能",
+  "Body limit": "本文サイズの上限",
+  "The connection key verifies deployment access, not agent or user identity.": "接続キーは導入環境へのアクセスを確認し、エージェントやユーザーの本人確認は行いません。",
+  "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.": "JSON HTTP とステートレス JSON MCP のみ対応します。この構成では OAuth ログイン仲介、セッション、長時間 SSE は未対応です。",
+  "Configured routes": "設定されたルート",
+  "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.": "宛先とマッピングは deployment.yaml を編集し、スタックを再作成してください。ポリシーとパスワードはここで管理します。",
+  "Listener checks do not prove destination authentication or successful inspection. Send a test request and inspect its decision record.": "リスナー確認だけでは宛先認証や検査成功は証明できません。テスト要求を送り、判定記録を確認してください。"
 }

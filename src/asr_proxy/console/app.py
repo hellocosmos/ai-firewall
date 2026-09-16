@@ -31,11 +31,13 @@ class Run(BaseModel):
 
 
 
-def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,identity=None,local_login=True):
+def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,identity=None,local_login=True,console_origin=None):
   runtime=runtime_factory(directory,seed=seed)
   app=FastAPI(title='TrapDefense Community Console',docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifespan)
   app.state.runtime=runtime
-  origins=ORIGINS | ({identity.origin} if identity else set())
+  deployment=getattr(runtime,'deployment',None)
+  origins=({console_origin} if console_origin else ORIGINS) | ({identity.origin} if identity else set())
+  secure_cookie=bool((console_origin or (identity.origin if identity else '')).startswith('https:'))
   if identity:
     from .sso import install_sso
     install_sso(app,identity,runtime.store,COOKIE)
@@ -84,10 +86,10 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
     return principal
 
   @app.get('/demo-api/auth/config')
-  def auth_config():return {'enabled':identity is not None,'synthetic':bool(identity and identity.synthetic),'local_login':local_login,'origin':identity.origin if identity else None}
+  def auth_config():return {'enabled':identity is not None,'synthetic':bool(identity and identity.synthetic),'local_login':local_login,'origin':identity.origin if identity else console_origin,**({'deployment':True} if deployment else {})}
 
   @app.get('/demo-api/health')
-  def health():return {'status':'ready','synthetic':True,'integrated':getattr(runtime,'integrated',False)}
+  def health():return {'status':'ready','synthetic':not bool(deployment),'integrated':getattr(runtime,'integrated',False)}
 
   @app.post('/demo-api/login')
   def login(payload:Login,request:Request,response:Response):
@@ -102,8 +104,8 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
         raise HTTPException(401,'Incorrect username or password.')
       runtime.store.logout(request.cookies.get(COOKIE))
       token=runtime.store.create_session()
-      response.set_cookie(COOKIE,token,httponly=True,samesite='strict',secure=bool(identity and identity.origin.startswith('https:')),path='/demo-api',max_age=8*3600)
-      runtime.store.audit('account.login','Local demo session started',actor='local/admin')
+      response.set_cookie(COOKIE,token,httponly=True,samesite='strict',secure=secure_cookie,path='/demo-api',max_age=8*3600)
+      runtime.store.audit('account.login','Local console session started',actor='local/admin')
       return {'username':'admin','role':'admin','authentication':'local','password_changed':runtime.store.changed()}
 
   router=APIRouter(prefix='/demo-api',dependencies=[Depends(authenticated)])
@@ -127,11 +129,11 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
 
   @router.get('/overview')
   def overview():
-    network=runtime.network_status() if getattr(runtime,'integrated',False) else None
+    network=runtime.network_status() if getattr(runtime,'integrated',False) or deployment else None
     return {'events':runtime.store.events(),'broker':{'agents':[],'delegations':[],'approvals':[]},'edition':'community','capabilities':{'broker':False},'policy':runtime.policy(),
-      'scenarios':[{'id':key,'label':value['label']} for key,value in CASES.items()],
-      'system':{'inspector':('ready' if network and network['inspector_ready'] else 'unavailable'),'broker':'not_included','database':'ready','proxy':('ready' if network['proxy_ready'] else 'unavailable') if network else 'not_connected','iam':('synthetic_entra' if identity.synthetic else 'entra') if identity else 'not_configured','tls':'synthetic'},'synthetic':True,'integrated':getattr(runtime,'integrated',False),
-      'network':network}
+      'scenarios':[{'id':key,'label':value['label']} for key,value in CASES.items()] if not deployment else [],
+      'system':{'inspector':('ready' if network and network['inspector_ready'] else 'unavailable'),'broker':'not_included','database':'ready','proxy':('ready' if network['proxy_ready'] else 'unavailable') if network else 'not_connected','iam':('synthetic_entra' if identity.synthetic else 'entra') if identity else 'not_configured','tls':'configured_upstream' if deployment else 'synthetic'},'synthetic':not bool(deployment),'integrated':getattr(runtime,'integrated',False),
+      'network':network,'deployment':deployment.public() if deployment else None}
 
   @router.get('/events')
   def events():return runtime.store.events()
@@ -145,13 +147,14 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
   @router.post('/policy/validate')
   def validate(payload:Policy):
     runtime.config(payload.model_dump())
-    return {'valid':True,'scope':'local-demo'}
+    return {'valid':True,'scope':'selfhost' if deployment else 'local-demo'}
 
   @router.post('/policy')
   def apply(payload:Policy):return runtime.apply(payload.model_dump())
 
   @router.post('/scenarios/{name}')
   def scenario(name:str,payload:Run):
+    if deployment:raise HTTPException(404,'Synthetic scenarios are not enabled in self-hosted mode')
     if name not in CASES:raise HTTPException(404,'Scenario not found')
     return runtime.run(name)
 

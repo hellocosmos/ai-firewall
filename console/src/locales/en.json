@@ -443,5 +443,22 @@
   "unhealthy": "unhealthy",
   "unresponsive": "unresponsive",
   "failed": "failed",
-  "stopped": "stopped"
+  "stopped": "stopped",
+  "Self-hosted Community": "Self-hosted Community",
+  "Use the administrator password chosen during setup.": "Use the administrator password chosen during setup.",
+  "No default password": "No default password",
+  "Configured destination only": "Configured destination only",
+  "Deployment traffic": "Deployment traffic",
+  "Only routed traffic is inspected. Target-service permissions still apply.": "Only routed traffic is inspected. Target-service permissions still apply.",
+  "Saved changes apply to new requests.": "Saved changes apply to new requests.",
+  "Client → TrapDefense → MCP / API": "Client → TrapDefense → MCP / API",
+  "Client authentication": "Client authentication",
+  "Destination authentication": "Destination authentication",
+  "Listener reachable": "Listener reachable",
+  "Body limit": "Body limit",
+  "The connection key verifies deployment access, not agent or user identity.": "The connection key verifies deployment access, not agent or user identity.",
+  "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.": "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.",
+  "Configured routes": "Configured routes",
+  "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.": "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.",
+  "Listener checks do not prove destination authentication or successful inspection. Send a test request and inspect its decision record.": "Listener checks do not prove destination authentication or successful inspection. Send a test request and inspect its decision record."
 }

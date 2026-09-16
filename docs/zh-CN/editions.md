@@ -4,7 +4,7 @@
 
 ## 部署条件与提供状态
 
-Self-hosted Community 目前为源码预览版，包含基于 Docker 的代理示例。统一 Docker 安装包仍在规划中。使用相同检查基础的托管 TrapDefense Cloud 也在规划中，尚未开放注册或使用。
+0.36 提供同时运行适配器、Envoy、检查器和管理界面的 Docker Compose 预览包。镜像从源码本地构建。TrapDefense Cloud 仍在规划中，尚未开放注册。
 
 [交付与兼容性](deployment-fit.md)
 
@@ -27,3 +27,5 @@ Community 是本仓库采用 MIT 许可的代理运行时和本地控制台，�
 私有提供程序通过 Python `trapdefense.authorizers` / `enterprise` 入口连接。`authorize(request)` 执行授权，`evaluate(request)` 提供不修改状态的 mirror 评估。选择 Enterprise 而缺少提供程序时启动失败。Broker 令牌记录是限定范围的决策证据，不是通用 OAuth 访问令牌。
 
 集中设备管理、分布式高可用、托管计费及不可变审计存储尚未交付。商业范围可包含私有提供程序、部署、策略集成和支持，价格及支持条款另行约定。本地 SQLite 和 JSONL 仍可修改。
+
+[Docker 0.36](self-hosting.md)

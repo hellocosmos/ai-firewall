@@ -42,3 +42,14 @@ jobs:
       - run: TD_CONSOLE_E2E=1 pytest tests/test_console.py -q
       - run: TD_RUNTIME_SMOKE=1 pytest tests/runtime/test_inspector_pool_runtime.py tests/runtime/test_console_pool_runtime.py -q
       - run: TD_MCP_PILOT=1 python -m pytest tests/test_mcp_pilot.py tests/runtime/test_mcp_pilot_runtime.py -q
+
+  selfhost-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pytest httpx PyYAML
+      - run: TD_SELFHOST_E2E=1 python -m pytest tests/runtime/test_selfhost_runtime.py -q

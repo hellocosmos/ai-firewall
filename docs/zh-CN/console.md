@@ -1,5 +1,7 @@
 # 控制台安装与操作
 
+> Docker 0.36: [Self-hosting / integration guide](self-hosting.md). This page describes the separate source-based synthetic demo.
+
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
 Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](identity.md).

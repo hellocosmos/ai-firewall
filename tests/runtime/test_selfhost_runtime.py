@@ -1,0 +1,122 @@
+"""Opt-in actual Docker package verification with an isolated synthetic destination."""
+import os
+from pathlib import Path
+import socket
+import subprocess
+import time
+from uuid import uuid4
+import httpx
+import pytest
+import yaml
+
+pytestmark=pytest.mark.skipif(os.environ.get('TD_SELFHOST_E2E')!='1',reason='Set TD_SELFHOST_E2E=1 to build and test Docker self-hosting')
+ROOT=Path(__file__).parents[2]
+
+
+def free_port():
+  with socket.socket() as sock:
+    sock.bind(('127.0.0.1',0));return sock.getsockname()[1]
+
+
+@pytest.mark.parametrize('mode',['passthrough','static_bearer','https_static_bearer'])
+def test_package_lifecycle(tmp_path,mode):
+  port,gateway_port=free_port(),free_port()
+  origin=f'http://localhost:{port}'
+  config=yaml.safe_load((ROOT/'deploy/selfhost/deployment.yaml').read_text())
+  config['console_origin']=origin
+  static=mode!='passthrough'
+  if static:config.update(destination_auth='static_bearer',bearer_file='/state/destination.token')
+  if mode.startswith('https'):
+    config.update(upstream='https://fixture:8080',allow_plaintext_upstream=False)
+  path=tmp_path/'deployment.yaml';path.write_text(yaml.safe_dump(config))
+  env={**os.environ,'TD_CONSOLE_PORT':str(port),'TD_GATEWAY_PORT':str(gateway_port),'TD_CONFIG_FILE':str(path)}
+  project='td-selfhost-test-'+uuid4().hex[:8]
+  base=['docker','compose','-p',project,'-f',str(ROOT/'deploy/selfhost/compose.yaml'),'--profile','smoke']
+  if mode.startswith('https'):
+    for name in ('fixture','untrusted'):
+      result=subprocess.run(['openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1',
+        '-subj','/CN='+name,'-addext','subjectAltName=DNS:'+name,'-keyout',str(tmp_path/(name+'.key')),
+        '-out',str(tmp_path/(name+'.crt'))],capture_output=True)
+      assert result.returncode==0,'Synthetic certificate generation failed'
+    ca=tmp_path/'ca.crt';ca.write_bytes((tmp_path/'fixture.crt').read_bytes())
+    override=tmp_path/'tls.yaml'
+    override.write_text(yaml.safe_dump({'services':{
+      'envoy':{'volumes':[str(ca)+':/etc/ssl/certs/ca-certificates.crt:ro']},
+      'fixture':{'environment':{'TD_FIXTURE_CERT':'/cert/fixture.crt','TD_FIXTURE_KEY':'/cert/fixture.key'},
+        'volumes':[str(tmp_path)+':/cert:ro']}}}))
+    base.extend(['-f',str(override)])
+  def compose(*args):
+    result=subprocess.run([*base,*args],env=env,cwd=ROOT,text=True,capture_output=True,timeout=600)
+    assert result.returncode==0, result.stderr[-3000:]
+    return result.stdout.strip()
+  def wait():
+    until=time.monotonic()+60
+    while time.monotonic()<until:
+      try:
+        if httpx.get(origin+'/demo-api/health',timeout=1).status_code==200:return
+      except httpx.HTTPError:pass
+      time.sleep(.5)
+    pytest.fail('Console did not become healthy')
+  password='synthetic-install-password-036'
+  try:
+    compose('build','app')
+    compose('run','--rm','--no-deps','--entrypoint','python','app','-c',
+      'from pathlib import Path; from asr_proxy.selfhost.main import initialize; from asr_proxy.selfhost.config import load; '
+      f'initialize(Path("/state"),Path("/generated"),load("/config/deployment.yaml"),"{password}"); '
+      'from asr_proxy.inspection.pool import atomic_write; atomic_write(Path("/state/destination.token"),"synthetic-target-token")')
+    compose('up','-d');wait()
+    key=compose('exec','-T','app','cat','/state/client.key')
+    headers={'x-td-client-key':key}
+    if not static:headers['authorization']='Bearer synthetic-target-token'
+    gateway=f'http://127.0.0.1:{gateway_port}'
+    with httpx.Client(base_url=gateway,timeout=15) as c, httpx.Client(base_url=origin,timeout=5,
+        headers={'origin':origin,'x-td-demo':'1'}) as admin:
+      assert c.post('/api/notes',json={'message':'safe'}).status_code==401
+      assert c.post('/api/notes',headers=headers,json={'message':'safe'}).status_code==200
+      redact=c.post('/api/notes',headers=headers,json={'message':'Contact alex@example.com'})
+      assert redact.status_code==200 and '[REDACTED]' in redact.text and 'alex@example.com' not in redact.text
+      denied=c.post('/mcp',headers=headers,json={'jsonrpc':'2.0','id':1,'method':'tools/call',
+        'params':{'name':'notes.delete','arguments':{}}})
+      assert denied.status_code==403
+      assert c.post('/api/notes',headers={**headers,'authorization':'Bearer wrong'},json={}).status_code==(400 if static else 401)
+      assert admin.post('/demo-api/login',json={'username':'admin','password':'1234'}).status_code==401
+      assert admin.post('/demo-api/login',json={'username':'admin','password':password}).status_code==200
+      data=admin.get('/demo-api/overview').json()
+      assert data['synthetic'] is False and data['scenarios']==[]
+      assert data['deployment']['destination_auth']==('static_bearer' if static else 'passthrough')
+      assert len(data['events'])>=(3 if static else 4)
+      text=str(data['events'])
+      assert key not in text and 'synthetic-target-token' not in text and 'alex@example.com' not in text
+      assert admin.post('/demo-api/scenarios/read',json={}).status_code==404
+      assert admin.post('/demo-api/network',json={}).status_code in (404,405)
+      assert admin.post('/demo-api/policy',headers={'origin':'https://untrusted.example'},json=data['policy']).status_code==403
+      policy=data['policy'];policy['rules']['0:notes.read']='block'
+      applied=admin.post('/demo-api/policy',json=policy)
+      assert applied.status_code==200
+      assert c.post('/api/notes',headers=headers,json={'message':'safe'}).status_code==403
+      changed=admin.post('/demo-api/password',json={'current_password':password,'new_password':password+'-changed'})
+      assert changed.status_code==200
+      assert admin.get('/demo-api/session').status_code==401
+      compose('restart','app','envoy');wait()
+      assert compose('exec','-T','app','cat','/state/client.key')==key
+      assert admin.post('/demo-api/login',json={'username':'admin','password':password+'-changed'}).status_code==200
+      current=admin.get('/demo-api/policy').json()
+      assert current['rules']['0:notes.read']=='block' and current['version']==applied.json()['version']
+      # Restore allow then prove there is no direct-upstream fallback when Envoy is absent.
+      current['rules']['0:notes.read']='allow'
+      assert admin.post('/demo-api/policy',json=current).status_code==200
+      compose('stop','envoy')
+      assert c.post('/api/notes',headers=headers,json={'message':'safe'}).status_code==503
+      compose('start','envoy')
+      until=time.monotonic()+15
+      while time.monotonic()<until:
+        if c.post('/api/notes',headers=headers,json={'message':'safe'}).status_code==200:break
+        time.sleep(.5)
+      else:pytest.fail('Inspection path did not recover')
+      if mode.startswith('https'):
+        ca.write_bytes((tmp_path/'untrusted.crt').read_bytes())
+        compose('restart','envoy')
+        assert c.post('/api/notes',headers=headers,json={'message':'safe'}).status_code==503
+  finally:
+    # The random project and all its volumes were created exclusively by this test.
+    compose('down','-v','--remove-orphans')

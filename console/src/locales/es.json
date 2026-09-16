@@ -443,5 +443,22 @@
   "unhealthy": "Con fallo",
   "unresponsive": "Sin respuesta",
   "failed": "Fallido",
-  "stopped": "Detenido"
+  "stopped": "Detenido",
+  "Self-hosted Community": "Community autoalojado",
+  "Use the administrator password chosen during setup.": "Utilice la contraseña de administrador elegida durante la configuración.",
+  "No default password": "Sin contraseña predeterminada",
+  "Configured destination only": "Solo el destino configurado",
+  "Deployment traffic": "Tráfico del despliegue",
+  "Only routed traffic is inspected. Target-service permissions still apply.": "Solo se inspecciona el tráfico enrutado. Los permisos del servicio de destino siguen vigentes.",
+  "Saved changes apply to new requests.": "Los cambios guardados se aplican a nuevas solicitudes.",
+  "Client → TrapDefense → MCP / API": "Cliente → TrapDefense → MCP / API",
+  "Client authentication": "Autenticación del cliente",
+  "Destination authentication": "Autenticación del destino",
+  "Listener reachable": "Listener accesible",
+  "Body limit": "Límite del cuerpo",
+  "The connection key verifies deployment access, not agent or user identity.": "La clave verifica el acceso al despliegue, no la identidad del agente o usuario.",
+  "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.": "Solo JSON HTTP y MCP JSON sin estado. Este perfil no admite intermediación de inicio de sesión OAuth, sesiones ni SSE de larga duración.",
+  "Configured routes": "Rutas configuradas",
+  "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.": "Edite deployment.yaml para los destinos y mapeos y recree el despliegue. Gestione aquí las políticas y contraseñas.",
+  "Listener checks do not prove destination authentication or successful inspection. Send a test request and inspect its decision record.": "La comprobación del listener no demuestra autenticación ni inspección correcta. Envíe una solicitud de prueba y revise su registro."
 }

@@ -1,5 +1,7 @@
 # Console installation and operation
 
+> Docker 0.36: [Self-hosting / integration guide](self-hosting.md). This page describes the separate source-based synthetic demo.
+
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
 Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](identity.md).
