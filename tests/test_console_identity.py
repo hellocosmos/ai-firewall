@@ -82,7 +82,7 @@ def test_callback_rejects_other_browser(tmp_path):
 def test_real_config_disables_synthetic_routes_and_local_optout(tmp_path,identity):
   with TestClient(create_app(tmp_path,seed=False,identity=identity,local_login=False)) as c:
     c.headers.update(HEADERS)
-    assert c.get('/demo-api/auth/config').json()=={'enabled':True,'synthetic':False,'local_login':False}
+    assert c.get('/demo-api/auth/config').json()=={'enabled':True,'synthetic':False,'local_login':False,'origin':'http://localhost:5176'}
     assert c.post('/demo-api/login',json={'username':'admin','password':'1234'}).status_code==403
     assert c.get('/demo-api/auth/synthetic/authorize').status_code==404
     assert c.post('/demo-api/auth/start',json={},headers={'origin':'https://evil.test'}).status_code==403
@@ -112,3 +112,8 @@ def test_existing_synthetic_session_rejected_by_real_mode(tmp_path,identity):
 @pytest.mark.parametrize('redirect',['http://evil.test/demo-api/auth/callback','https://console.test/other','https://console.test/demo-api/auth/callback?next=evil'])
 def test_config_rejects_unsafe_callback(redirect):
   with pytest.raises(IdentityError):Identity({'tenant_id':TENANT,'client_id':CLIENT,'client_secret':'secret','redirect_uri':redirect})
+
+
+def test_start_requires_callback_origin(tmp_path):
+  with TestClient(create_app(tmp_path,seed=False,identity=synthetic())) as c:
+    assert c.post('/demo-api/auth/start',json={},headers={'origin':'http://localhost:5176','x-td-demo':'1'}).status_code==400

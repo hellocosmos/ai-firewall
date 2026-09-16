@@ -21,7 +21,8 @@ def install_sso(app,identity,store,session_cookie):
     private_key=rsa.generate_private_key(public_exponent=65537,key_size=2048)
 
   @app.post('/demo-api/auth/start')
-  def start(response: Response):
+  def start(response: Response,request:Request):
+    if request.headers.get('origin')!=identity.origin:raise HTTPException(400,'Open the configured console origin before signing in.')
     state,verifier,nonce,url=identity.start();binding=secrets.token_urlsafe(32)
     with lock:
       now=time.time()

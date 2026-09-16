@@ -79,7 +79,7 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
     return principal
 
   @app.get('/demo-api/auth/config')
-  def auth_config():return {'enabled':identity is not None,'synthetic':bool(identity and identity.synthetic),'local_login':local_login}
+  def auth_config():return {'enabled':identity is not None,'synthetic':bool(identity and identity.synthetic),'local_login':local_login,'origin':identity.origin if identity else None}
 
   @app.get('/demo-api/health')
   def health():return {'status':'ready','synthetic':True,'integrated':getattr(runtime,'integrated',False)}
