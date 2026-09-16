@@ -6,6 +6,19 @@ Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles
 
 Notifique vulnerabilidades en privado a **hellocosmos@gmail.com** , indicando revisión, reproducción sintética e impacto. No incluya datos de clientes, tokens ni credenciales reales en incidencias públicas. No se promete un SLA de respuesta fijo.
 
+## Cobertura PII
+
+La inspección sin conexión evalúa los seis perfiles de idioma para cada carga compatible:
+
+- Inglés: correo electrónico, teléfono, tarjeta de crédito, IBAN y SSN estadounidense.
+- Coreano: registros de residente y extranjero, permiso de conducir, pasaporte y registro empresarial.
+- Chino simplificado: teléfono y número de identidad de residente GB 11643.
+- Japonés: teléfono y número individual de 12 dígitos (My Number).
+- Español: teléfono, NIF, NIE y pasaporte.
+- Francés: teléfono y número de seguridad social NIR, incluidos códigos de Córcega.
+
+Los identificadores nacionales validan formato y suma de comprobación cuando la norma la define. Es inspección determinista de patrones, no NER general: nombres, ubicaciones, direcciones postales, imágenes, OCR y archivos arbitrarios quedan fuera de esta versión.
+
 El perímetro cubre tráfico HTTP/MCP compatible, enrutado explícitamente desde un salto firmado de confianza. Los ejemplos locales son demostraciones sintéticas, no equipos de producción endurecidos.
 
 - Limite los listeners de texto claro, ExtProc y mirror a redes y remitentes de confianza.

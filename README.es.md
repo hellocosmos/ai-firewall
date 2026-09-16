@@ -45,7 +45,7 @@ Incluye inventario de interfaces y explicación de topología. La demo loopback 
 
 [Guía de consola](docs/es/console.md) · [Architecture](docs/es/architecture.md) · [Community / Enterprise](docs/es/editions.md) · [SDK → Proxy](docs/es/migration.md) · [Security](docs/es/security.md)
 
-El código de aplicación está en inglés y mantiene seis diccionarios UI completos. Los casos de seguridad en otros idiomas prueban entradas internacionales. Cada guía tiene un selector de idioma al principio.
+El código de aplicación está en inglés y mantiene seis diccionarios UI completos. La inspección PII sin conexión admite patrones y validadores explícitos en inglés, coreano, chino simplificado, japonés, español y francés. No ofrece NER general de nombres, ubicaciones o direcciones. Cada guía tiene un selector de idioma al principio.
 
 ```bash
 .venv/bin/python -m pytest -q

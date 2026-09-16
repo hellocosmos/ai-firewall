@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from importlib.metadata import version
 from typing import Any
 
@@ -12,8 +13,63 @@ PRESIDIO_VERSION = "2.2.364"
 LANGUAGE_ENTITIES: dict[str, tuple[str, ...]] = {
   "en": ("EMAIL_ADDRESS", "PHONE_NUMBER", "CREDIT_CARD", "IBAN_CODE", "US_SSN"),
   "ko": ("KR_RRN", "KR_FRN", "KR_DRIVER_LICENSE", "KR_PASSPORT", "KR_BRN"),
+  "zh": ("CN_RESIDENT_ID", "PHONE_NUMBER"),
+  "ja": ("JP_MY_NUMBER", "PHONE_NUMBER"),
+  "es": ("ES_NIF", "ES_NIE", "ES_PASSPORT", "PHONE_NUMBER"),
+  "fr": ("FR_NIR", "PHONE_NUMBER"),
 }
 _ENTITY_LABEL = re.compile(r"[A-Z][A-Z0-9_]{0,63}\Z")
+_IDENTIFIER_SEPARATORS = re.compile(r"[\s.-]+")
+
+
+def _compact_identifier(value: str) -> str:
+  return _IDENTIFIER_SEPARATORS.sub("", value).upper()
+
+
+def _valid_cn_resident_id(value: str) -> bool:
+  """Validate the GB 11643 18-character citizen identification number."""
+  candidate = _compact_identifier(value)
+  if not re.fullmatch(r"[0-9]{17}[0-9X]", candidate):
+    return False
+  if candidate[:6] == "000000" or candidate[14:17] == "000":
+    return False
+  try:
+    datetime.strptime(candidate[6:14], "%Y%m%d")
+  except ValueError:
+    return False
+  weights = (7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2)
+  check_characters = "10X98765432"
+  checksum = sum(int(digit) * weight for digit, weight in zip(candidate[:17], weights))
+  return candidate[-1] == check_characters[checksum % 11]
+
+
+def _valid_jp_my_number(value: str) -> bool:
+  """Validate the modulus-11 check digit defined for Japan's 12-digit Individual Number."""
+  candidate = _compact_identifier(value)
+  if not re.fullmatch(r"[0-9]{12}", candidate) or len(set(candidate[:11])) == 1:
+    return False
+  total = 0
+  for position, digit in enumerate(reversed(candidate[:11]), start=1):
+    weight = position + 1 if position <= 6 else position - 5
+    total += int(digit) * weight
+  remainder = total % 11
+  expected = 0 if remainder in (0, 1) else 11 - remainder
+  return int(candidate[-1]) == expected
+
+
+def _valid_fr_nir(value: str) -> bool:
+  """Validate the INSEE NIR control key, including Corsica department codes 2A and 2B."""
+  candidate = _compact_identifier(value)
+  if not re.fullmatch(r"[12][0-9]{4}(?:[0-9]{2}|2[AB])[0-9]{6}[0-9]{2}", candidate):
+    return False
+  base, key = candidate[:13], int(candidate[13:])
+  if base[5:7] == "2A":
+    adjusted = int(base.replace("A", "0")) - 1_000_000
+  elif base[5:7] == "2B":
+    adjusted = int(base.replace("B", "0")) - 2_000_000
+  else:
+    adjusted = int(base)
+  return key == 97 - adjusted % 97
 
 
 class PiiInitializationError(RuntimeError):
@@ -69,11 +125,14 @@ def _create_analyzer(
     raise PiiInitializationError("Unsupported Presidio analyzer version")
 
   import regex as timed_regex
-  from presidio_analyzer import AnalyzerEngine, Pattern, RecognizerRegistry
+  from presidio_analyzer import AnalyzerEngine, Pattern, PatternRecognizer, RecognizerRegistry
   from presidio_analyzer.nlp_engine import NoOpNlpEngine
   from presidio_analyzer.predefined_recognizers import (
     CreditCardRecognizer,
     EmailRecognizer,
+    EsNieRecognizer,
+    EsNifRecognizer,
+    EsPassportRecognizer,
     IbanRecognizer,
     KrBrnRecognizer,
     KrDriverLicenseRecognizer,
@@ -97,6 +156,19 @@ def _create_analyzer(
       domain = pattern_text.rsplit("@", 1)[-1]
       return self._offline_extract(domain).fqdn != ""
 
+  class ValidatedPatternRecognizer(PatternRecognizer):
+    def __init__(self, *, entity: str, language: str, pattern: str, validator: Any) -> None:
+      super().__init__(
+        supported_entity=entity,
+        supported_language=language,
+        patterns=[Pattern(name=entity.lower(), regex=pattern, score=0.6)],
+        name=f"{entity}Recognizer",
+      )
+      self._validator = validator
+
+    def validate_result(self, pattern_text: str) -> bool:
+      return bool(self._validator(pattern_text))
+
   recognizers = [
     OfflineEmailRecognizer(),
     PhoneRecognizer(
@@ -111,11 +183,51 @@ def _create_analyzer(
     KrDriverLicenseRecognizer(supported_language="ko"),
     KrPassportRecognizer(supported_language="ko"),
     KrBrnRecognizer(supported_language="ko"),
+    ValidatedPatternRecognizer(
+      entity="CN_RESIDENT_ID",
+      language="zh",
+      pattern=r"(?<![0-9])[0-9]{17}[0-9Xx](?![0-9])",
+      validator=_valid_cn_resident_id,
+    ),
+    ValidatedPatternRecognizer(
+      entity="JP_MY_NUMBER",
+      language="ja",
+      pattern=r"(?<![0-9])(?:[0-9][ .-]?){11}[0-9](?![0-9])",
+      validator=_valid_jp_my_number,
+    ),
+    EsNifRecognizer(supported_language="es"),
+    EsNieRecognizer(supported_language="es"),
+    EsPassportRecognizer(supported_language="es"),
+    ValidatedPatternRecognizer(
+      entity="FR_NIR",
+      language="fr",
+      pattern=(
+        r"(?<![0-9A-Za-z])[12][ .-]?[0-9]{2}[ .-]?[0-9]{2}[ .-]?(?:[0-9]{2}|2[ABab])"
+        r"[ .-]?[0-9]{3}[ .-]?[0-9]{3}[ .-]?[0-9]{2}(?![0-9A-Za-z])"
+      ),
+      validator=_valid_fr_nir,
+    ),
+    PhoneRecognizer(
+      supported_language="zh", supported_regions=("CN",),
+      context=["电话", "手机", "电话号码"], name="ZhPhoneRecognizer",
+    ),
+    PhoneRecognizer(
+      supported_language="ja", supported_regions=("JP",),
+      context=["電話", "携帯", "電話番号"], name="JaPhoneRecognizer",
+    ),
+    PhoneRecognizer(
+      supported_language="es", supported_regions=("ES",),
+      context=["teléfono", "móvil", "número"], name="EsPhoneRecognizer",
+    ),
+    PhoneRecognizer(
+      supported_language="fr", supported_regions=("FR",),
+      context=["téléphone", "portable", "numéro"], name="FrPhoneRecognizer",
+    ),
   ]
   for recognizer in recognizers:
     thresholds = {"default": score_threshold}
-    if "KR_PASSPORT" in recognizer.supported_entities:
-      thresholds["KR_PASSPORT"] = passport_score_threshold
+    for passport_entity in {"KR_PASSPORT", "ES_PASSPORT"} & set(recognizer.supported_entities):
+      thresholds[passport_entity] = passport_score_threshold
     recognizer.score_thresholds = thresholds
     if hasattr(recognizer, "patterns"):
       # Own instance-local patterns without changing the upstream class PATTERNS.
@@ -147,7 +259,7 @@ def _create_analyzer(
 
 
 class PresidioScanner:
-  """Use explicit en/ko patterns and validators; this does not replace NER or secret detection."""
+  """Use explicit six-language patterns and validators without NER or model downloads."""
 
   def __init__(
     self,
@@ -194,9 +306,12 @@ class PresidioScanner:
       "ner_enabled": False,
       "network_required": False,
       "languages": list(LANGUAGE_ENTITIES),
-      "entities": sorted(entity for entities in LANGUAGE_ENTITIES.values() for entity in entities),
+      "entities": sorted({entity for entities in LANGUAGE_ENTITIES.values() for entity in entities}),
       "score_threshold": self._score_threshold,
-      "entity_score_thresholds": {"KR_PASSPORT": self._passport_score_threshold},
+      "entity_score_thresholds": {
+        "ES_PASSPORT": self._passport_score_threshold,
+        "KR_PASSPORT": self._passport_score_threshold,
+      },
       "regex_timeout_seconds": self._regex_timeout_seconds,
     }
 
@@ -220,7 +335,8 @@ class PresidioScanner:
           if finding.entity_type not in entities or finding.end > len(text):
             raise ValueError("Unexpected PII recognizer result")
           threshold = (
-            self._passport_score_threshold if finding.entity_type == "KR_PASSPORT"
+            self._passport_score_threshold
+            if finding.entity_type in {"ES_PASSPORT", "KR_PASSPORT"}
             else self._score_threshold
           )
           if finding.score < threshold:

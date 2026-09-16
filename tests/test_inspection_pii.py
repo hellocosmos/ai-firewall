@@ -88,11 +88,11 @@ def test_regex_timeout_is_not_the_swallowed_upstream_exception(during_iteration)
   assert "private payload" not in str(error.value)
 
 
-def test_both_languages_are_inspected_without_decision_trace(monkeypatch):
+def test_all_six_languages_are_inspected_without_decision_trace(monkeypatch):
   scanner = _scanner(monkeypatch, {"en": [_result("EMAIL_ADDRESS", 1, 4)], "ko": [_result("KR_RRN", 4, 8)]})
   findings = scanner.analyze("abcdefghij")
   assert [finding.entity_type for finding in findings] == ["EMAIL_ADDRESS", "KR_RRN"]
-  assert [call["language"] for call in scanner._analyzer.calls] == ["en", "ko"]
+  assert [call["language"] for call in scanner._analyzer.calls] == ["en", "ko", "zh", "ja", "es", "fr"]
   assert all(call["return_decision_process"] is False for call in scanner._analyzer.calls)
   assert set(asdict(findings[0])) == {"entity_type", "start", "end", "score"}
 
@@ -166,7 +166,8 @@ def test_health_is_configuration_only_and_returns_independent_collections(monkey
   assert metadata["network_required"] is False
   assert metadata["ner_enabled"] is False
   metadata["entities"].clear()
-  assert len(scanner.health()["entities"]) == 10
+  assert scanner.health()["languages"] == ["en", "ko", "zh", "ja", "es", "fr"]
+  assert len(scanner.health()["entities"]) == 16
   assert "text" not in metadata
 
 
@@ -192,6 +193,17 @@ def real_scanner():
   ("여권 M123A4567", "KR_PASSPORT"),
   ("여권 M12345678", "KR_PASSPORT"),
   ("사업자등록번호 123-45-67891", "KR_BRN"),
+  ("居民身份证 999999199001011238", "CN_RESIDENT_ID"),
+  ("手机 +86 138 0013 8000", "PHONE_NUMBER"),
+  ("マイナンバー 123456789018", "JP_MY_NUMBER"),
+  ("電話 090-1234-5678", "PHONE_NUMBER"),
+  ("DNI 12345678Z", "ES_NIF"),
+  ("NIE X1234567L", "ES_NIE"),
+  ("Pasaporte AAA000000", "ES_PASSPORT"),
+  ("Teléfono +34 612 34 56 78", "PHONE_NUMBER"),
+  ("Numéro de sécurité sociale 1 99 01 99 999 999 79", "FR_NIR"),
+  ("NIR Corse 1 99 01 2A 999 999 08", "FR_NIR"),
+  ("Téléphone +33 6 12 34 56 78", "PHONE_NUMBER"),
 ])
 def test_real_recognizer_fixture_and_redaction(real_scanner, text, entity):
   findings = real_scanner.analyze(text)
@@ -200,6 +212,18 @@ def test_real_recognizer_fixture_and_redaction(real_scanner, text, entity):
   assert redacted != text
   for finding in findings:
     assert text[finding.start:finding.end] not in redacted
+
+
+@pytest.mark.parametrize(("text", "entity"), [
+  ("居民身份证 999999199001011239", "CN_RESIDENT_ID"),
+  ("居民身份证 999999199013011238", "CN_RESIDENT_ID"),
+  ("マイナンバー 123456789019", "JP_MY_NUMBER"),
+  ("DNI 12345678A", "ES_NIF"),
+  ("NIE X1234567A", "ES_NIE"),
+  ("Numéro de sécurité sociale 1 99 01 99 999 999 78", "FR_NIR"),
+])
+def test_real_invalid_national_identifier_is_not_accepted(real_scanner, text, entity):
+  assert entity not in {finding.entity_type for finding in real_scanner.analyze(text)}
 
 
 def test_real_no_general_ner_or_date_claim(real_scanner):

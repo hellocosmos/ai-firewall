@@ -64,7 +64,7 @@ NIC inventory and topology explanation are included. The loopback demo does not 
 
 [Console guide](docs/en/console.md) · [Architecture](docs/en/architecture.md) · [Community / Enterprise](docs/en/editions.md) · [SDK → Proxy](docs/en/migration.md) · [Security](docs/en/security.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
-English application source and six complete UI dictionaries are maintained together. Non-English security test fixtures intentionally exercise international input. Localized guides have a language switch at the top.
+English application source and six complete UI dictionaries are maintained together. Offline PII inspection covers explicit English, Korean, Simplified Chinese, Japanese, Spanish and French patterns and validators. It does not provide general name, location or address NER. Localized guides have a language switch at the top.
 
 ```bash
 .venv/bin/python -m pytest -q

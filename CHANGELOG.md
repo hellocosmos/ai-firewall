@@ -2,7 +2,27 @@
 
 All notable changes to TrapDefense Community are documented here.
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses semantic versioning for Community source releases.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases use the `0.31`, `0.32` numbering sequence.
+
+## [0.31] - 2026-09-16
+
+### Added
+
+- Offline PII profiles for English, Korean, Simplified Chinese, Japanese, Spanish and French.
+- Checksum-validated Chinese GB 11643 resident IDs, Japanese Individual Numbers and French NIR social security numbers.
+- Presidio Spanish NIF, NIE and passport recognition.
+- Region-aware phone recognition for Chinese, Japanese, Spanish and French inputs.
+
+### Security
+
+- National identifier patterns reject invalid dates or check digits instead of accepting format-only matches.
+- All six language profiles run for every supported payload, so the configured UI language does not change enforcement.
+- Inspection remains deterministic and offline. Names, locations, addresses, images, OCR and general NER are explicitly outside this release.
+
+### Verified
+
+- Locale-specific positive, invalid-checksum, redaction, timeout and no-network tests.
+- Existing request, response, SSE and fail-closed inspection suites.
 
 ## [0.3.0] - 2026-09-16
 
@@ -35,4 +55,5 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 - Local audit storage is mutable, and content detection can produce false positives or false negatives.
 - Enterprise Access Broker, approvals and delegated authorization are distributed separately.
 
+[0.31]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.31
 [0.3.0]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.3.0

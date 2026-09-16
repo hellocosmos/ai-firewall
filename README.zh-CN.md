@@ -45,7 +45,7 @@ Community 包含本地策略、显式 HTTP/MCP 映射、可信跳签名、有界
 
 [控制台指南](docs/zh-CN/console.md) · [Architecture](docs/zh-CN/architecture.md) · [Community / Enterprise](docs/zh-CN/editions.md) · [SDK → Proxy](docs/zh-CN/migration.md) · [Security](docs/zh-CN/security.md)
 
-应用源码使用英语，维护六套完整 UI 字典。非英语安全测试样本用于验证国际化输入。每份本地化指南顶部均可切换语言。
+应用源码使用英语，并维护六套完整 UI 字典。离线 PII 检查支持英语、韩语、简体中文、日语、西班牙语和法语的显式模式与校验器；不提供覆盖姓名、位置和地址的通用 NER。每份本地化指南顶部均可切换语言。
 
 ```bash
 .venv/bin/python -m pytest -q

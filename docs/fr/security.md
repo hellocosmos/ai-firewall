@@ -6,6 +6,19 @@ Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec 
 
 Signalez les vulnérabilités en privé à **hellocosmos@gmail.com** , avec révision, reproduction synthétique et impact. Ne publiez pas de données client, jetons ou identifiants réels dans les issues. Aucun SLA de réponse fixe n’est promis.
 
+## Couverture PII
+
+L’inspection hors ligne évalue les six profils linguistiques pour chaque charge prise en charge :
+
+- Anglais : e-mail, téléphone, carte bancaire, IBAN et SSN américain.
+- Coréen : numéros d’enregistrement des résidents et étrangers, permis, passeport et entreprise.
+- Chinois simplifié : téléphone et numéro d’identité résident GB 11643.
+- Japonais : téléphone et numéro individuel à 12 chiffres (My Number).
+- Espagnol : téléphone, NIF, NIE et passeport.
+- Français : téléphone et numéro de sécurité sociale NIR, y compris les codes corses.
+
+Les identifiants nationaux valident le format et la clé lorsque la norme en définit une. Il s’agit d’une inspection déterministe de motifs, pas d’un NER général : noms, lieux, adresses postales, images, OCR et fichiers arbitraires sont hors périmètre de cette version.
+
 Le périmètre couvre les flux HTTP/MCP pris en charge et explicitement routés depuis un relais signé de confiance. Les exemples locaux sont synthétiques, pas des appliances de production durcies.
 
 - Restreignez les listeners en clair, ExtProc et mirror aux réseaux et émetteurs fiables.

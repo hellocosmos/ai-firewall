@@ -45,7 +45,7 @@ NIC 목록과 토폴로지 설명을 제공합니다. loopback 데모는 OS 주�
 
 [콘솔 안내](docs/ko/console.md) · [Architecture](docs/ko/architecture.md) · [Community / Enterprise](docs/ko/editions.md) · [SDK → Proxy](docs/ko/migration.md) · [Security](docs/ko/security.md)
 
-애플리케이션 코드는 영어로 작성하고 UI 사전 6개를 함께 유지합니다. 비영어 보안 테스트 입력은 다국어 검증을 위해 보존합니다. 각 번역 문서 상단에서 언어를 전환할 수 있습니다.
+애플리케이션 코드는 영어로 작성하고 UI 사전 6개를 함께 유지합니다. 오프라인 PII 검사는 영어·한국어·중국어 간체·일본어·스페인어·프랑스어의 명시적 패턴과 검증기를 지원합니다. 이름·위치·주소를 포괄하는 범용 NER은 제공하지 않습니다. 각 번역 문서 상단에서 언어를 전환할 수 있습니다.
 
 ```bash
 .venv/bin/python -m pytest -q

@@ -45,7 +45,7 @@ L’inventaire NIC et la topologie sont expliqués. La démo loopback ne configu
 
 [Guide de console](docs/fr/console.md) · [Architecture](docs/fr/architecture.md) · [Community / Enterprise](docs/fr/editions.md) · [SDK → Proxy](docs/fr/migration.md) · [Security](docs/fr/security.md)
 
-Le code applicatif est en anglais, avec six dictionnaires UI complets. Les fixtures de sécurité dans d’autres langues vérifient les entrées internationales. Chaque guide propose un choix de langue en haut.
+Le code applicatif est en anglais, avec six dictionnaires UI complets. L’inspection PII hors ligne prend en charge des motifs et validateurs explicites en anglais, coréen, chinois simplifié, japonais, espagnol et français. Elle ne fournit pas de NER général pour les noms, lieux ou adresses. Chaque guide propose un choix de langue en haut.
 
 ```bash
 .venv/bin/python -m pytest -q

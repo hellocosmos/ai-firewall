@@ -45,7 +45,7 @@ NIC 一覧と構成説明を含みます。ループバックのデモは OS ア
 
 [コンソールガイド](docs/ja/console.md) · [Architecture](docs/ja/architecture.md) · [Community / Enterprise](docs/ja/editions.md) · [SDK → Proxy](docs/ja/migration.md) · [Security](docs/ja/security.md)
 
-アプリケーションコードは英語で、完全な UI 辞書を 6 言語で管理します。英語以外のセキュリティテスト入力は国際化検証のために保持します。各ガイド上部で言語を切り替えられます。
+アプリケーションコードは英語で、完全な UI 辞書を 6 言語で管理します。オフライン PII 検査は英語、韓国語、簡体字中国語、日本語、スペイン語、フランス語の明示的なパターンと検証器に対応します。氏名、場所、住所を網羅する汎用 NER は提供しません。各ガイド上部で言語を切り替えられます。
 
 ```bash
 .venv/bin/python -m pytest -q
