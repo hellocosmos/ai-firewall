@@ -18,6 +18,98 @@ SIGN=b'synthetic-signing-key-'+b'x'*32
 @pytest.fixture
 def config():return load(Path(__file__).parents[1]/'deploy/selfhost/deployment.yaml')
 
+
+def jwt_auth(**updates):
+  value={
+    'mode':'jwt',
+    'issuer':'https://issuer.example/tenant',
+    'audience':'https://firewall.example/mcp',
+    'jwks_uri':'https://issuer.example/jwks',
+    'resource':'https://firewall.example/mcp',
+    'authorization_servers':['https://issuer.example/tenant'],
+    'required_scopes':['mcp.invoke'],
+  }
+  value.update(updates)
+  return value
+
+
+def deployment_data(config):
+  return config.model_dump(exclude_none=True)
+
+
+def test_structured_auth_defaults_and_public_boundary(config):
+  assert config.gateway_auth.mode=='client_key'
+  assert config.target_auth.mode=='passthrough_bearer'
+  public=config.public()
+  assert public['gateway_auth']=={'mode':'client_key'}
+  assert public['target_auth']=={'mode':'passthrough_bearer'}
+  assert 'secret_file' not in public['target_auth']
+
+
+def test_legacy_auth_is_normalized(config):
+  data=deployment_data(config)
+  data.pop('target_auth')
+  data.update(destination_auth='static_bearer',bearer_file='/state/target.token')
+  parsed=Deployment.model_validate(data)
+  assert parsed.target_auth.mode=='static_bearer'
+  assert parsed.target_auth.secret_file=='/state/target.token'
+  assert parsed.destination_auth is None and parsed.bearer_file is None
+
+
+def test_jwt_gateway_requires_separate_target_credential(config):
+  data=deployment_data(config)
+  data['gateway_auth']=jwt_auth()
+  data['target_auth']={'mode':'passthrough_bearer'}
+  with pytest.raises(ValueError,match='passthrough'):
+    Deployment.model_validate(data)
+
+
+@pytest.mark.parametrize('auth',[
+  jwt_auth(issuer='http://issuer.example/tenant'),
+  jwt_auth(jwks_uri='http://issuer.example/jwks'),
+  jwt_auth(resource='http://firewall.example/mcp'),
+  jwt_auth(authorization_servers=['http://issuer.example/tenant']),
+  jwt_auth(required_scopes=['mcp.invoke','mcp.invoke']),
+])
+def test_jwt_gateway_rejects_unsafe_contract(config,auth):
+  data=deployment_data(config)
+  data.update(gateway_auth=auth,target_auth={'mode':'none'})
+  with pytest.raises(ValueError):Deployment.model_validate(data)
+
+
+def test_synthetic_loopback_jwt_requires_explicit_opt_in(config):
+  auth=jwt_auth(
+    issuer='http://127.0.0.1:9190',jwks_uri='http://127.0.0.1:9190/jwks',
+    resource='http://127.0.0.1:18084/mcp',authorization_servers=['http://127.0.0.1:9190'])
+  data=deployment_data(config)
+  data.update(gateway_auth=auth,target_auth={'mode':'none'})
+  with pytest.raises(ValueError):Deployment.model_validate(data)
+  auth['allow_insecure_loopback']=True
+  parsed=Deployment.model_validate({**data,'gateway_auth':auth})
+  assert parsed.gateway_auth.metadata_path=='/.well-known/oauth-protected-resource/mcp'
+  assert parsed.gateway_auth.metadata_url=='http://127.0.0.1:18084/.well-known/oauth-protected-resource/mcp'
+
+
+@pytest.mark.parametrize('target_auth',[
+  {'mode':'static_api_key','secret_file':'relative.key','header':'x-api-key'},
+  {'mode':'static_api_key','secret_file':'/state/key','header':'x-td-secret'},
+  {'mode':'static_api_key','secret_file':'/state/key','header':'authorization'},
+  {'mode':'static_api_key','secret_file':'/state/key','header':'x-api-key','prefix':'bad\nvalue'},
+  {'mode':'static_bearer'},
+  {'mode':'none','secret_file':'/state/key'},
+])
+def test_target_auth_rejects_unsafe_contract(config,target_auth):
+  with pytest.raises(ValueError):
+    Deployment.model_validate({**deployment_data(config),'target_auth':target_auth})
+
+
+def test_static_api_key_public_contract_excludes_secret_path(config):
+  data=deployment_data(config)
+  data['target_auth']={'mode':'static_api_key','secret_file':'/state/key','header':'Ocp-Apim-Subscription-Key'}
+  parsed=Deployment.model_validate(data)
+  assert parsed.public()['target_auth']=={
+    'mode':'static_api_key','header':'ocp-apim-subscription-key','prefix':''}
+
 @pytest.mark.parametrize('update',[
  {'upstream':'https://user:secret@example.com'}, {'upstream':'https://example.com/path'},
  {'upstream':'http://fixture:8080','allow_plaintext_upstream':False},

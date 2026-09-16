@@ -57,7 +57,7 @@ gateway_auth:
 
 JWT mode accepts only `Authorization: Bearer`. It validates RS256 signature, issuer, audience, expiry, issued-at time, subject, and configured scopes using the configured JWKS endpoint. JWKS and metadata URLs require HTTPS except for an explicitly enabled loopback-only synthetic test setting. Validation failure returns a sanitized `401`; a valid token missing scope returns `403`.
 
-JWT mode publishes `/.well-known/oauth-protected-resource`. The metadata identifies the configured resource and authorization servers. Its `WWW-Authenticate` challenge contains the absolute metadata URL configured by the operator.
+JWT mode publishes the RFC 9728 path derived from the resource URI. For `https://firewall.example.com/mcp`, that path is `/.well-known/oauth-protected-resource/mcp`. The metadata identifies the configured resource and authorization servers. Its `WWW-Authenticate` challenge contains the derived absolute metadata URL.
 
 `target_auth` controls the independent credential sent from TrapDefense to the fixed target.
 

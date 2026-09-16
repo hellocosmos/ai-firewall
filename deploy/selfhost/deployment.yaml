@@ -2,7 +2,10 @@
 upstream: http://fixture:8080
 allow_plaintext_upstream: true
 console_origin: http://localhost:18080
-destination_auth: passthrough
+gateway_auth:
+  mode: client_key
+target_auth:
+  mode: passthrough_bearer
 max_body_bytes: 1048576
 routes:
   - authority: fixture:8080
