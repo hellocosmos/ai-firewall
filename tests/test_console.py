@@ -104,3 +104,56 @@ def test_real_community_console_proxy(tmp_path):
         assert response.status_code>=500 and len(runtime.destination.receipts)==count
     finally:await runtime.stop()
   asyncio.run(exercise())
+
+
+@pytest.mark.parametrize('terminal', ['response_body', 'response_headers', 'immediate_response'])
+def test_evidence_committed_before_final_extproc_reply(tmp_path, monkeypatch, terminal):
+  """A client may close the generator without requesting another response."""
+  import asyncio
+  from envoy.service.ext_proc.v3 import external_processor_pb2 as pb
+  from asr_proxy.console import dataplane
+  from asr_proxy.inspection.contracts import Verdict
+
+  async def fake_process(processor, requests, context):
+    async for _ in requests:pass
+    processor.engine.verdict=Verdict('block' if terminal=='immediate_response' else 'allow','policy_allowed','inline')
+    reply=pb.ProcessingResponse()
+    getattr(reply,terminal).SetInParent()
+    yield reply
+
+  monkeypatch.setattr(dataplane.ExternalProcessor,'Process',fake_process)
+  async def exercise():
+    runtime=Runtime(tmp_path)
+    async def requests():
+      yield pb.ProcessingRequest(response_headers=pb.HttpHeaders(end_of_stream=terminal=='response_headers'))
+    stream=dataplane.ConsoleProcessor(runtime).Process(requests(),None)
+    result=await anext(stream)
+    assert result.WhichOneof('response')==terminal
+    events=runtime.store.events()
+    assert len(events)==1 and events[0]['transport']['stream_completed'] is True
+    await stream.aclose()
+    assert len(runtime.store.events())==1
+  asyncio.run(exercise())
+
+
+def test_cancelled_partial_stream_keeps_incomplete_evidence(tmp_path, monkeypatch):
+  import asyncio
+  from envoy.service.ext_proc.v3 import external_processor_pb2 as pb
+  from asr_proxy.console import dataplane
+  from asr_proxy.inspection.contracts import Verdict
+
+  async def partial_process(processor, requests, context):
+    processor.engine.verdict=Verdict('allow','policy_allowed','inline')
+    yield pb.ProcessingResponse(request_body=pb.BodyResponse())
+
+  monkeypatch.setattr(dataplane.ExternalProcessor,'Process',partial_process)
+  async def exercise():
+    runtime=Runtime(tmp_path)
+    stream=dataplane.ConsoleProcessor(runtime).Process(None,None)
+    await anext(stream)
+    assert runtime.store.events()==[]
+    await stream.aclose()
+    event,=runtime.store.events()
+    assert event['action']=='unknown' and event['coverage']=='incomplete'
+    assert not event['enforcement_applied'] and not event['transport']['stream_completed']
+  asyncio.run(exercise())

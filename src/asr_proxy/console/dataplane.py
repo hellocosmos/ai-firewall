@@ -4,6 +4,7 @@ import json
 import time
 from dataclasses import replace
 from uuid import uuid4
+from threading import Lock
 
 from envoy.service.ext_proc.v3 import external_processor_pb2_grpc as rpc
 from asr_proxy.inspection.contracts import Verdict
@@ -26,6 +27,8 @@ class StreamInspection:
     self.upstream_received=None
     self.started=time.perf_counter()
     self.completed=False
+    self.finished=False
+    self.finish_lock=Lock()
     self.run_id=uuid4().hex
 
   def inspect_request(self,message,*,mode):
@@ -57,6 +60,13 @@ class StreamInspection:
     if phase=='transport':self.verdict=verdict
 
   def finish(self):
+    # Final replies can race stream cancellation. Persist exactly once.
+    with self.finish_lock:
+      if self.finished:return
+      self.persist()
+      self.finished=True
+
+  def persist(self):
     verdict=self.verdict or Verdict('unknown','inspection_stream_failed',self.policy['mode'],coverage='incomplete')
     if self.response_verdict and self.response_verdict.action!='allow':verdict=self.response_verdict
     if not self.completed and verdict.action in ('allow','redact'):
@@ -96,9 +106,22 @@ class ConsoleProcessor(rpc.ExternalProcessorServicer):
     processor=ExternalProcessor(inspection,inspection)
     processor.slots=self.slots
     processor.workers=self.workers
+    response_has_no_body=False
+    async def observed_requests():
+      nonlocal response_has_no_body
+      async for request in request_iterator:
+        if request.WhichOneof('request')=='response_headers':
+          response_has_no_body=request.response_headers.end_of_stream
+        yield request
     try:
-      async for result in processor.Process(request_iterator,context):yield result
-      inspection.completed=True
+      async for result in processor.Process(observed_requests(),context):
+        kind=result.WhichOneof('response')
+        terminal=kind in ('immediate_response','response_body') or (kind=='response_headers' and response_has_no_body)
+        if terminal:
+          # Envoy may cancel immediately after the final reply; commit evidence first.
+          inspection.completed=True
+          await asyncio.shield(asyncio.to_thread(inspection.finish))
+        yield result
     finally:
-      # Store sanitized evidence even when the proxy cancels or the stream fails.
-      await asyncio.to_thread(inspection.finish)
+      # Cancellation before a final decision retains incomplete evidence.
+      await asyncio.shield(asyncio.to_thread(inspection.finish))
