@@ -127,4 +127,5 @@ class Store:
     with self.connect() as db:
       db.execute('INSERT OR REPLACE INTO settings VALUES(?,?)',('policy',json.dumps(policy)))
       db.execute('INSERT INTO audit(ts,actor,event,detail) VALUES(?,?,?,?)',
-        (now(),'system','policy.applied',f"v{policy['version']} · {policy['mode']} · PII {policy['pii_action']}"))
+        (now(),'system','policy.applied',
+         f"v{policy['version']} · {policy['mode']} · PII {policy['pii_action']} · tool overrides {sum(value!='inherit' for value in policy['pii_rules'].values())}"))

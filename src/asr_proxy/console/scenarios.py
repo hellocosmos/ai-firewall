@@ -20,3 +20,5 @@ class Policy(BaseModel):
   mode:Literal['inline','mirror']='inline'
   pii_action:Literal['redact','block']='redact'
   rules:dict[str,Literal['allow','block']]=Field(default_factory=lambda:{'notes.read':'allow','notes.delete':'block'})
+  pii_rules:dict[str,Literal['inherit','redact','block']]=Field(
+    default_factory=lambda:{name:'inherit' for name in TOOLS})

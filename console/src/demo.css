@@ -18,3 +18,12 @@ body:has(.td-app){margin:0;background:#0f1117}.td-app{--bg:#0f1117;--surface:#16
   .td-topbar .td-tag.demo { display: none; }
   .td-topbar .td-breadcrumb { display: none; }
 }
+
+.td-rule-controls { display: flex; gap: 9px; align-items: end; }
+.td-rule-controls label { margin: 0; gap: 4px; font-size: 10px; }
+.td-app .td-rule-controls select { width: 128px; font-size: 11px; }
+@media (max-width: 760px) {
+  .td-rule-controls { width: 100%; align-items: stretch; }
+  .td-rule-controls label { flex: 1; }
+  .td-app .td-rule-controls select { width: 100%; }
+}

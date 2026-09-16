@@ -14,6 +14,7 @@ class ToolRule(BaseModel):
   model_config = ConfigDict(extra="forbid")
   action: str
   effect: Literal["allow", "block"] = "allow"
+  pii_action: Literal["redact", "block"] | None = None
   resource: str | None = None
   resource_pointer: str | None = None
   # Full Mcp-Param-* header names mapped to exact JSON pointers in the body.
@@ -27,6 +28,7 @@ class RouteRule(BaseModel):
   method: str = "POST"
   required_headers: dict[str, str] = Field(default_factory=dict)
   protocol: Literal["http", "mcp"] = "mcp"
+  pii_action: Literal["redact", "block"] | None = None
   mcp_versions: list[str] = Field(default_factory=lambda: [
     "2025-03-26", "2025-06-18", "2025-11-25", "2026-07-28",
   ])
@@ -79,6 +81,8 @@ class Verdict:
   access_action: str | None = None
   source_verified: bool = False
   authorization_scope: str = "none"
+  pii_policy_action: Literal["redact", "block"] | None = None
+  pii_policy_scope: Literal["global", "route", "tool"] | None = None
 
   def evidence(self, *, phase: str, applied: bool = False) -> dict:
     return {
@@ -90,6 +94,8 @@ class Verdict:
       "identity_verified": self.identity_verified,
       "source_verified": self.source_verified,
       "authorization_scope": self.authorization_scope,
+      "pii_policy_action": self.pii_policy_action,
+      "pii_policy_scope": self.pii_policy_scope,
       "request_digest": self.request_digest, "entities": sorted(set(self.entities)),
       "tool": self.tool, "access_action": self.access_action,
       "approval_id": self.approval_id if self.mode == "inline" else None,

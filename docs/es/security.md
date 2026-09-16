@@ -19,6 +19,10 @@ La inspección sin conexión evalúa los seis perfiles de idioma para cada carga
 
 Los identificadores nacionales validan formato y suma de comprobación cuando la norma la define. Es inspección determinista de patrones, no NER general: nombres, ubicaciones, direcciones postales, imágenes, OCR y archivos arbitrarios quedan fuera de esta versión.
 
+### Selección de política y evidencia Mirror
+
+El tratamiento PII usa una precedencia determinista: **herramienta/acción mapeada → ruta → valor global**. La acción elegida para la solicitud también rige su respuesta compatible, incluido SSE almacenado por completo. La evidencia solo registra la acción y el alcance, nunca el contenido capturado. En modo Mirror, un hallazgo completo conserva `would_redact` o `would_block` y los bytes originales siguen sin cambios; un transporte o una inspección incompletos quedan como `unknown`.
+
 ## Cobertura de exposición de secretos
 
 La inspección sin conexión bloquea claves privadas reconocidas, formatos comunes de tokens de AWS, GitHub, GCP, Slack, Stripe y OpenAI, JWT firmados con estructura válida, combinaciones de consulta SAS de Azure Storage y valores de alta entropía en campos JSON sensibles. Se aplica a cuerpos de solicitud compatibles, respuestas y flujos SSE reensamblados.

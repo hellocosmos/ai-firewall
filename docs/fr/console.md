@@ -40,6 +40,12 @@ L’émetteur simule un relais de confiance après déchiffrement TLS et signe l
 4. **Connexions / Système :** vérifiez composants et chemin. ** Audit :** examinez les changements de connexion, politique et réseau.
 5. **Paramètres :** consultez les interfaces et modifiez port, délai ou limite du corps. Le validateur Envoy contrôle la configuration. L’application redémarre brièvement le conteneur propre, vérifie la nouvelle écoute et restaure l’ancienne en cas d’échec.
 
+## Politique PII par route et outil
+
+L’action PII globale est la valeur par défaut. Une route HTTP/MCP peut la remplacer, puis une action mappée ou un outil MCP peut remplacer la route. La priorité exacte est **outil/action → route → global** ; une valeur omise est héritée. L’action et la portée choisies sont enregistrées dans la preuve nettoyée et réutilisées pour inspecter la réponse correspondante.
+
+Dans **Politiques → Dérogation PII**, réglez chaque outil de démonstration sur hériter, masquer ou bloquer. En mode Mirror, la requête et la réponse d’origine restent inchangées ; l’interface affiche **Autoriserait**, **Masquerait** ou **Bloquerait**. `unknown` reste réservé aux captures incomplètes ou aux échecs d’inspection. Un résultat Mirror est une preuve d’évaluation, pas une preuve d’application en production.
+
 ## Réseau et cartes NIC
 
 | Paramètre | Valeur par défaut / sens |

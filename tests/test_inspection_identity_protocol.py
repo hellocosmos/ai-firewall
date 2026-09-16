@@ -372,8 +372,9 @@ class _CaptureEngine:
     assert mode == "mirror"
     self.calls.append(("request", message))
     return Verdict("block", "synthetic_detection", "mirror")
-  def inspect_response(self, message, *, mode):
+  def inspect_response(self, message, *, mode, pii_action=None, pii_policy_scope=None):
     assert mode == "mirror"
+    assert pii_action is None and pii_policy_scope is None
     self.calls.append(("response", message))
     return Verdict("allow", "synthetic_response", "mirror")
 

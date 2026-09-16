@@ -214,7 +214,7 @@
   "External request": "Requête externe",
   "Request masking at destination": "Masquage à destination",
   "Redacted receipt confirmed": "Réception du contenu masqué confirmée",
-  "Not applicable": "Sans objet",
+  "Not applicable": "Non applicable",
   "Response masking": "Masquage de la réponse",
   "Redacted response confirmed": "Réponse masquée confirmée",
   "Decision path": "Chemin de décision",
@@ -414,5 +414,18 @@
   "Console SSO authenticates operators. Proxy source verification does not establish agent identity.": "Le SSO authentifie les opérateurs ; vérifier la source du proxy n’authentifie pas les agents.",
   "Sign-in configuration unavailable.": "Configuration de connexion indisponible.",
   "Entra sign-in failed. Check your assigned app role.": "Échec de connexion Entra. Vérifiez votre rôle d’application.",
-  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "L’identité des agents n’est pas connectée à ce trajet synthétique. Le SSO de console se configure séparément."
+  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "L’identité des agents n’est pas connectée à ce trajet synthétique. Le SSO de console se configure séparément.",
+  "Action policy": "Politique d’action",
+  "PII override": "Dérogation PII",
+  "{0} PII policy": "Politique PII de {0}",
+  "Inherit global": "Hériter de la politique globale",
+  "PII policy": "Politique PII",
+  "Global default": "Valeur globale par défaut",
+  "Route override": "Dérogation de route",
+  "Tool override": "Dérogation d’outil",
+  "Mirror assessment": "Évaluation miroir",
+  "Would allow": "Autoriserait",
+  "Would block": "Bloquerait",
+  "Would redact": "Masquerait",
+  "Would require approval": "Demanderait une approbation"
 }

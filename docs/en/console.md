@@ -40,6 +40,12 @@ The sender simulates a trusted forwarding hop after TLS decryption. It signs exa
 4. **Connections / System:** inspect component readiness and the actual path. ** Audit:** review sign-in, policy and network changes.
 5. **Settings:** inspect host interfaces and change the proxy listener port, timeout or body limit. Validate invokes Envoy's validator. Apply briefly restarts the owned container, checks the new listener and restores the previous configuration on failure.
 
+## Route and tool PII policy
+
+The global PII action is the default. An HTTP/MCP route can override it, and a mapped action or MCP tool can override the route. The exact precedence is **tool/action → route → global**; omitted values inherit. The selected action and scope are stored in sanitized decision evidence and reused for the corresponding response.
+
+Use **Policies → PII override** to set each demo tool to inherit, redact or block. In Mirror mode, the original request and response are not changed and the UI reports **Would allow**, **Would redact** or **Would block**. `unknown` remains reserved for incomplete capture or inspection failure; Mirror results are evaluation evidence, not production enforcement proof.
+
 ## Network settings and NICs
 
 | Setting | Default / meaning |

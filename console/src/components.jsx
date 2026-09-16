@@ -92,6 +92,19 @@ export function EventDetail({
   event,
   onClose
 }) {
+  const piiAction = event.pii_policy_action === 'block' ? t("Block") : event.pii_policy_action === 'redact' ? t("Redact") : t("Not applicable");
+  const piiScope = {
+    global: t("Global default"),
+    route: t("Route override"),
+    tool: t("Tool override")
+  }[event.pii_policy_scope] || t("Not applicable");
+  const mirrorAssessment = {
+    would_allow: t("Would allow"),
+    would_block: t("Would block"),
+    would_redact: t("Would redact"),
+    would_approval_required: t("Would require approval"),
+    would_unknown: t("Needs review")
+  }[event.hypothetical_action];
   return <Drawer title={t("Decision details \xB7 #{0}", [event.id])} onClose={onClose}><div className="td-detail-hero"><Badge value={event.action} /><span>{event.mode === 'mirror' ? t("Observation only") : event.transport ? t("Real proxy path") : t("In-process demo")}</span><h3>{t(event.label)}</h3><p>{t(reasons[event.reason] || event.reason)}</p></div><dl className="td-dl">{Object.entries({
         [t("Time")]: date(event.ts),
         [t("Agent")]: event.agent,
@@ -99,6 +112,10 @@ export function EventDetail({
         [t("Resource")]: event.resource,
         [t("Rule reason")]: event.reason,
         [t("Policy")]: `v${event.policy_version}`,
+        [t("PII policy")]: `${piiAction} · ${piiScope}`,
+        ...(event.mode === 'mirror' ? {
+          [t("Mirror assessment")]: mirrorAssessment || t("Needs review")
+        } : {}),
         [t("Local decision latency")]: `${event.latency_ms} ms`,
         [t("Authorization scope")]: event.authorization_scope,
         [t("Forwarding source")]: event.source_verified ? t("Signature verified") : t("Not verified"),

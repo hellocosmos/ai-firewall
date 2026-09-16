@@ -2,7 +2,27 @@
 
 All notable changes to TrapDefense Community are documented here.
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases use the `0.31`, `0.32` numbering sequence.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases use the `0.31`, `0.32`, `0.33` numbering sequence.
+
+## [0.33] - 2026-09-16
+
+### Added
+
+- Deterministic PII policy overrides for HTTP/MCP routes and mapped actions or MCP tools, with tool/action → route → global precedence.
+- Request-selected PII policy propagation into supported JSON, text and complete buffered SSE responses.
+- Console controls for per-tool inherit, redact or block behavior and sanitized evidence of the selected policy scope.
+
+### Security
+
+- Mirror keeps original request and response bytes unchanged while complete detections retain explicit `would_redact` or `would_block` assessments.
+- Incomplete capture, unsupported inspection and transport failures remain `unknown`; policy evidence never stores inspected content.
+- Existing configurations inherit the global PII action unless an explicit route or tool override is present.
+
+### Verified
+
+- Synthetic tool, route and global precedence tests for request and response inspection.
+- Six matching UI dictionaries and localized console/security guidance.
+- Community proxy integration covers a tool-specific block policy in Mirror mode without enforcement or request mutation.
 
 ## [0.32] - 2026-09-16
 
@@ -75,6 +95,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Com
 - Local audit storage is mutable, and content detection can produce false positives or false negatives.
 - Enterprise Access Broker, approvals and delegated authorization are distributed separately.
 
+[0.33]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.33
 [0.32]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.32
 [0.31]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.31
 [0.3.0]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.3.0

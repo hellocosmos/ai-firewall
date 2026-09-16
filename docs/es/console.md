@@ -40,6 +40,12 @@ El emisor simula un salto de confianza tras el descifrado TLS y firma solicitude
 4. **Conexiones / Sistema:** revise componentes y ruta. ** Auditoría:** examine cambios de sesión, política y red.
 5. **Configuración:** vea las interfaces y cambie puerto, tiempo de espera o límite del cuerpo. La validación utiliza Envoy. Aplicar reinicia brevemente el contenedor propio, comprueba la nueva escucha y restaura la anterior si falla.
 
+## Política PII por ruta y herramienta
+
+La acción PII global es el valor predeterminado. Una ruta HTTP/MCP puede sustituirla y una acción mapeada o herramienta MCP puede sustituir la ruta. La precedencia exacta es **herramienta/acción → ruta → global**; los valores omitidos se heredan. La acción y el alcance elegidos se guardan en la evidencia depurada y se reutilizan al inspeccionar la respuesta correspondiente.
+
+En **Políticas → Excepción de PII**, configure cada herramienta de la demo para heredar, ocultar o bloquear. En modo Mirror no se modifican la solicitud ni la respuesta originales; la interfaz muestra **Permitiría**, **Ocultaría** o **Bloquearía**. `unknown` se reserva para capturas incompletas o fallos de inspección. El resultado Mirror es evidencia de evaluación, no prueba de aplicación en producción.
+
 ## Red y NIC
 
 | Ajuste | Valor predeterminado / significado |

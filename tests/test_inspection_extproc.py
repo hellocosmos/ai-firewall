@@ -32,8 +32,10 @@ class Engine:
       raise self.error
     return self.request_verdict
 
-  def inspect_response(self, message, *, mode):
+  def inspect_response(self, message, *, mode, pii_action=None, pii_policy_scope=None):
     self.calls.append(("response", message, mode))
+    assert pii_action == self.request_verdict.pii_policy_action
+    assert pii_policy_scope == self.request_verdict.pii_policy_scope
     if self.error:
       raise self.error
     return self.response_verdict

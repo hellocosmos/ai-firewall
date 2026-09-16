@@ -19,6 +19,10 @@ L’inspection hors ligne évalue les six profils linguistiques pour chaque char
 
 Les identifiants nationaux valident le format et la clé lorsque la norme en définit une. Il s’agit d’une inspection déterministe de motifs, pas d’un NER général : noms, lieux, adresses postales, images, OCR et fichiers arbitraires sont hors périmètre de cette version.
 
+### Sélection de politique et preuve Mirror
+
+Le traitement PII suit une priorité déterministe : **outil/action mappé → route → valeur globale**. L’action choisie pour la requête s’applique aussi à sa réponse prise en charge, y compris un flux SSE entièrement mis en mémoire tampon. La preuve enregistre uniquement l’action et la portée, jamais le contenu capturé. En mode Mirror, une détection complète conserve `would_redact` ou `would_block` et les octets d’origine restent inchangés ; un transport ou une inspection incomplets restent `unknown`.
+
 ## Couverture des fuites de secrets
 
 L’inspection hors ligne bloque les clés privées reconnues, les formats courants de jetons AWS, GitHub, GCP, Slack, Stripe et OpenAI, les JWT signés dont la structure est valide, les combinaisons de paramètres SAS Azure Storage et les valeurs à forte entropie dans les champs JSON sensibles. Elle couvre les corps de requête pris en charge, les réponses et les flux SSE réassemblés.

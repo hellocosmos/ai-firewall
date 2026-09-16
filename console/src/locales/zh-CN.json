@@ -414,5 +414,18 @@
   "Console SSO authenticates operators. Proxy source verification does not establish agent identity.": "控制台 SSO 验证操作员，代理来源验证不代表智能体身份。",
   "Sign-in configuration unavailable.": "无法获取登录配置。",
   "Entra sign-in failed. Check your assigned app role.": "Entra 登录失败，请检查应用角色分配。",
-  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "此合成流量路径未连接智能体身份。控制台 SSO 单独配置。"
+  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "此合成流量路径未连接智能体身份。控制台 SSO 单独配置。",
+  "Action policy": "操作策略",
+  "PII override": "PII 覆盖",
+  "{0} PII policy": "{0} PII 策略",
+  "Inherit global": "继承全局策略",
+  "PII policy": "PII 策略",
+  "Global default": "全局默认值",
+  "Route override": "路由覆盖",
+  "Tool override": "工具覆盖",
+  "Mirror assessment": "镜像评估",
+  "Would allow": "将允许",
+  "Would block": "将阻止",
+  "Would redact": "将脱敏",
+  "Would require approval": "将请求审批"
 }

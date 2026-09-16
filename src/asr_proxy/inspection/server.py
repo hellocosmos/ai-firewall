@@ -104,6 +104,7 @@ class ExternalProcessor(rpc.ExternalProcessorServicer):
   async def Process(self, request_iterator, context):
     request_headers = response_headers = None
     request_checked = response_checked = False
+    request_verdict = None
     method = authority = path = ""
     deadline = time.monotonic() + self.stream_timeout
     try:
@@ -125,6 +126,7 @@ class ExternalProcessor(rpc.ExternalProcessorServicer):
               if event.request_headers.end_of_stream:
                 verdict = await self._inspect(self.engine.inspect_request,
                   HttpMessage(method, authority, path, request_headers, b""), mode="inline", deadline=deadline)
+                request_verdict = verdict
                 self.audit.record(verdict, phase="request")
                 request_checked = True
                 if verdict.action not in ("allow", "redact"):
@@ -138,6 +140,7 @@ class ExternalProcessor(rpc.ExternalProcessorServicer):
               message = HttpMessage(method, authority, path, request_headers,
                                     bytes(event.request_body.body), event.request_body.end_of_stream)
               verdict = await self._inspect(self.engine.inspect_request, message, mode="inline", deadline=deadline)
+              request_verdict = verdict
               self.audit.record(verdict, phase="request")
               request_checked = True
               if verdict.action not in ("allow", "redact"):
@@ -164,7 +167,9 @@ class ExternalProcessor(rpc.ExternalProcessorServicer):
                 raise InspectionError("unexpected_protocol_sequence")
               message = HttpMessage(method, authority, path, response_headers,
                                     bytes(event.response_body.body), event.response_body.end_of_stream)
-              verdict = await self._inspect(self.engine.inspect_response, message, mode="inline", deadline=deadline)
+              verdict = await self._inspect(self.engine.inspect_response, message, mode="inline",
+                pii_action=request_verdict.pii_policy_action,
+                pii_policy_scope=request_verdict.pii_policy_scope, deadline=deadline)
               self.audit.record(verdict, phase="response")
               response_checked = True
               if verdict.action not in ("allow", "redact"):
@@ -241,7 +246,8 @@ def create_mirror_app(engine: InspectionEngine, audit: InspectionAudit) -> FastA
           base64.b64decode(response["body_base64"], validate=True),
           complete=response.get("complete") is True)
         async with asyncio.timeout(10):
-          result = await workers.run(engine.inspect_response, response_message, mode="mirror")
+          result = await workers.run(engine.inspect_response, response_message, mode="mirror",
+            pii_action=verdict.pii_policy_action, pii_policy_scope=verdict.pii_policy_scope)
         response_event = audit.record(result, phase="response")
       return {"request": event, "response": response_event,
               "visibility": "request_response" if response else "request_only",

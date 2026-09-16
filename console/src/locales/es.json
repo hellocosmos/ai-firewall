@@ -214,7 +214,7 @@
   "External request": "Solicitud externa",
   "Request masking at destination": "Ocultación en destino",
   "Redacted receipt confirmed": "Recepción de contenido ocultado confirmada",
-  "Not applicable": "No corresponde",
+  "Not applicable": "No aplicable",
   "Response masking": "Ocultación de respuesta",
   "Redacted response confirmed": "Respuesta ocultada confirmada",
   "Decision path": "Ruta de decisión",
@@ -414,5 +414,18 @@
   "Console SSO authenticates operators. Proxy source verification does not establish agent identity.": "SSO autentica operadores; verificar el origen del proxy no autentica agentes.",
   "Sign-in configuration unavailable.": "Configuración de acceso no disponible.",
   "Entra sign-in failed. Check your assigned app role.": "Error de acceso Entra. Revise su rol de aplicación.",
-  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "La identidad del agente no está conectada a esta ruta sintética. El SSO de consola se configura aparte."
+  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "La identidad del agente no está conectada a esta ruta sintética. El SSO de consola se configura aparte.",
+  "Action policy": "Política de acciones",
+  "PII override": "Excepción de PII",
+  "{0} PII policy": "Política de PII de {0}",
+  "Inherit global": "Heredar la política global",
+  "PII policy": "Política de PII",
+  "Global default": "Valor global predeterminado",
+  "Route override": "Excepción de ruta",
+  "Tool override": "Excepción de herramienta",
+  "Mirror assessment": "Evaluación en espejo",
+  "Would allow": "Permitiría",
+  "Would block": "Bloquearía",
+  "Would redact": "Ocultaría",
+  "Would require approval": "Solicitaría aprobación"
 }

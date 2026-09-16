@@ -31,7 +31,7 @@ Abra [http://127.0.0.1:5176](http://127.0.0.1:5176). Inicie sesión con `admin` 
 
 ## Funciones operativas
 
-Panel y pruebas de solicitudes; política local de permiso/bloqueo y PII; escenarios HTTP sintéticos; auditoría; cambio de contraseña; interfaces, listeners y destinos; aplicación validada y reversión del contenedor Envoy propio.
+Panel y pruebas de solicitudes; política local de permiso/bloqueo; política PII global, por ruta y por herramienta con evaluación Mirror `would_*`; escenarios HTTP sintéticos; auditoría; cambio de contraseña; interfaces, listeners y destinos; aplicación validada y reversión del contenedor Envoy propio.
 
 Las solicitudes sintéticas recorren Envoy → inspector gRPC → destino HTTP reales. Se registran recibos del destino y ocultación de respuestas, sin sustituirlos por llamadas directas al motor. Listener predeterminado: `127.0.0.1:18082`; inspector: `18081`; destino sintético: `18090`.
 

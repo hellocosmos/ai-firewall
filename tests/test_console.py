@@ -33,7 +33,9 @@ def test_password_policy_and_persistence(tmp_path):
     c.post('/demo-api/login',json={'username':'admin','password':'1234'}).raise_for_status()
     cookie=c.cookies.get('td_demo_session')
     policy=c.get('/demo-api/policy').json()
+    assert policy['pii_rules']=={'notes.read':'inherit','notes.delete':'inherit'}
     policy['rules']['notes.read']='block'
+    policy['pii_rules']['notes.read']='block'
     assert c.post('/demo-api/policy',json=policy).status_code==200
     assert c.post('/demo-api/policy',json=policy).status_code==400
     assert c.post('/demo-api/password',json={'current_password':'wrong','new_password':'Synthetic-5678'}).status_code==400
@@ -45,7 +47,8 @@ def test_password_policy_and_persistence(tmp_path):
     assert c.get('/demo-api/policy').status_code==401
     c.cookies.clear()  # Remove the intentionally injected revoked cookie before normal sign-in.
     assert c.post('/demo-api/login',json={'username':'admin','password':'Synthetic-5678'}).status_code==200
-    assert c.get('/demo-api/policy').json()['rules']['notes.read']=='block'
+    saved=c.get('/demo-api/policy').json()
+    assert saved['rules']['notes.read']=='block' and saved['pii_rules']['notes.read']=='block'
 
 
 def test_network_rejects_unsafe_settings_and_stale_revision(tmp_path):
@@ -55,6 +58,19 @@ def test_network_rejects_unsafe_settings_and_stale_revision(tmp_path):
   before=manager.current()
   with pytest.raises(ValueError,match='refresh'):manager.apply({**before,'version':99})
   assert manager.current()==before
+
+
+def test_stream_response_reuses_request_selected_pii_policy(tmp_path):
+  from asr_proxy.console.dataplane import StreamInspection
+  from asr_proxy.inspection.contracts import HttpMessage, Verdict
+  runtime=Runtime(tmp_path)
+  stream=StreamInspection(runtime)
+  stream.verdict=Verdict('allow','policy_allowed','inline',
+    pii_policy_action='block',pii_policy_scope='tool')
+  message=HttpMessage('POST','tools.demo.test','/mcp',{'content-type':'application/json'},
+    b'{"message":"alex@example.com"}')
+  result=stream.inspect_response(message,mode='inline',pii_action='block',pii_policy_scope='tool')
+  assert (result.action,result.reason,result.pii_policy_scope)==('block','pii_block_policy','tool')
 
 
 def test_real_community_console_proxy(tmp_path):
@@ -83,6 +99,16 @@ def test_real_community_console_proxy(tmp_path):
       response=await run('response')
       assert response['action']=='redact' and response['transport']['response_redacted']
       assert 'alex@example.com' not in str(runtime.store.events())
+      policy=runtime.policy();policy['mode']='mirror';policy['pii_rules']['notes.read']='block'
+      await asyncio.to_thread(runtime.apply,policy)
+      mirror_pii=await run('pii')
+      assert mirror_pii['action']=='block' and mirror_pii['reason']=='pii_block_policy'
+      assert mirror_pii['hypothetical_action']=='would_block' and not mirror_pii['enforcement_applied']
+      assert mirror_pii['pii_policy_action']=='block' and mirror_pii['pii_policy_scope']=='tool'
+      assert mirror_pii['transport']['http_status']==200 and mirror_pii['transport']['upstream_received']
+      assert mirror_pii['transport']['receipt']['request_redacted'] is False
+      policy=runtime.policy();policy['mode']='inline';policy['pii_rules']['notes.read']='inherit'
+      await asyncio.to_thread(runtime.apply,policy)
       policy=runtime.policy();policy['rules']['notes.read']='block'
       await asyncio.to_thread(runtime.apply,policy)
       assert (await run('read'))['transport']['http_status']==403

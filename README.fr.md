@@ -31,7 +31,7 @@ Ouvrez [http://127.0.0.1:5176](http://127.0.0.1:5176). Connectez-vous avec `admi
 
 ## Fonctions opérationnelles
 
-Tableau de bord et preuves des requêtes ; politique locale d’autorisation/blocage et PII ; scénarios HTTP synthétiques ; audit ; mot de passe ; inventaire des interfaces, réglages listener/amont, validation, application et restauration du conteneur Envoy détenu.
+Tableau de bord et preuves des requêtes ; politique locale d’autorisation/blocage ; politique PII globale, par route et par outil avec évaluation Mirror `would_*` ; scénarios HTTP synthétiques ; audit ; mot de passe ; inventaire des interfaces, réglages listener/amont, validation, application et restauration du conteneur Envoy détenu.
 
 Les requêtes synthétiques traversent réellement Envoy → inspecteur gRPC → destination HTTP. La console enregistre les reçus et le masquage des réponses, sans appel direct au moteur en substitution. Listener par défaut : `127.0.0.1:18082` ; inspecteur : `18081` ; destination synthétique : `18090`.
 

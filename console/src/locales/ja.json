@@ -214,7 +214,7 @@
   "External request": "外部リクエスト",
   "Request masking at destination": "宛先でのリクエストマスキング",
   "Redacted receipt confirmed": "マスキング済み内容の受信確認",
-  "Not applicable": "対象外",
+  "Not applicable": "該当なし",
   "Response masking": "応答のマスキング",
   "Redacted response confirmed": "マスキング済み応答を確認",
   "Decision path": "判断経路",
@@ -414,5 +414,18 @@
   "Console SSO authenticates operators. Proxy source verification does not establish agent identity.": "コンソール SSO は運用者を認証します。転送元の検証はエージェント認証ではありません。",
   "Sign-in configuration unavailable.": "サインイン設定を取得できません。",
   "Entra sign-in failed. Check your assigned app role.": "Entra サインインに失敗しました。アプリロールを確認してください。",
-  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "この合成通信経路にエージェント認証は接続されていません。コンソール SSO は別途設定します。"
+  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "この合成通信経路にエージェント認証は接続されていません。コンソール SSO は別途設定します。",
+  "Action policy": "アクションポリシー",
+  "PII override": "PII オーバーライド",
+  "{0} PII policy": "{0} PII ポリシー",
+  "Inherit global": "グローバル設定を継承",
+  "PII policy": "PII ポリシー",
+  "Global default": "グローバル既定値",
+  "Route override": "ルート設定",
+  "Tool override": "ツール設定",
+  "Mirror assessment": "ミラー評価",
+  "Would allow": "許可予定",
+  "Would block": "ブロック予定",
+  "Would redact": "マスキング予定",
+  "Would require approval": "承認要求予定"
 }

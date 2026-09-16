@@ -64,6 +64,13 @@ class InspectionEngine:
       text = text[:start] + "[REDACTED]" + text[end:]
     return text
 
+  def _pii_policy(self, route=None, rule=None):
+    if rule is not None and rule.pii_action is not None:
+      return rule.pii_action, "tool"
+    if route is not None and route.pii_action is not None:
+      return route.pii_action, "route"
+    return self.config.pii_action, "global"
+
   def inspect_metadata(self, message: HttpMessage, *, response: bool = False):
     # Credentials are transmitted only to the attested mapped destination, not redacted.
     # They are still bound to authorization; they are never copied into inspection audit.
@@ -88,22 +95,23 @@ class InspectionEngine:
         if self._find(candidate):
           raise InspectionError("pii_in_request_target")
 
-  def _redact_json(self, value, fields: list[str] | None, entities: list[str], path=()):
+  def _redact_json(self, value, fields: list[str] | None, entities: list[str],
+                   pii_action: str, path=()):
     if isinstance(value, dict):
       result = {}
       for key, child in value.items():
         if self._find(key):
           raise InspectionError("pii_in_structural_field")
-        result[key] = self._redact_json(child, fields, entities, (*path, key))
+        result[key] = self._redact_json(child, fields, entities, pii_action, (*path, key))
       return result
     if isinstance(value, list):
-      return [self._redact_json(child, fields, entities, (*path, str(i)))
+      return [self._redact_json(child, fields, entities, pii_action, (*path, str(i)))
               for i, child in enumerate(value)]
     if isinstance(value, str):
       findings = self._find(value)
       entities.extend(f.entity_type for f in findings)
       if findings:
-        if self.config.pii_action == "block":
+        if pii_action == "block":
           raise InspectionError("pii_block_policy")
         if fields is not None and not field_allowed(path, fields):
           raise InspectionError("pii_in_nonredactable_field")
@@ -126,11 +134,13 @@ class InspectionEngine:
       original_semantics = semantics(message, route, value)
       verdict.tool, verdict.access_action, _ = original_semantics
       rule = route.tools.get(original_semantics[0]) if route.protocol == "mcp" else route.rule
+      verdict.pii_policy_action, verdict.pii_policy_scope = self._pii_policy(route, rule)
       if rule is not None and rule.effect == "block":
         raise InspectionError("local_policy_denied")
       self._signatures(value)
       check_egress(value, self.config)
-      modified = self._redact_json(value, route.redact_fields, verdict.entities)
+      modified = self._redact_json(value, route.redact_fields, verdict.entities,
+                                   verdict.pii_policy_action)
       # Only serialize when content actually changes; preserve original wire bytes otherwise.
       new_body = encode_json(modified) if modified != value else message.body
       if semantics(message, route, modified) != original_semantics:
@@ -190,7 +200,8 @@ class InspectionEngine:
 
   def _inspect_unmapped_mirror(self, message: HttpMessage, reason: str) -> Verdict:
     """Missing action mapping does not suppress data findings; it still prevents access claims."""
-    verdict = Verdict("unknown", reason, "mirror", coverage="incomplete")
+    verdict = Verdict("unknown", reason, "mirror", coverage="incomplete",
+                      pii_policy_action=self.config.pii_action, pii_policy_scope="global")
     try:
       validate_message(message, self.config)
       self.inspect_metadata(message)
@@ -203,7 +214,7 @@ class InspectionEngine:
         return verdict
       self._signatures(value)
       check_egress(value, self.config)
-      self._redact_json(value, None, verdict.entities)
+      self._redact_json(value, None, verdict.entities, self.config.pii_action)
       if verdict.entities:
         verdict.action, verdict.reason = "redact", "pii_detected_unmapped_context"
       try:
@@ -218,8 +229,16 @@ class InspectionEngine:
       verdict.action, verdict.reason = "unknown", "inspection_unavailable"
     return verdict
 
-  def inspect_response(self, message: HttpMessage, *, mode: str) -> Verdict:
-    verdict = Verdict("allow", "response_clean", mode)
+  def inspect_response(self, message: HttpMessage, *, mode: str, pii_action: str | None = None,
+                       pii_policy_scope: str | None = None) -> Verdict:
+    if pii_action is None:
+      try:
+        route = route_for(message, self.config)
+      except InspectionError:
+        route = None
+      pii_action, pii_policy_scope = self._pii_policy(route)
+    verdict = Verdict("allow", "response_clean", mode, pii_policy_action=pii_action,
+                      pii_policy_scope=pii_policy_scope)
     try:
       validate_message(message, self.config)
       self.inspect_metadata(message, response=True)
@@ -229,16 +248,16 @@ class InspectionEngine:
       if media in ("application/json", "application/json-rpc"):
         value = strict_json(message.body, self.config.max_json_depth)
         self._signatures(value)
-        modified = self._redact_json(value, None, verdict.entities)
+        modified = self._redact_json(value, None, verdict.entities, pii_action)
         new_body = encode_json(modified) if modified != value else message.body
       elif media == "text/event-stream":
-        new_body = self._redact_sse(message.body, verdict.entities)
+        new_body = self._redact_sse(message.body, verdict.entities, pii_action)
       elif media == "text/plain":
         value = message.body.decode("utf-8")
         self._signatures(value)
         findings = self._find(value)
         verdict.entities.extend(f.entity_type for f in findings)
-        if findings and self.config.pii_action == "block":
+        if findings and pii_action == "block":
           raise InspectionError("pii_block_policy")
         new_body = self._mask(value, findings).encode()
       else:
@@ -248,13 +267,21 @@ class InspectionEngine:
       return verdict
     except (InspectionError, UnicodeError) as exc:
       reason = str(exc) if isinstance(exc, InspectionError) else "invalid_utf8"
-      return Verdict("block" if mode == "inline" else "unknown", reason, mode,
-                     entities=verdict.entities, coverage="incomplete")
+      complete_detection = reason in {
+        "pii_block_policy", "secret_detected", "suspicious_instruction", "pii_in_http_header",
+        "pii_in_structural_field", "pii_in_numeric_field", "pii_in_sse_metadata",
+        "pii_in_sse_structural_field", "pii_in_nonredactable_field",
+      }
+      return Verdict("block" if mode == "inline" or complete_detection else "unknown", reason, mode,
+                     entities=verdict.entities,
+                     coverage="complete" if complete_detection else "incomplete",
+                     pii_policy_action=pii_action, pii_policy_scope=pii_policy_scope)
     except Exception:  # noqa: BLE001 - never release an unchecked response
       return Verdict("block" if mode == "inline" else "unknown", "inspection_unavailable", mode,
-                     coverage="incomplete")
+                     coverage="incomplete", pii_policy_action=pii_action,
+                     pii_policy_scope=pii_policy_scope)
 
-  def _redact_sse(self, body: bytes, entities: list[str]) -> bytes:
+  def _redact_sse(self, body: bytes, entities: list[str], pii_action: str) -> bytes:
     """Reassemble only complete, supported SSE streams; do not infer unknown delta semantics."""
     text = body.decode("utf-8").removeprefix("\ufeff").replace("\r\n", "\n").replace("\r", "\n")
     if not text.endswith("\n\n"):
@@ -483,7 +510,7 @@ class InspectionEngine:
       if kind == "json":
         value = strict_json(joined.encode(), self.config.max_json_depth)
         self._signatures(value)
-        modified = self._redact_json(value, None, entities)
+        modified = self._redact_json(value, None, entities, pii_action)
         if modified != value:
           replacement, cursor = encode_json(modified).decode(), 0
           for i, (parent, key, old) in enumerate(string_refs):
@@ -494,7 +521,7 @@ class InspectionEngine:
         continue
       findings = self._find(joined)
       entities.extend(f.entity_type for f in findings)
-      if findings and self.config.pii_action == "block":
+      if findings and pii_action == "block":
         raise InspectionError("pii_block_policy")
       if findings and kind == "structural":
         raise InspectionError("pii_in_sse_structural_field")

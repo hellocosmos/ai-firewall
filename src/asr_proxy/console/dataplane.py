@@ -51,8 +51,10 @@ class StreamInspection:
     if self.policy['mode']=='mirror':return
     return self.engine.inspect_metadata(message,response=response)
 
-  def inspect_response(self,message,*,mode):
-    self.response_verdict=self.engine.inspect_response(message,mode=self.policy['mode'])
+  def inspect_response(self,message,*,mode,pii_action=None,pii_policy_scope=None):
+    self.response_verdict=self.engine.inspect_response(message,mode=self.policy['mode'],
+      pii_action=self.verdict.pii_policy_action if self.verdict else None,
+      pii_policy_scope=self.verdict.pii_policy_scope if self.verdict else None)
     if self.policy['mode']=='mirror':return Verdict('allow','observation_only','inline')
     return self.response_verdict
 
@@ -82,6 +84,8 @@ class StreamInspection:
       'source':'demo-decryptor' if base.source_verified else 'unverified','synthetic':case_id in CASES,
       'enforcement_applied':self.completed and self.policy['mode']=='inline',
       'authorization_scope':base.authorization_scope,'approval_id':base.approval_id,
+      'pii_policy_action':base.pii_policy_action,'pii_policy_scope':base.pii_policy_scope,
+      'hypothetical_action':f'would_{verdict.action}' if self.policy['mode']=='mirror' else None,
       'request_digest':base.request_digest,'source_verified':base.source_verified,'identity_verified':False,
       'entities':sorted(set(base.entities+verdict.entities)),'coverage':verdict.coverage,
       'request':{'method':self.message.method if self.message and self.message.method in ('POST','GET','PUT','DELETE','PATCH','HEAD','OPTIONS') else 'unknown',

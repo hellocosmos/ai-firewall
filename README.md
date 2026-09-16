@@ -50,7 +50,7 @@ Open [http://127.0.0.1:5176](http://127.0.0.1:5176). Sign in with `admin` / `123
 
 ## What you can operate
 
-Dashboard and request evidence; local allow/block and PII policy; synthetic HTTP scenarios; audit; password change; interface inventory, listener/upstream settings and verified apply/rollback of the owned Envoy container.
+Dashboard and request evidence; local allow/block policy; global, route and tool PII policy with Mirror `would_*` assessment; synthetic HTTP scenarios; audit; password change; interface inventory, listener/upstream settings and verified apply/rollback of the owned Envoy container.
 
 The synthetic requests traverse a real Envoy → gRPC inspector → HTTP destination path. The console records downstream receipts and response redaction; it does not substitute a direct engine call. The default listener is `127.0.0.1:18082`; the inspector uses `18081` and the synthetic destination `18090`.
 

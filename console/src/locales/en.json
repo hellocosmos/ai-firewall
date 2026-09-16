@@ -414,5 +414,18 @@
   "Console SSO authenticates operators. Proxy source verification does not establish agent identity.": "Console SSO authenticates operators. Proxy source verification does not establish agent identity.",
   "Sign-in configuration unavailable.": "Sign-in configuration unavailable.",
   "Entra sign-in failed. Check your assigned app role.": "Entra sign-in failed. Check your assigned app role.",
-  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately."
+  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.",
+  "Action policy": "Action policy",
+  "PII override": "PII override",
+  "{0} PII policy": "{0} PII policy",
+  "Inherit global": "Inherit global",
+  "PII policy": "PII policy",
+  "Global default": "Global default",
+  "Route override": "Route override",
+  "Tool override": "Tool override",
+  "Mirror assessment": "Mirror assessment",
+  "Would allow": "Would allow",
+  "Would block": "Would block",
+  "Would redact": "Would redact",
+  "Would require approval": "Would require approval"
 }

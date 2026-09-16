@@ -40,9 +40,16 @@ class Runtime:
 
   def config(self,policy):
     if set(policy['rules'])!=set(TOOLS):raise ValueError('Every mapped tool must have an explicit rule')
+    if set(policy['pii_rules'])!=set(TOOLS):raise ValueError('Every mapped tool must have a PII rule')
+    def tool_rule(name,action,resource):
+      result={'action':action,'resource':resource,'effect':policy['rules'][name]}
+      if policy['pii_rules'][name]!='inherit':result['pii_action']=policy['pii_rules'][name]
+      return result
     config=InspectionConfig(edition='community',trusted_sources=['demo-decryptor'],pii_action=policy['pii_action'],
       nonce_db=str(self.store.directory/'nonces.sqlite'),audit_path=str(self.store.directory/'inspection.jsonl'),
-      routes=[{'authority':'tools.demo.test','path':'/mcp','tools':{name:{'action':action,'resource':resource,'effect':policy['rules'][name]} for name,(action,resource) in TOOLS.items()},'redact_fields':['/params/arguments/message']}])
+      routes=[{'authority':'tools.demo.test','path':'/mcp','tools':{
+        name:tool_rule(name,action,resource) for name,(action,resource) in TOOLS.items()},
+        'redact_fields':['/params/arguments/message']}])
     network=self.store.get('network')
     if network:config.max_body_bytes=network['max_body_bytes']
     return config

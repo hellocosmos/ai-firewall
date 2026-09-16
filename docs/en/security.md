@@ -19,6 +19,10 @@ Offline inspection evaluates all six language profiles for every supported paylo
 
 National identifiers use format and checksum validation where the standard defines one. The implementations follow [China GB 11643](https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=080D6FBF2BB468F9007657F26D60013E), the [Japanese Individual Number modulus-11 rule](https://www.j-lis.go.jp/data/open/cnt/3/1282/1/H2707_qa.pdf) and the [INSEE NIR control key](https://xml.insee.fr/schema/nir.html). This is deterministic pattern inspection, not general NER: names, locations, postal addresses, images, OCR and arbitrary files are outside this release.
 
+### Policy selection and Mirror evidence
+
+PII handling uses one deterministic precedence: **mapped tool/action → route → global default**. The request-selected action also governs its supported response body, including complete buffered SSE. Evidence records only the action and scope, never captured content. In Mirror mode, complete findings retain `would_redact` or `would_block` while original bytes continue unchanged; incomplete transport or inspection remains `unknown`.
+
 ## Secret exposure coverage
 
 Offline inspection blocks recognized private keys, common AWS, GitHub, GCP, Slack, Stripe and OpenAI token forms, structurally valid signed JWTs, Azure Storage SAS query combinations, and high-entropy values in sensitive JSON fields. It applies to supported request bodies, responses and reassembled SSE streams.
