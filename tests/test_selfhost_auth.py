@@ -1,5 +1,8 @@
 """Gateway caller authentication and independent target credentials."""
 from types import SimpleNamespace
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import json
+import threading
 import time
 
 import jwt
@@ -102,6 +105,33 @@ def test_jwks_error_is_sanitized(signing_key):
   with pytest.raises(AuthError) as error:
     auth.authenticate({'authorization':'Bearer '+encoded(signing_key)})
   assert str(error.value)=='invalid_token'
+
+
+def test_protocol_realistic_synthetic_jwks_lookup(signing_key):
+  public=json.loads(jwt.algorithms.RSAAlgorithm.to_jwk(signing_key.public_key()))
+  public.update(kid='synthetic-key',use='sig',alg='RS256')
+  document=json.dumps({'keys':[public]}).encode()
+  class Handler(BaseHTTPRequestHandler):
+    def log_message(self,*args):pass
+    def do_GET(self):
+      if self.path!='/jwks':self.send_error(404);return
+      self.send_response(200);self.send_header('Content-Type','application/json')
+      self.send_header('Content-Length',str(len(document)));self.end_headers();self.wfile.write(document)
+  server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+  thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+  try:
+    issuer=f'http://127.0.0.1:{server.server_port}'
+    resource='http://127.0.0.1:18084/mcp'
+    config=auth_config(issuer=issuer,audience=resource,jwks_uri=issuer+'/jwks',resource=resource,
+      authorization_servers=[issuer],allow_insecure_loopback=True)
+    now=int(time.time())
+    token=jwt.encode({'iss':issuer,'aud':resource,'sub':'synthetic-agent','iat':now,'exp':now+300,
+      'scope':'mcp.invoke'},signing_key,algorithm='RS256',headers={'kid':'synthetic-key'})
+    result=GatewayAuthenticator(config,client_key=CLIENT_KEY).authenticate(
+      {'authorization':'Bearer '+token})
+    assert result.subject=='synthetic-agent'
+  finally:
+    server.shutdown();server.server_close();thread.join(timeout=2)
 
 
 @pytest.mark.parametrize(('target','gateway_mode','inbound','expected'),[

@@ -19,6 +19,7 @@ dependencies = [
 [project.optional-dependencies]
 console = ["psutil>=6,<8"]
 pilot = ["mcp==1.30.0", "psutil>=6,<8"]
+compat = ["mcp==1.30.0"]
 dev = ["pytest>=8.3,<9", "pytest-asyncio>=0.24,<1"]
 
 [project.scripts]
