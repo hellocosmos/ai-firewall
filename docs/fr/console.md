@@ -34,7 +34,7 @@ L’émetteur simule un relais de confiance après déchiffrement TLS et signe l
 
 ## Pages et premier parcours
 
-1. **Tableau de bord :** lancez lecture, masquage client, suppression, injection, transfert externe et PII de réponse. Les données proviennent de vraies requêtes, pas de décisions préremplies.
+1. **Tableau de bord :** lancez lecture, masquage client, blocage d’identifiant divulgué, suppression, injection, transfert externe et PII de réponse. Les données proviennent de vraies requêtes, pas de décisions préremplies.
 2. **Trafic / Événements :** filtrez et consultez statut HTTP, réception à destination, masquage et version de politique. Le CSV contient des métadonnées expurgées.
 3. **Politiques :** bloquez `notes.read`, validez, appliquez puis rejouez. Rétablissez l’autorisation ensuite. Les nouveaux flux prennent la mise à jour ; les flux en cours gardent leur politique.
 4. **Connexions / Système :** vérifiez composants et chemin. ** Audit :** examinez les changements de connexion, politique et réseau.

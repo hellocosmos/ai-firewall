@@ -106,6 +106,14 @@ def test_secret_in_comment_blocks(engine):
   assert inspect(engine, body).reason == "secret_detected"
 
 
+def test_secret_split_across_sse_deltas_blocks(engine):
+  secret = "AIza" + "A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7R"
+  body = frame(chat(secret[:18])) + frame(chat(secret[18:])) + b"data: [DONE]\n\n"
+  result = inspect(engine, body)
+  assert result.action == "block" and result.reason == "secret_detected"
+  assert result.body is None
+
+
 def test_protocol_id_is_not_redacted_into_a_different_identifier(engine):
   value = chat("safe")
   value["id"] = "synthetic@example.com"

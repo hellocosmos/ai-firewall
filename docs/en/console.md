@@ -34,7 +34,7 @@ The sender simulates a trusted forwarding hop after TLS decryption. It signs exa
 
 ## Pages and a first walkthrough
 
-1. **Dashboard:** run Read business notes, Redact customer data, Delete protected notes, injection, external transfer and response PII scenarios. Data is produced by real requests, not prefilled verdicts.
+1. **Dashboard:** run business-read, PII redaction, leaked-credential blocking, protected deletion, injection, external transfer and response PII scenarios. Data is produced by real requests, not prefilled verdicts.
 2. **Traffic / Events:** filter decisions and open details. Check HTTP status, destination receipt, masking and policy version. CSV exports contain sanitized metadata.
 3. **Policies:** change `notes.read` to block, validate, apply, and rerun. Restore allow when finished. Updates apply to new streams; in-flight streams retain their policy snapshot.
 4. **Connections / System:** inspect component readiness and the actual path. ** Audit:** review sign-in, policy and network changes.

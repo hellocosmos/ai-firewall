@@ -47,6 +47,8 @@ L’inventaire NIC et la topologie sont expliqués. La démo loopback ne configu
 
 Le code applicatif est en anglais, avec six dictionnaires UI complets. L’inspection PII hors ligne prend en charge des motifs et validateurs explicites en anglais, coréen, chinois simplifié, japonais, espagnol et français. Elle ne fournit pas de NER général pour les noms, lieux ou adresses. Chaque guide propose un choix de langue en haut.
 
+L’inspection déterministe des secrets bloque les jetons fournisseurs reconnus, les JWT signés, les liens SAS Azure Storage et les identifiants à forte entropie dans les corps, réponses et flux SSE pris en charge. Les en-têtes d’identification ne sont transmis qu’à la destination mappée et vérifiée par signature, puis exclus de l’audit. Consultez [Security](docs/fr/security.md) pour le périmètre et les limites.
+
 ```bash
 .venv/bin/python -m pytest -q
 npm run check --prefix console

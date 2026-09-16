@@ -4,6 +4,26 @@ All notable changes to TrapDefense Community are documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases use the `0.31`, `0.32` numbering sequence.
 
+## [0.32] - 2026-09-16
+
+### Added
+
+- Bounded offline detection for recognized AWS, GitHub, GCP, Slack, Stripe and OpenAI token forms.
+- Structural signed-JWT validation, Azure Storage SAS query detection and high-entropy credential checks for sensitive JSON fields.
+- Secret inspection across supported request bodies, responses, headers and reassembled SSE streams.
+- A six-language `Block leaked credential` console scenario that traverses the installed Envoy path.
+
+### Security
+
+- Recognized credentials fail closed with the stable `secret_detected` reason and captured values are never copied into verdict evidence or audit records.
+- Request authorization, cookie and API-key headers remain pass-through only on the signed, explicitly mapped destination path; response headers are inspected.
+- Malformed JWT-like strings, ordinary `sig` query parameters and documented placeholders are excluded to reduce obvious false positives.
+
+### Verified
+
+- Synthetic provider-token, JWT, Azure SAS, sensitive-field, request, response, SSE split-stream, credential-header and sanitized-evidence tests.
+- Existing Community request, response, PII, protocol, console and proxy integration suites.
+
 ## [0.31] - 2026-09-16
 
 ### Added
@@ -55,5 +75,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Com
 - Local audit storage is mutable, and content detection can produce false positives or false negatives.
 - Enterprise Access Broker, approvals and delegated authorization are distributed separately.
 
+[0.32]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.32
 [0.31]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.31
 [0.3.0]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.3.0

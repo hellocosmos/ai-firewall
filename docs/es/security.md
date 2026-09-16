@@ -19,6 +19,12 @@ La inspección sin conexión evalúa los seis perfiles de idioma para cada carga
 
 Los identificadores nacionales validan formato y suma de comprobación cuando la norma la define. Es inspección determinista de patrones, no NER general: nombres, ubicaciones, direcciones postales, imágenes, OCR y archivos arbitrarios quedan fuera de esta versión.
 
+## Cobertura de exposición de secretos
+
+La inspección sin conexión bloquea claves privadas reconocidas, formatos comunes de tokens de AWS, GitHub, GCP, Slack, Stripe y OpenAI, JWT firmados con estructura válida, combinaciones de consulta SAS de Azure Storage y valores de alta entropía en campos JSON sensibles. Se aplica a cuerpos de solicitud compatibles, respuestas y flujos SSE reensamblados.
+
+Las cabeceras `Authorization`, cookie y API-key de la solicitud solo se conservan para la ruta de destino ya autenticada por firma y asignada explícitamente, y se omiten de la auditoría. Las cabeceras de respuesta sí se inspeccionan. Texto parecido a JWT pero no válido, parámetros `sig` ordinarios y marcadores de documentación no se bloquean. El registro contiene solo `secret_detected`, nunca el valor capturado. La cobertura determinista puede omitir formatos nuevos o propios y producir falsos positivos; rote toda credencial real que pudiera haber cruzado un límite no confiable.
+
 El perímetro cubre tráfico HTTP/MCP compatible, enrutado explícitamente desde un salto firmado de confianza. Los ejemplos locales son demostraciones sintéticas, no equipos de producción endurecidos.
 
 - Limite los listeners de texto claro, ExtProc y mirror a redes y remitentes de confianza.

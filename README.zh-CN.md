@@ -47,6 +47,8 @@ Community 包含本地策略、显式 HTTP/MCP 映射、可信跳签名、有界
 
 应用源码使用英语，并维护六套完整 UI 字典。离线 PII 检查支持英语、韩语、简体中文、日语、西班牙语和法语的显式模式与校验器；不提供覆盖姓名、位置和地址的通用 NER。每份本地化指南顶部均可切换语言。
 
+确定性的 Secret 检查会在受支持的正文、响应和 SSE 中阻止已识别的服务商令牌、签名 JWT、Azure Storage SAS 链接和敏感字段中的高熵凭证。请求凭证头仅传给已完成签名验证的映射目标，并从审计证据中排除。具体范围和限制请参阅 [Security](docs/zh-CN/security.md)。
+
 ```bash
 .venv/bin/python -m pytest -q
 npm run check --prefix console

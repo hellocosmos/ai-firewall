@@ -47,6 +47,8 @@ Incluye inventario de interfaces y explicación de topología. La demo loopback 
 
 El código de aplicación está en inglés y mantiene seis diccionarios UI completos. La inspección PII sin conexión admite patrones y validadores explícitos en inglés, coreano, chino simplificado, japonés, español y francés. No ofrece NER general de nombres, ubicaciones o direcciones. Cada guía tiene un selector de idioma al principio.
 
+La inspección determinista de secretos bloquea tokens de proveedores reconocidos, JWT firmados, enlaces SAS de Azure Storage y credenciales de alta entropía en campos sensibles de cuerpos, respuestas y SSE compatibles. Las cabeceras de credenciales solo llegan al destino asignado y verificado por firma, y se excluyen de la auditoría. Consulte [Security](docs/es/security.md) para conocer alcance y límites.
+
 ```bash
 .venv/bin/python -m pytest -q
 npm run check --prefix console

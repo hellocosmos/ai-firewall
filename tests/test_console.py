@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from asr_proxy.console.app import create_app
 from asr_proxy.console.runtime import Runtime
 from asr_proxy.console.network import NetworkConfig, NetworkManager
+from asr_proxy.console.scenarios import CASES
 from asr_proxy.console.store import Store
 
 HEADERS={'origin':'http://127.0.0.1:5176','x-td-demo':'1'}
@@ -75,6 +76,10 @@ def test_real_community_console_proxy(tmp_path):
       assert blocked['transport']['upstream_received'] is False
       pii=await run('pii')
       assert pii['action']=='redact' and pii['transport']['receipt']['request_redacted']
+      secret=await run('secret')
+      assert secret['action']=='block' and secret['reason']=='secret_detected'
+      assert secret['transport']['upstream_received'] is False
+      assert CASES['secret']['message'] not in str(runtime.store.events())
       response=await run('response')
       assert response['action']=='redact' and response['transport']['response_redacted']
       assert 'alex@example.com' not in str(runtime.store.events())

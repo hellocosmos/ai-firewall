@@ -48,6 +48,7 @@ export const reasons = {
   response_pii_redacted: "Personal data in the tool response was redacted.",
   policy_allowed: "The mapped tool and local policy allowed the request.",
   pii_redacted: "Personal data in permitted fields was redacted.",
+  secret_detected: "A recognized credential was blocked without recording its value.",
   local_policy_denied: "An explicit policy blocked this tool action.",
   suspicious_instruction: "A known suspicious instruction pattern was detected.",
   pii_block_policy: "The request matched the personal-data blocking policy.",

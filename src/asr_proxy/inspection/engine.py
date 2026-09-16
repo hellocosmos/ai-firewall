@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from dataclasses import replace
 from urllib.parse import parse_qsl, unquote, urlsplit
 
@@ -19,9 +18,7 @@ from .protocol import (
   strict_json,
   validate_message,
 )
-
-SECRET_PATTERN = re.compile(r"(?:-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|"
-                            r"\bAKIA[0-9A-Z]{16}\b|\bgh[pousr]_[A-Za-z0-9]{30,}\b)")
+from .secret_detection import contains_secret
 
 
 def field_allowed(path: tuple[str, ...], patterns: list[str]) -> bool:
@@ -46,10 +43,10 @@ class InspectionEngine:
             if finding.score >= self.config.pii_min_score]
 
   def _signatures(self, value):
+    if contains_secret(value):
+      raise InspectionError("secret_detected")
     for text in iter_strings(value):
       check_deadline()
-      if SECRET_PATTERN.search(text):
-        raise InspectionError("secret_detected")
       try:
         if any(pattern.search(text, timeout=0.02) for pattern in self.signature_patterns):
           raise InspectionError("suspicious_instruction")

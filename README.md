@@ -66,6 +66,8 @@ NIC inventory and topology explanation are included. The loopback demo does not 
 
 English application source and six complete UI dictionaries are maintained together. Offline PII inspection covers explicit English, Korean, Simplified Chinese, Japanese, Spanish and French patterns and validators. It does not provide general name, location or address NER. Localized guides have a language switch at the top.
 
+Deterministic secret inspection blocks recognized provider tokens, signed JWTs, Azure Storage SAS links and high-entropy credentials in sensitive fields across supported bodies, responses and SSE. Request credential headers remain bound to the attested mapped destination and are excluded from audit evidence. See [Security](docs/en/security.md) for exact coverage and limitations.
+
 ```bash
 .venv/bin/python -m pytest -q
 npm run check --prefix console

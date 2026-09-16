@@ -53,6 +53,13 @@ def test_redaction_preserves_request_and_records_final_digest(engine):
   assert result.request_digest
 
 
+def test_secret_in_request_body_is_blocked_without_echoing_value(engine):
+  secret = "sk-proj-" + "A1b2C3d4E5f6G7h8I9j0K1l2"
+  result = engine.inspect_request(message(text=secret), mode="inline")
+  assert (result.action, result.reason, result.body) == ("block", "secret_detected", None)
+  assert secret not in json.dumps(result.evidence(phase="request"))
+
+
 @pytest.mark.parametrize("kwargs,reason", [
   ({"tool": "notes.delete"}, "local_policy_denied"),
   ({"tool": "unknown"}, "unmapped_tool"),

@@ -34,7 +34,7 @@ El emisor simula un salto de confianza tras el descifrado TLS y firma solicitude
 
 ## Páginas y primer recorrido
 
-1. **Panel:** ejecute lectura de notas, ocultación de datos, borrado, inyección, transferencia externa y PII de respuesta. Los datos proceden de solicitudes reales, no de decisiones precargadas.
+1. **Panel:** ejecute lectura de notas, ocultación de datos, bloqueo de credenciales filtradas, borrado, inyección, transferencia externa y PII de respuesta. Los datos proceden de solicitudes reales, no de decisiones precargadas.
 2. **Tráfico / Eventos:** filtre y revise el estado HTTP, recepción en destino, ocultación y versión de política. El CSV contiene metadatos depurados.
 3. **Políticas:** bloquee `notes.read`, valide, aplique y repita. Restaure permitir al terminar. Los cambios afectan a flujos nuevos; los ya iniciados conservan su política.
 4. **Conexiones / Sistema:** revise componentes y ruta. ** Auditoría:** examine cambios de sesión, política y red.
