@@ -2,6 +2,12 @@
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
+## Compatibilité et disponibilité
+
+Self-hosted Community est une préversion installée depuis les sources avec des exemples de proxy Docker. Un paquet Docker intégré est prévu. TrapDefense Cloud est également prévu, avec le même socle d’inspection ; aucune inscription ni utilisation n’est encore disponible.
+
+[Offres et compatibilité](deployment-fit.md)
+
 Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](identity.md).
 
 ## État actuel de livraison

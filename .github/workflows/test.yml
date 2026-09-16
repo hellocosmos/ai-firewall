@@ -37,7 +37,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install -e '.[dev,console]'
+      - run: pip install -e '.[dev,console,pilot]'
       - run: docker pull envoyproxy/envoy@sha256:57e14a549d7bd43c8d3f6d03e8cfa653e037d4b38e133acd9b54f38c524401b4
       - run: TD_CONSOLE_E2E=1 pytest tests/test_console.py -q
       - run: TD_RUNTIME_SMOKE=1 pytest tests/runtime/test_inspector_pool_runtime.py tests/runtime/test_console_pool_runtime.py -q
+      - run: TD_MCP_PILOT=1 python -m pytest tests/test_mcp_pilot.py tests/runtime/test_mcp_pilot_runtime.py -q

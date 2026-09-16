@@ -2,6 +2,12 @@
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
+## 部署条件与提供状态
+
+Self-hosted Community 目前为源码预览版，包含基于 Docker 的代理示例。统一 Docker 安装包仍在规划中。使用相同检查基础的托管 TrapDefense Cloud 也在规划中，尚未开放注册或使用。
+
+[交付与兼容性](deployment-fit.md)
+
 Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](identity.md).
 
 ## 当前交付状态

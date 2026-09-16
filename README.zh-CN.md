@@ -18,6 +18,14 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](docs/zh-CN/identity.md).
 
+## 部署条件与提供状态
+
+保护可通过受支持检查路径的 HTTP API 和远程 MCP 调用。保留 MCP 服务器和连接器中的现有服务认证，不替代 IAM。
+
+Self-hosted Community 目前为源码预览版，包含基于 Docker 的代理示例。统一 Docker 安装包仍在规划中。使用相同检查基础的托管 TrapDefense Cloud 也在规划中，尚未开放注册或使用。
+
+[交付与兼容性](docs/zh-CN/deployment-fit.md)
+
 ## TrapDefense 的差异
 
 TrapDefense 控制模型输出转化为真实操作的边界，将基于代理的执行点、本地数据保护和明确的身份语义结合在同一运行路径中。
@@ -93,3 +101,9 @@ Community 采用 MIT 许可，不包含私有 Enterprise 代码和客户资产�
 在 Connections / System 查看 PID、状态和重启次数。管理员可在 Settings → Inspector processes 选择 1、2 或 4 个进程并应用、启动或停止。Viewer 仅可查看。停止期间阻止内联流量。
 
 [Operations](docs/zh-CN/operations.md) · [Inspector pool](docs/zh-CN/inspector-pool.md)
+
+## 真实 MCP 试点（0.35 Community Preview）
+
+通过防火墙运行真实 MCP 初始化、发现和文档工具，可选连接本地 LLM。明确区分合成数据、检测边界与直接/代理延迟。
+
+[MCP pilot](docs/zh-CN/mcp-pilot.md)

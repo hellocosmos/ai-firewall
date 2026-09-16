@@ -23,6 +23,14 @@ Logical product flow. See [deployment architecture](docs/en/architecture.md) for
 
 Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](docs/en/identity.md).
 
+## Deployment fit and availability
+
+Protect the HTTP API and remote MCP calls you can route through a supported inspection path. Keep existing service authentication in your MCP servers and connectors; do not replace your IAM.
+
+Self-hosted Community is available as a source-based preview with Docker-backed proxy examples. A unified Docker installation package is planned. TrapDefense Cloud is planned, not available for sign-up: the intended managed offering uses the same inspection foundation.
+
+[Delivery and compatibility](docs/en/deployment-fit.md)
+
 ## Why TrapDefense
 
 TrapDefense governs the point where model output becomes a real action. It combines a proxy-based enforcement boundary with local data protection and explicit identity semantics.
@@ -115,3 +123,9 @@ MIT for Community. Private Enterprise code and customer assets are not included.
 Operate 1, 2 or 4 inspector processes from the console, view recovery state, and install an opt-in Linux user service. Same-host recovery is not cross-server HA.
 
 [Operations](docs/en/operations.md) · [Inspector pool](docs/en/inspector-pool.md)
+
+## Real MCP pilot (0.35 Community Preview)
+
+Run actual MCP initialization, discovery and document tools through the firewall; optionally add a local LLM agent. Synthetic data, explicit detection limits and measured direct/proxy latency.
+
+[MCP pilot](docs/en/mcp-pilot.md)

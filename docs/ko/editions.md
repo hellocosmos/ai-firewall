@@ -2,6 +2,12 @@
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
+## 배포 적합성과 제공 상태
+
+Self-hosted Community는 Docker 프록시 예제를 포함한 소스 기반 Preview입니다. 통합 Docker 설치 패키지는 계획 중입니다. 같은 검사 기반을 사용하는 관리형 TrapDefense Cloud도 계획 중이며 아직 가입·사용할 수 없습니다.
+
+[제공 방식과 호환성](deployment-fit.md)
+
 Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다. [Entra SSO](identity.md).
 
 ## 현재 제공 상태

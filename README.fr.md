@@ -18,6 +18,14 @@ Flux logique du produit. Consultez l’[architecture de déploiement](docs/fr/ar
 
 Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](docs/fr/identity.md).
 
+## Compatibilité et disponibilité
+
+Protégez les appels HTTP API et MCP distants que vous pouvez acheminer via un chemin d’inspection pris en charge. Conservez l’authentification des serveurs MCP et connecteurs ; ne remplacez pas votre IAM.
+
+Self-hosted Community est une préversion installée depuis les sources avec des exemples de proxy Docker. Un paquet Docker intégré est prévu. TrapDefense Cloud est également prévu, avec le même socle d’inspection ; aucune inscription ni utilisation n’est encore disponible.
+
+[Offres et compatibilité](docs/fr/deployment-fit.md)
+
 ## Pourquoi TrapDefense
 
 TrapDefense gouverne le point où la sortie du modèle devient une action réelle. Il réunit un point d’application par proxy, une protection locale des données et des limites d’identité explicites.
@@ -95,3 +103,9 @@ Community est sous MIT. Le code Enterprise privé et les actifs clients sont exc
 Connections / System affiche les PID, états et redémarrages. Dans Settings → Inspector processes, l’administrateur choisit 1, 2 ou 4 processus et applique, démarre ou arrête l’inspection. Viewer dispose d’un accès en lecture seule. L’arrêt bloque le trafic inline.
 
 [Operations](docs/fr/operations.md) · [Inspector pool](docs/fr/inspector-pool.md)
+
+## Pilote MCP réel (candidat local 0.35)
+
+Exécutez initialisation, découverte et outils documentaires MCP réels via le pare-feu, avec un agent LLM local facultatif. Données synthétiques, limites explicites et latence directe/proxy.
+
+[MCP pilot](docs/fr/mcp-pilot.md)

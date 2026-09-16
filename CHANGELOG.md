@@ -6,6 +6,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Com
 
 ## [Unreleased]
 
+## [0.35] - 2026-09-17
+
+### Added
+
+- Optional real MCP pilot using the pinned official Python SDK: initialization, discovery and persisted document tool operations through the existing Envoy/Community inspector.
+- Separate local signing adapter with fixed destination, private key, fresh attestations, reserved-context removal and bounded forwarding; no agent SDK or production network-isolation claim.
+- Deterministic request/response PII and secret checks, denied deletion with downstream state verification, unknown/unsigned calls and inspector-outage blocking.
+- Bounded actual local LLM tool loop with schema validation, explicit model endpoint, no scripted fallback, no identical-call replay and sanitized model/protocol evidence.
+- Six-language guides, direct-versus-proxy sequential latency measurements and an opt-in CI regression.
+
+### Documentation
+
+- Clarify supported HTTP/MCP deployment paths, existing authentication, self-hosted availability and planned Docker packaging / managed Cloud across six languages.
+
+### Limits
+
+- A semantic malicious instruction outside the current signatures passes unchanged. The pilot records this known detection miss separately from policy enforcement.
+- Model refusal, incomplete tasks and unexercised cases are distinguished from firewall detection. Response blocking cannot undo an already-executed tool action.
+- Stateless Streamable HTTP JSON and finite synthetic documents only; no customer MCP/OAuth, production sizing, HA or language migration claim.
+
+
 ## [0.34] - 2026-09-16
 
 ### Operations

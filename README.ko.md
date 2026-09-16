@@ -18,6 +18,14 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다. [Entra SSO](docs/ko/identity.md).
 
+## 배포 적합성과 제공 상태
+
+지원하는 검사 경로로 전달할 수 있는 HTTP API·원격 MCP 호출을 보호합니다. MCP와 커넥터의 기존 서비스 인증을 활용하며 IAM을 대체하지 않습니다.
+
+Self-hosted Community는 Docker 프록시 예제를 포함한 소스 기반 Preview입니다. 통합 Docker 설치 패키지는 계획 중입니다. 같은 검사 기반을 사용하는 관리형 TrapDefense Cloud도 계획 중이며 아직 가입·사용할 수 없습니다.
+
+[제공 방식과 호환성](docs/ko/deployment-fit.md)
+
 ## TrapDefense가 다른 점
 
 TrapDefense는 모델의 출력이 실제 행동으로 바뀌는 지점을 통제합니다. 프록시 기반 집행 경계, 로컬 데이터 보호, 명확한 신원 의미를 하나의 운영 경로로 결합합니다.
@@ -93,3 +101,9 @@ Community는 MIT 라이선스입니다. 비공개 Enterprise 코드와 고객 �
 Connections / System에서 PID·상태·재시작 횟수를 확인합니다. 관리자는 Settings → Inspector processes에서 1·2·4개를 선택하고 적용/시작/중지할 수 있습니다. Viewer는 조회만 가능합니다. 중지 중에는 인라인 트래픽이 차단됩니다.
 
 [Operations](docs/ko/operations.md) · [Inspector pool](docs/ko/inspector-pool.md)
+
+## 실제 MCP 파일럿 (0.35 Community Preview)
+
+실제 MCP 초기화·도구 조회·문서 작업을 방화벽 경로로 실행하고 로컬 LLM 에이전트를 선택적으로 연결합니다. 합성 데이터·탐지 한계·직접/프록시 지연을 구분합니다.
+
+[MCP pilot](docs/ko/mcp-pilot.md)
