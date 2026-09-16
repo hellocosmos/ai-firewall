@@ -26,7 +26,8 @@ class GatewayAuthenticator:
     self.config,self.client_key=config,client_key
     self.keys=jwk_client
     if isinstance(config,JwtGatewayAuth) and self.keys is None:
-      self.keys=jwt.PyJWKClient(config.jwks_uri,timeout=5,lifespan=300)
+      # Bound unknown-kid refreshes to protect the IdP while accepting normal key rotation quickly.
+      self.keys=jwt.PyJWKClient(config.jwks_uri,timeout=5,lifespan=300,cooldown_duration=5)
 
   def authenticate(self,headers: dict[str,str]):
     if isinstance(self.config,ClientKeyGatewayAuth):
@@ -68,4 +69,3 @@ class GatewayAuthenticator:
       if error.code=='insufficient_scope':
         value+=f', scope="{" ".join(self.config.required_scopes)}"'
     return value
-

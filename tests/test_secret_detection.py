@@ -82,6 +82,17 @@ def test_request_credential_headers_pass_but_response_headers_are_inspected(engi
     engine.inspect_metadata(request, response=True)
 
 
+def test_configured_target_credential_header_is_bound_but_not_content_scanned():
+  token = "sk-proj-" + "A1b2C3d4E5f6G7h8I9j0K1l2"
+  engine=InspectionEngine(InspectionConfig(routes=[],
+    credential_headers=['ocp-apim-subscription-key']),NoPii(),None,None)
+  request=HttpMessage('POST','example.test','/api',{
+    'ocp-apim-subscription-key':token,'x-business-value':'safe'},b'')
+  engine.inspect_metadata(request)
+  with pytest.raises(InspectionError,match='^secret_detected$'):
+    engine.inspect_metadata(request,response=True)
+
+
 def test_secret_verdict_and_evidence_never_include_captured_value(engine):
   secret = "sk-proj-" + "A1b2C3d4E5f6G7h8I9j0K1l2"
   message = HttpMessage("POST", "example.test", "/api", {

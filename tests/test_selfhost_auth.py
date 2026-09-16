@@ -110,11 +110,12 @@ def test_jwks_error_is_sanitized(signing_key):
 def test_protocol_realistic_synthetic_jwks_lookup(signing_key):
   public=json.loads(jwt.algorithms.RSAAlgorithm.to_jwk(signing_key.public_key()))
   public.update(kid='synthetic-key',use='sig',alg='RS256')
-  document=json.dumps({'keys':[public]}).encode()
+  documents=[json.dumps({'keys':[public]}).encode()]
   class Handler(BaseHTTPRequestHandler):
     def log_message(self,*args):pass
     def do_GET(self):
       if self.path!='/jwks':self.send_error(404);return
+      document=documents[0]
       self.send_response(200);self.send_header('Content-Type','application/json')
       self.send_header('Content-Length',str(len(document)));self.end_headers();self.wfile.write(document)
   server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
@@ -127,9 +128,17 @@ def test_protocol_realistic_synthetic_jwks_lookup(signing_key):
     now=int(time.time())
     token=jwt.encode({'iss':issuer,'aud':resource,'sub':'synthetic-agent','iat':now,'exp':now+300,
       'scope':'mcp.invoke'},signing_key,algorithm='RS256',headers={'kid':'synthetic-key'})
-    result=GatewayAuthenticator(config,client_key=CLIENT_KEY).authenticate(
-      {'authorization':'Bearer '+token})
+    authenticator=GatewayAuthenticator(config,client_key=CLIENT_KEY)
+    result=authenticator.authenticate({'authorization':'Bearer '+token})
     assert result.subject=='synthetic-agent'
+    rotated=rsa.generate_private_key(public_exponent=65537,key_size=2048)
+    rotated_public=json.loads(jwt.algorithms.RSAAlgorithm.to_jwk(rotated.public_key()))
+    rotated_public.update(kid='rotated-key',use='sig',alg='RS256')
+    documents[0]=json.dumps({'keys':[rotated_public]}).encode()
+    time.sleep(5.05)
+    rotated_token=jwt.encode({'iss':issuer,'aud':resource,'sub':'rotated-agent','iat':now,
+      'exp':now+300,'scope':'mcp.invoke'},rotated,algorithm='RS256',headers={'kid':'rotated-key'})
+    assert authenticator.authenticate({'authorization':'Bearer '+rotated_token}).subject=='rotated-agent'
   finally:
     server.shutdown();server.server_close();thread.join(timeout=2)
 

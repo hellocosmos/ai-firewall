@@ -90,7 +90,7 @@ class InspectionEngine:
     # Credentials are transmitted only to the attested mapped destination, not redacted.
     # They are still bound to authorization; they are never copied into inspection audit.
     credentials = {"authorization", "proxy-authorization", "cookie", "x-api-key", "api-key",
-                   "x-goog-api-key"}
+                   "x-goog-api-key", *self.config.credential_headers}
     for key, value in application_headers(message.headers).items():
       if not response and key in credentials:
         continue

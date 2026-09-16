@@ -38,7 +38,10 @@ class SelfhostRuntime(Runtime):
         key = f'{index}:{name}'
         rule.effect = policy['rules'][key]
         rule.pii_action = None if policy['pii_rules'][key]=='inherit' else policy['pii_rules'][key]
+    credential_headers=([self.deployment.target_auth.header]
+      if self.deployment.target_auth.mode=='static_api_key' else [])
     return InspectionConfig(edition='community',trusted_sources=['selfhost-adapter'],routes=routes,
+      credential_headers=credential_headers,
       max_body_bytes=self.deployment.max_body_bytes,pii_action=policy['pii_action'],
       nonce_db=str(self.store.directory/'nonces.sqlite'),audit_path=str(self.store.directory/'inspection.jsonl'))
 

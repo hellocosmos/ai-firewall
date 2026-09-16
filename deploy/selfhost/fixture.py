@@ -19,7 +19,7 @@ class Handler(BaseHTTPRequestHandler):
     else:raw=self.rfile.read(int(self.headers.get('Content-Length','0')))
     value=json.loads(raw)
     if (self.headers.get('Authorization')!='Bearer synthetic-target-token'
-        and self.headers.get('X-API-Key')!='synthetic-target-token'):
+        and self.headers.get('X-API-Key')!='sk-proj-A1b2C3d4E5f6G7h8I9j0K1l2'):
       self.send_response(401);self.send_header('Content-Length','0');self.end_headers();return
     if any(name.lower().startswith(('x-td-','x-asr-')) for name in self.headers):
       self.send_response(500);self.send_header('Content-Length','0');self.end_headers();return

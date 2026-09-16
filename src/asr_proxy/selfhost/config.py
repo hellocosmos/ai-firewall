@@ -46,6 +46,8 @@ class JwtGatewayAuth(BaseModel):
       _network_url(server,'authorization_servers',allow_loopback=self.allow_insecure_loopback)
     if len(set(self.authorization_servers))!=len(self.authorization_servers):
       raise ValueError('authorization_servers must be unique')
+    if self.issuer not in self.authorization_servers:
+      raise ValueError('authorization_servers must include the token issuer')
     if len(set(self.required_scopes))!=len(self.required_scopes) or any(
         not re.fullmatch(r'[A-Za-z0-9._:/-]{1,128}', scope) for scope in self.required_scopes):
       raise ValueError('required_scopes must be unique OAuth scope tokens')

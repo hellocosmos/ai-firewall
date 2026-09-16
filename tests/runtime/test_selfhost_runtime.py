@@ -25,6 +25,8 @@ def test_package_lifecycle(tmp_path,mode):
   config=yaml.safe_load((ROOT/'deploy/selfhost/deployment.yaml').read_text())
   config['console_origin']=origin
   static=mode!='passthrough_bearer'
+  secret_value=('sk-proj-'+'A1b2C3d4E5f6G7h8I9j0K1l2'
+    if mode=='static_api_key' else 'synthetic-target-token')
   if mode in ('static_bearer','https_static_bearer'):
     config['target_auth']={'mode':'static_bearer','secret_file':'/state/destination.token'}
   elif mode=='static_api_key':
@@ -68,7 +70,7 @@ def test_package_lifecycle(tmp_path,mode):
     compose('run','--rm','--no-deps','--entrypoint','python','app','-c',
       'from pathlib import Path; from asr_proxy.selfhost.main import initialize; from asr_proxy.selfhost.config import load; '
       f'initialize(Path("/state"),Path("/generated"),load("/config/deployment.yaml"),"{password}"); '
-      'from asr_proxy.inspection.pool import atomic_write; atomic_write(Path("/state/destination.token"),"synthetic-target-token")')
+      f'from asr_proxy.inspection.pool import atomic_write; atomic_write(Path("/state/destination.token"),"{secret_value}")')
     compose('up','-d');wait()
     key=compose('exec','-T','app','cat','/state/client.key')
     if os.environ.get('GITHUB_ACTIONS')=='true':print('::add-mask::'+key,flush=True)
@@ -107,7 +109,7 @@ def test_package_lifecycle(tmp_path,mode):
       assert 'secret_file' not in data['deployment']['target_auth']
       assert len(data['events'])>=(3 if static else 4)
       text=str(data['events'])
-      assert key not in text and 'synthetic-target-token' not in text and 'alex@example.com' not in text
+      assert key not in text and secret_value not in text and 'alex@example.com' not in text
       assert admin.post('/demo-api/scenarios/read',json={}).status_code==404
       assert admin.post('/demo-api/network',json={}).status_code in (404,405)
       assert admin.post('/demo-api/policy',headers={'origin':'https://untrusted.example'},json=data['policy']).status_code==403

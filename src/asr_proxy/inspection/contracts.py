@@ -46,6 +46,8 @@ class InspectionConfig(BaseModel):
   trusted_sources: list[str] = Field(default_factory=list)
   routes: list[RouteRule]
   allowed_egress_origins: list[str] = Field(default_factory=list)
+  # Request credential headers remain digest-bound but are excluded from content scanning.
+  credential_headers: list[str] = Field(default_factory=list)
   max_body_bytes: int = Field(default=1_048_576, ge=1024, le=16_777_216)
   max_json_depth: int = Field(default=32, ge=1, le=100)
   pii_action: Literal["redact", "block"] = "redact"
