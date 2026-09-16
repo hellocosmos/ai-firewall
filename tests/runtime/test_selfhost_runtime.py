@@ -42,7 +42,9 @@ def test_package_lifecycle(tmp_path,mode):
     override=tmp_path/'tls.yaml'
     override.write_text(yaml.safe_dump({'services':{
       'envoy':{'volumes':[str(ca)+':/etc/ssl/certs/ca-certificates.crt:ro']},
-      'fixture':{'environment':{'TD_FIXTURE_CERT':'/cert/fixture.crt','TD_FIXTURE_KEY':'/cert/fixture.key'},
+      # The pytest directory and private key belong to the runner. With cap_drop=ALL,
+      # container root cannot bypass its 0700/0600 permissions on Linux.
+      'fixture':{'user':f'{os.getuid()}:{os.getgid()}', 'environment':{'TD_FIXTURE_CERT':'/cert/fixture.crt','TD_FIXTURE_KEY':'/cert/fixture.key'},
         'volumes':[str(tmp_path)+':/cert:ro']}}}))
     base.extend(['-f',str(override)])
   def compose(*args):
@@ -131,6 +133,10 @@ def test_package_lifecycle(tmp_path,mode):
         ca.write_bytes((tmp_path/'untrusted.crt').read_bytes())
         compose('restart','envoy')
         assert c.post('/api/notes',headers=headers,json={'message':'safe'}).status_code==503
+  except BaseException:
+    # Access logging is disabled; retain bounded component errors for CI diagnosis.
+    print(compose('logs','--no-color','--tail','30','app','envoy','fixture'),flush=True)
+    raise
   finally:
     # The random project and all its volumes were created exclusively by this test.
     compose('down','-v','--remove-orphans')
