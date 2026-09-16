@@ -1,0 +1,50 @@
+name: Feature request
+description: Propose a focused improvement to TrapDefense Community.
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Start with the user or operator problem. Community covers the public local proxy, inspector, console, policy and sanitized evidence path. Delegation, approvals and the Enterprise Access Broker are separate products.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Who has the problem, what triggers it and what decision or workflow is blocked?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe observable behavior rather than a preferred implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: community
+    attributes:
+      label: Community scope
+      description: Explain how this fits the local public AI Firewall rather than delegated Enterprise authorization.
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Security and operational impact
+      description: Consider policy bypass, fail-closed behavior, sensitive data, latency and operator workload.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing configuration, integration pattern or smaller change that might solve the problem.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues and documentation.
+          required: true
+        - label: I did not include customer data, secrets, credentials or tokens.
+          required: true

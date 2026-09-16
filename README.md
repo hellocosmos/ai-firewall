@@ -1,5 +1,9 @@
 # TrapDefense — AI Firewall for Agents
 
+[![Community verification](https://github.com/hellocosmos/ai-firewall/actions/workflows/test.yml/badge.svg)](https://github.com/hellocosmos/ai-firewall/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2563EB.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-0F172A.svg)](pyproject.toml)
+
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
 **Control AI actions. Protect your data.**
@@ -15,6 +19,21 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 Logical product flow. See [deployment architecture](docs/en/architecture.md) for trusted forwarding, transport visibility and routing requirements.
 
 Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](docs/en/identity.md).
+
+## See it in action
+
+<table>
+  <tr>
+    <td width="58%"><img src="docs/assets/community-dashboard.png" alt="TrapDefense Community dashboard with synthetic allow, block and redact decisions"></td>
+    <td width="42%"><img src="docs/assets/entra-sign-in.png" alt="TrapDefense Community sign-in with synthetic Entra and local administrator options"></td>
+  </tr>
+  <tr>
+    <td><strong>Runtime decisions</strong><br>Sanitized synthetic evidence for allow, block and redact outcomes.</td>
+    <td><strong>Console identity</strong><br>Local sign-in and a protocol-realistic synthetic Entra flow.</td>
+  </tr>
+</table>
+
+Screens show the local synthetic demo. They are not evidence of a production Entra tenant or customer traffic deployment.
 
 ## Install and open the console
 
@@ -43,7 +62,7 @@ NIC inventory and topology explanation are included. The loopback demo does not 
 
 ## Documentation and verification
 
-[Console guide](docs/en/console.md) · [Architecture](docs/en/architecture.md) · [Community / Enterprise](docs/en/editions.md) · [SDK → Proxy](docs/en/migration.md) · [Security](docs/en/security.md)
+[Console guide](docs/en/console.md) · [Architecture](docs/en/architecture.md) · [Community / Enterprise](docs/en/editions.md) · [SDK → Proxy](docs/en/migration.md) · [Security](docs/en/security.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
 English application source and six complete UI dictionaries are maintained together. Non-English security test fixtures intentionally exercise international input. Localized guides have a language switch at the top.
 

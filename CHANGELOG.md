@@ -1,0 +1,38 @@
+# Changelog
+
+All notable changes to TrapDefense Community are documented here.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project uses semantic versioning for Community source releases.
+
+## [0.3.0] - 2026-09-16
+
+### Added
+
+- Self-hosted Community AI Firewall with Envoy ExtProc request and response inspection.
+- A local operations console for dashboard, event, policy, connection, audit and settings workflows.
+- Explicit HTTP and MCP action mappings, local allow/block rules, PII block or redaction, trusted-hop signatures and replay protection.
+- Sanitized local decision evidence and synthetic HTTP scenarios that traverse the proxy path.
+- Single-tenant Microsoft Entra ID console SSO with Administrator and Viewer app roles, plus a protocol-realistic synthetic Entra flow for local evaluation.
+- English, Korean, Simplified Chinese, Japanese, Spanish and French console dictionaries and guides.
+
+### Security
+
+- Inline inspection fails closed when complete policy evaluation cannot finish.
+- Console writes require same-origin requests and a CSRF header, and local login attempts are rate limited.
+- Community source verification remains distinct from Enterprise agent identity verification and delegated authorization.
+
+### Verified
+
+- Community tests run on Python 3.11 and 3.12 in GitHub Actions.
+- Console type checks and production build run on Node.js 22 in GitHub Actions.
+- Linux CI runs the Envoy to gRPC inspector to synthetic HTTP destination integration test.
+
+### Known boundaries
+
+- This is a source installation; no PyPI package is implied.
+- The included screens and scenarios use synthetic data.
+- A real Entra tenant, customer TLS path, enforced production routing, high availability and performance are not certified by this release.
+- Local audit storage is mutable, and content detection can produce false positives or false negatives.
+- Enterprise Access Broker, approvals and delegated authorization are distributed separately.
+
+[0.3.0]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.3.0

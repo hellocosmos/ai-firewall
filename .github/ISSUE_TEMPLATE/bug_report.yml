@@ -1,0 +1,77 @@
+name: Bug report
+description: Report a reproducible problem in TrapDefense Community.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve TrapDefense Community. Use synthetic inputs and remove secrets, credentials, tokens and customer content. Report suspected vulnerabilities through the Security policy instead.
+  - type: input
+    id: revision
+    attributes:
+      label: Version or revision
+      description: Release tag or full Git commit SHA.
+      placeholder: v0.3.0 or a full commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - Proxy or inspector
+        - Community console
+        - Entra console SSO
+        - Installation or scripts
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, architecture, Python, Node.js, Docker and browser versions that are relevant.
+      placeholder: macOS 15, arm64, Python 3.12, Node.js 22, Docker Desktop ...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Smallest sequence that triggers the problem with synthetic data.
+      placeholder: |
+        1. Install from ...
+        2. Run ...
+        3. Open ...
+        4. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Relevant logs, screenshots or test output with secrets and sensitive content removed.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I removed secrets, credentials, tokens and customer content.
+          required: true
+        - label: This report concerns the public Community repository rather than a private Enterprise deployment.
+          required: true
