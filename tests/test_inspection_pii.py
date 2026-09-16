@@ -224,7 +224,7 @@ def test_real_upstream_regex_timeout_is_not_silently_skipped(real_scanner):
   email.patterns[0].compiled_regex = pii._FailClosedRegex(TimedOutRegex(), 0.1)
   with pytest.raises(PiiInspectionError):
     scanner.analyze("synthetic@example.com")
-  # 인스턴스별 pattern 복사이므로 다른 scanner에는 주입한 오류가 전파되지 않는다.
+  # Instance-local pattern copies prevent injected errors from affecting other scanners.
   assert real_scanner.analyze("synthetic@example.com")
 
 

@@ -1,8 +1,8 @@
-"""로컬 TLS 종료 모의 장비. 투명 TLS MITM·인증서 발급·IdP 검증 구현이 아니다.
+"""Local TLS termination simulator, not a transparent MITM, CA or IdP.
 
-임시 자체서명 인증서의 신뢰는 테스트 클라이언트가 명시적으로 지정한다. 시스템
-신뢰 저장소는 변경하지 않으며, 선택적인 신원은 테스트가 주입한 신뢰 홉 컨텍스트다.
-실제 고객의 신원을 이 helper가 독립적으로 확인했다는 의미가 아니다.
+Test clients explicitly trust temporary self-signed certificates. The system
+trust store is not modified. Optional identity is injected trusted-hop context;
+this helper does not independently verify customer identities.
 """
 from __future__ import annotations
 

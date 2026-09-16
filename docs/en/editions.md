@@ -1,0 +1,11 @@
+# Community and Enterprise
+
+[English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
+
+Community is the MIT-licensed proxy runtime and local operations console in this repository. It includes signed trusted-hop verification, explicit HTTP/MCP mappings, local policy, signature checks, PII redaction, bounded response/SSE inspection, sanitized audit evidence, local login/password changes and proxy settings. No private package or external model API is required.
+
+Enterprise adds the separately distributed Access Broker: user/agent/task delegation, access decisions and one-time, expiring, request-bound human approval. Existing IAM context must come from a trusted integration; real customer IdP validation remains necessary. The Community UI identifies these unavailable capabilities.
+
+The private provider connects through the `trapdefense.authorizers` / `enterprise` Python entry point. `authorize(request)` enforces decisions; `evaluate(request)` provides non-mutating mirror assessment. Selecting Enterprise without its provider fails startup. Broker token records are scoped decision evidence, not general-purpose OAuth access tokens.
+
+Central fleet management, distributed HA, hosted billing and immutable audit storage are not shipped features. Commercial scope can include the private provider, deployment, policy integration and support; pricing and support terms are separate. Local SQLite and JSONL storage remain mutable.

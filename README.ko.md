@@ -1,28 +1,57 @@
-# TrapDefense — AI Firewall for Agents
+# TrapDefense — 에이전트를 위한 AI 방화벽
 
-[English](README.md) · [아키텍처](docs/architecture.md) · [Community / Enterprise](docs/editions.md)
+[English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-**기존 TLS decryptor 뒤에서 AI agent의 HTTP/MCP 요청과 응답을 검사하는 프록시 보안 제품입니다.**
+**TLS 복호화 이후 지원되는 HTTP·MCP 행위를 검사하고 통제합니다.**
+
+TrapDefense Community는 로컬 운영 UI를 제공하는 자체 호스팅 프록시 검사 런타임입니다. Envoy와 검사기를 통해 복호화 트래픽을 전달하여 요청·응답을 허용·차단·마스킹하고 감사합니다. 기존 SDK는 [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security)에 유지됩니다.
 
 ```text
-AI Agent → TLS 복호화 → 신뢰된 forwarding adapter
-                         → Envoy + TrapDefense 검사기 → 지정된 목적지
-                           ← 응답 검사 ←
+AI agent → TLS decryptor → trusted signing adapter → Envoy + inspector → destination
+                                                       ← response inspection ←
 ```
 
-## Community
+## 콘솔 설치와 실행
 
-- 명시적으로 매핑한 HTTP 경로와 MCP tool/action에 허용·차단 정책 적용
-- PII 마스킹, egress 검사, 알려진 prompt injection 패턴 탐지
-- 요청·응답 및 지원되는 SSE 형식의 제한된 버퍼 검사
-- 원본 요청에 결합된 신뢰 구간 서명, 유효기간 및 재생 공격 검사
-- 민감 원문을 제외한 로컬 JSONL 감사 기록
-- SDK·Enterprise 패키지·외부 모델 API 없이 실행, MIT 라이선스
+Python 3.11+, Node.js 22.12+ 또는 24, npm, 로컬 Docker Engine/Desktop이 필요합니다. 소스 설치이며 PyPI 배포를 의미하지 않습니다.
 
-[영문 README의 실행 명령](README.md#run-the-local-demo)으로 합성 요청의 허용·마스킹·차단을 확인할 수 있습니다. 기본 데모는 Python 3.11+와 Docker Desktop을 사용합니다.
+```bash
+git clone https://github.com/hellocosmos/ai-firewall.git
+cd ai-firewall
+./scripts/install-console.sh
+./scripts/run-console.sh
+```
 
-Community는 신뢰한 전달 지점을 검증하며 사용자·에이전트 신원을 보증하지 않습니다. Enterprise는 별도 비공개 Access Broker로 사용자·에이전트·위임·작업 기반 판단과 요청별 승인을 확장합니다. Enterprise 설정에서 해당 플러그인이 없으면 시작에 실패합니다.
+**http://127.0.0.1:5176**에서 `admin` / `1234`로 로그인한 후 설정에서 비밀번호를 변경하세요. 기본 언어는 영어입니다. 로그인 전후 언어 선택기를 사용할 수 있고 브라우저에 선택이 저장됩니다.
 
-TLS 복호화만으로 연결이 완료되지는 않습니다. 신뢰된 어댑터의 요청 서명, 정확한 HTTP 전달, 우회 방지와 네트워크 격리가 필요합니다. 실제 고객 복호화 장비·IdP·HA는 별도 검증 대상입니다. Mirror는 관찰 전용이며 원본 요청을 차단하지 않습니다. SSE는 크기·시간 제한 안에서 버퍼링합니다. 탐지 패턴은 모든 prompt injection 방어를 보장하지 않습니다.
+## 운영할 수 있는 기능
 
-이 저장소는 새 프록시 제품입니다. 이전 SDK는 [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security)에 보존하며 새 Community 배포에는 포함하지 않습니다.
+대시보드와 요청 증거, 로컬 허용·차단·PII 정책, 합성 HTTP 시나리오, 감사, 비밀번호 변경, 인터페이스 목록, 리스너·업스트림 설정, 소유한 Envoy 컨테이너의 검증·적용·롤백을 제공합니다.
+
+합성 요청은 실제 Envoy → gRPC 검사기 → HTTP 목적지를 통과합니다. 목적지 수신 증거와 응답 마스킹을 기록하며 엔진 직접 호출로 대체하지 않습니다. 기본 리스너는 `127.0.0.1:18082`, 검사기는 `18081`, 합성 목적지는 `18090`입니다.
+
+## 범위와 에디션
+
+Community에는 로컬 정책, 명시적 HTTP/MCP 매핑, 신뢰 홉 서명, 제한된 응답/SSE 검사와 정제된 로컬 증거가 포함됩니다. Enterprise Access Broker 구현은 별도 배포하며 Community는 사용자·에이전트 신원, 위임 접근, 승인을 제공하지 않습니다.
+
+NIC 목록과 토폴로지 설명을 제공합니다. loopback 데모는 OS 주소, 2-NIC 라우팅, 투명 브리지, 물리 출구를 설정하지 않습니다. TLS 복호화기에는 신뢰 서명 어댑터가 필요합니다. inline 검사 실패는 차단합니다. 콘솔 Mirror는 동기 경로를 관찰하며 별도 mirror 수집기는 원본을 차단할 수 없습니다.
+
+## 문서와 검증
+
+[콘솔 안내](docs/ko/console.md) · [Architecture](docs/ko/architecture.md) · [Community / Enterprise](docs/ko/editions.md) · [SDK → Proxy](docs/ko/migration.md) · [Security](docs/ko/security.md)
+
+애플리케이션 코드는 영어로 작성하고 UI 사전 6개를 함께 유지합니다. 비영어 보안 테스트 입력은 다국어 검증을 위해 보존합니다. 각 번역 문서 상단에서 언어를 전환할 수 있습니다.
+
+```bash
+.venv/bin/python -m pytest -q
+npm run check --prefix console
+npm run build --prefix console
+# Stop the running console before this Docker test.
+TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
+```
+
+합성 로컬 검증이며 고객 TLS/IdP 연동, 운영 경로 강제, HA, 성능 인증이 아닙니다. 탐지에는 오탐·미탐이 있으며 로컬 감사는 불변 저장소가 아닙니다.
+
+## License
+
+Community는 MIT 라이선스입니다. 비공개 Enterprise 코드와 고객 자산은 포함하지 않습니다.

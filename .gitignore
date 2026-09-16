@@ -10,3 +10,6 @@ dist/
 *.key
 *.pem
 .DS_Store
+
+console/node_modules/
+console/dist/

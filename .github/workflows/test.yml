@@ -13,7 +13,30 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '${{ matrix.python }}'
-      - run: pip install -e '.[dev]'
+      - run: pip install -e '.[dev,console]'
       - run: python -c "import importlib.util; assert importlib.util.find_spec('trapdefense_enterprise') is None; assert importlib.util.find_spec('asr') is None"
       - run: pytest -q
-      - run: trapdefense-inspector --help
+      - run: trapdefense-inspector --help && trapdefense-console --help
+  console:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: console/package-lock.json
+      - run: npm ci --prefix console
+      - run: npm run check --prefix console
+      - run: npm run build --prefix console
+  proxy-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e '.[dev,console]'
+      - run: docker pull envoyproxy/envoy@sha256:57e14a549d7bd43c8d3f6d03e8cfa653e037d4b38e133acd9b54f38c524401b4
+      - run: TD_CONSOLE_E2E=1 pytest tests/test_console.py -q

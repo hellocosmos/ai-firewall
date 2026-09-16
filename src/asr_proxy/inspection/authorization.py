@@ -1,4 +1,4 @@
-"""공개 인가 계약. Enterprise 구현은 별도 배포의 entry point로 연결한다."""
+"""Public authorization contract. Enterprise uses an entry point from a separate distribution."""
 from importlib.metadata import entry_points
 from typing import Any
 

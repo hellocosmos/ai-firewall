@@ -1,6 +1,6 @@
 services:
   proxy:
-    image: envoyproxy/envoy@sha256:b21240e552b588017072424716c0bce30000f49deed6262bde55b042b5acfd97
+    image: envoyproxy/envoy@sha256:57e14a549d7bd43c8d3f6d03e8cfa653e037d4b38e133acd9b54f38c524401b4
     command: ["envoy", "-c", "/etc/envoy/envoy.yaml", "--concurrency", "2", "--log-level", "warning"]
     ports: ["127.0.0.1:18082:18082"]
     extra_hosts: ["host.docker.internal:host-gateway"]

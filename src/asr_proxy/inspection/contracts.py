@@ -39,7 +39,7 @@ class RouteRule(BaseModel):
 
 class InspectionConfig(BaseModel):
   model_config = ConfigDict(extra="forbid")
-  # 이전 설정은 Enterprise로 유지해 인가가 조용히 제거되는 것을 막는다.
+  # Legacy configurations remain Enterprise to avoid silently removing authorization.
   edition: Literal["community", "enterprise"] = "enterprise"
   trusted_sources: list[str] = Field(default_factory=list)
   routes: list[RouteRule]

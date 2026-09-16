@@ -1,4 +1,4 @@
-"""모델 다운로드 없이 실행하는 선택적 Presidio PII 어댑터."""
+"""Optional Presidio PII adapter without model downloads."""
 
 from __future__ import annotations
 
@@ -17,16 +17,16 @@ _ENTITY_LABEL = re.compile(r"[A-Z][A-Z0-9_]{0,63}\Z")
 
 
 class PiiInitializationError(RuntimeError):
-  """선택한 검사기를 사용할 수 없음. 호출자는 조용히 우회하지 않아야 한다."""
+  """The selected scanner is unavailable; callers must not silently bypass it."""
 
 
 class PiiInspectionError(RuntimeError):
-  """검사가 완료되지 않음. 오류 메시지에 입력 원문을 포함하지 않는다."""
+  """Inspection is incomplete. Never include raw input in error messages."""
 
 
 @dataclass(frozen=True, slots=True)
 class PiiFinding:
-  """원문을 담지 않는 Python 문자열 문자 단위 구간."""
+  """Python character-index spans without original content."""
 
   entity_type: str
   start: int
@@ -45,7 +45,7 @@ class PiiFinding:
 
 
 class _FailClosedRegex:
-  """Presidio가 TimeoutError를 삼켜 부분 성공으로 반환하지 못하도록 한다."""
+  """Prevent Presidio from swallowing TimeoutError and returning partial success."""
 
   def __init__(self, compiled: Any, timeout_seconds: float) -> None:
     self._compiled = compiled
@@ -64,7 +64,7 @@ def _create_analyzer(
   passport_score_threshold: float,
   regex_timeout_seconds: float,
 ) -> Any:
-  # optional dependency는 선택 시점에만 로드한다. 전역 SDK monkey patch는 하지 않는다.
+  # Load the optional dependency only when selected; do not monkey-patch global SDK state.
   if version("presidio-analyzer") != PRESIDIO_VERSION:
     raise PiiInitializationError("Unsupported Presidio analyzer version")
 
@@ -86,14 +86,14 @@ def _create_analyzer(
   from tldextract import TLDExtract
 
   class OfflineEmailRecognizer(EmailRecognizer):
-    # tldextract 기본 인스턴스의 최초 실행 네트워크 요청/캐시 쓰기를 금지한다.
+    # Disable initial network requests and cache writes in the default tldextract instance.
     def __init__(self) -> None:
       super().__init__(supported_language="en")
       self._offline_extract = TLDExtract(suffix_list_urls=(), cache_dir=None)
       self._offline_extract("example.com")
 
     def validate_result(self, pattern_text: str) -> bool:
-      # RFC local-part의 / ? = 등을 URL 경로로 해석하여 이메일을 누락하지 않는다.
+      # Do not misinterpret RFC local-part characters such as / ? = as URL paths.
       domain = pattern_text.rsplit("@", 1)[-1]
       return self._offline_extract(domain).fqdn != ""
 
@@ -118,7 +118,7 @@ def _create_analyzer(
       thresholds["KR_PASSPORT"] = passport_score_threshold
     recognizer.score_thresholds = thresholds
     if hasattr(recognizer, "patterns"):
-      # upstream 클래스 공유 PATTERNS를 바꾸지 않고 이 인스턴스만 소유한다.
+      # Own instance-local patterns without changing the upstream class PATTERNS.
       recognizer.patterns = [
         Pattern(name=pattern.name, regex=pattern.regex, score=pattern.score)
         for pattern in recognizer.patterns
@@ -147,7 +147,7 @@ def _create_analyzer(
 
 
 class PresidioScanner:
-  """en/ko의 명시적 패턴·검증기만 사용하며 NER·비밀 탐지기를 대체하지 않는다."""
+  """Use explicit en/ko patterns and validators; this does not replace NER or secret detection."""
 
   def __init__(
     self,
@@ -179,13 +179,13 @@ class PresidioScanner:
         self._score_threshold, self._passport_score_threshold, self._regex_timeout_seconds,
       )
     except Exception:  # noqa: BLE001 - sanitize optional backend initialization failures
-      # import/초기화 예외 문자열이나 traceback context를 외부 응답에 전달하지 않는다.
+      # Do not expose import or initialization exception strings or traceback context.
       raise PiiInitializationError(
         "Presidio PII initialization failed; install the pinned pii dependency and check configuration"
       ) from None
 
   def health(self) -> dict[str, Any]:
-    """초기화 구성 정보만 반환하며 입력이나 최근 탐지 결과를 보관하지 않는다."""
+    """Return initialization configuration only; retain no input or recent findings."""
     return {
       "backend": "presidio",
       "version": PRESIDIO_VERSION,
@@ -229,7 +229,7 @@ class PresidioScanner:
           if key not in findings or findings[key].score < finding.score:
             findings[key] = finding
     except Exception:  # noqa: BLE001 - partial recognizer success must never fail open
-      # 중간 언어 검사 결과를 성공으로 반환하지 않는다.
+      # Do not return intermediate language results as successful inspection.
       raise PiiInspectionError("Presidio PII inspection did not complete") from None
     return sorted(findings.values(), key=lambda finding: (finding.start, finding.end, finding.entity_type))
 
@@ -238,7 +238,7 @@ class PresidioScanner:
     if not findings:
       return text, []
 
-    # 겹치는 구간 전체를 합쳐 부분 중첩 결과의 후반 원문이 남는 것을 막는다.
+    # Merge overlapping spans completely to avoid leaving a trailing part of the original content.
     spans: list[tuple[int, int, set[str]]] = []
     for finding in findings:
       if spans and finding.start < spans[-1][1]:

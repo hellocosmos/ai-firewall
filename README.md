@@ -1,96 +1,57 @@
 # TrapDefense — AI Firewall for Agents
 
-[한국어](README.ko.md) · [Website](https://trapdefense.com) · [Architecture](docs/architecture.md) · [Editions](docs/editions.md)
+[English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
 **Inspect and control supported HTTP and MCP actions after TLS decryption.**
 
-TrapDefense Community is a self-hosted proxy inspection runtime. Route decrypted traffic through Envoy and the TrapDefense inspector to apply local policy, block unsafe requests, redact sensitive content, and record sanitized decision evidence.
+TrapDefense Community is a self-hosted proxy inspection runtime with a local operations UI. Route decrypted traffic through Envoy and the inspector to allow, block, redact and audit supported requests and responses. This is the Community proxy product; the earlier SDK remains in [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
 
 ```text
-AI agent → existing TLS decryptor → trusted forwarding adapter
-                                      ↓
-                           Envoy + TrapDefense inspector
-                                      ↓
-                              configured destination
-                         ← response inspection ←
+AI agent → TLS decryptor → trusted signing adapter → Envoy + inspector → destination
+                                                       ← response inspection ←
 ```
 
-This repository contains the **Community proxy product**, not an application SDK. The previous SDK remains at [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
+## Install and open the console
 
-## Community capabilities
-
-- Explicit HTTP route and MCP tool/action mappings; unmapped inline requests fail closed.
-- Local allow/block policy, egress checks, bounded signature detection, and Presidio PII redaction.
-- Complete buffered request/response inspection, including supported SSE formats.
-- Signed trusted-hop context bound to the request, with expiry and replay rejection.
-- Sanitized local JSONL audit evidence. Mirror mode observes copies and never blocks original traffic.
-- No Enterprise package, license server, or external model API required.
-
-## Run the local demo
-
-Python 3.11+ and Docker Desktop are required for the Envoy demonstration. Commands below use the repository source; no PyPI release is implied.
+Requires Python 3.11+, Node.js 22.12+ (or 24), npm and local Docker Engine/Desktop. Source installation; no PyPI release is implied.
 
 ```bash
 git clone https://github.com/hellocosmos/ai-firewall.git
 cd ai-firewall
-python3 -m venv .venv
-. .venv/bin/activate
-pip install -e '.[dev]'
-trapdefense-demo init --state-dir .runtime-state/demo
+./scripts/install-console.sh
+./scripts/run-console.sh
 ```
 
-Start the following in three terminals from the same directory:
+Open **http://127.0.0.1:5176**. Sign in with `admin` / `1234`, then change the password in Settings. English is the default. Use the language selector before or after login; the browser remembers your choice.
+
+## What you can operate
+
+Dashboard and request evidence; local allow/block and PII policy; synthetic HTTP scenarios; audit; password change; interface inventory, listener/upstream settings and verified apply/rollback of the owned Envoy container.
+
+The synthetic requests traverse a real Envoy → gRPC inspector → HTTP destination path. The console records downstream receipts and response redaction; it does not substitute a direct engine call. The default listener is `127.0.0.1:18082`; the inspector uses `18081` and the synthetic destination `18090`.
+
+## Scope and editions
+
+Community includes local policy, explicit HTTP/MCP mappings, trusted-hop signatures, bounded response/SSE inspection and sanitized local evidence. Enterprise Access Broker implementation is separately distributed; Community does not claim human/agent identity, delegated access or approvals.
+
+NIC inventory and topology explanation are included. The loopback demo does not configure OS addresses, two-NIC routing, transparent bridges or physical egress. TLS decryptors need a trusted signing adapter; TLS termination alone is insufficient. Inline inspection failures block. Console Mirror observes its synchronous path; the separate mirror collector cannot block original traffic.
+
+## Documentation and verification
+
+[Console guide](docs/en/console.md) · [Architecture](docs/en/architecture.md) · [Community / Enterprise](docs/en/editions.md) · [SDK → Proxy](docs/en/migration.md) · [Security](docs/en/security.md)
+
+English application source and six complete UI dictionaries are maintained together. Non-English security test fixtures intentionally exercise international input. Localized guides have a language switch at the top.
 
 ```bash
-# Terminal 1: Community inspector
-. .venv/bin/activate
-trapdefense-inspector --config .runtime-state/demo/inspector.yaml \
-  --key-file .runtime-state/demo/attestation.key --grpc-host 0.0.0.0
-
-# Terminal 2: synthetic destination
-. .venv/bin/activate
-trapdefense-demo upstream
-
-# Terminal 3: Envoy data plane, published on loopback only
-docker compose -f deploy/compose.yaml up
+.venv/bin/python -m pytest -q
+npm run check --prefix console
+npm run build --prefix console
+# Stop the running console before this Docker test.
+TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 ```
 
-Then simulate the trusted forwarding adapter with synthetic requests:
-
-```bash
-trapdefense-demo send --state-dir .runtime-state/demo --endpoint http://127.0.0.1:18082
-trapdefense-demo send --state-dir .runtime-state/demo --endpoint http://127.0.0.1:18082 \
-  --message 'Email alex@example.com'
-trapdefense-demo send --state-dir .runtime-state/demo --endpoint http://127.0.0.1:18082 --tool delete
-```
-
-Expect allow (200), redacted upstream content (200), and deny (403). The demo destination performs no real business action. Stop Compose and the two local processes after use.
-
-The local ExtProc listener is exposed to Docker for this demo only. Restrict it to the proxy network in deployment; it is not an authenticated public gRPC endpoint.
-
-## Deploy behind a TLS decryptor
-
-TLS termination alone is insufficient. Your decryptor or a trusted adapter must preserve HTTP method, authority, path/query, application headers and complete body, remove client-supplied forwarding context, and sign the observed request. The signing key belongs only to that hop. Community proves the trusted source, **not the human or agent identity**. See the [integration contract](docs/architecture.md).
-
-Envoy routes to explicitly configured upstreams. This is not an unrestricted CONNECT proxy, packet sniffer, automatic TLS decryptor, or arbitrary MCP transport implementation. Example routing targets a loopback synthetic upstream, not production destinations.
-
-## Community and Enterprise
-
-Community protects a configured proxy boundary with local policy. Enterprise adds the separately distributed Access Broker for user/agent/task delegation and approval. It connects through a public authorization extension contract. Selecting Enterprise without its provider fails startup; there is no silent downgrade.
-
-Central fleet management, HA, managed services and immutable audit storage are roadmap capabilities, not claims about this Community release. [Edition details](docs/editions.md)
-
-## Verification and limits
-
-```bash
-pytest -q
-# Optional macOS / Docker Desktop transport + local TLS simulation
-sh deploy/inspection/fetch-runtimes.sh
-TD_RUNTIME_SMOKE=1 pytest tests/runtime -q
-```
-
-Local TLS tests use temporary test certificates and synthetic traffic. They do not certify customer TLS appliances, production forced routing, real IdP integration or performance/HA. Buffered SSE has body/time limits and does not provide unbounded live streaming. Signature detection is not complete prompt-injection prevention. [Security scope](SECURITY.md)
+These are synthetic local checks, not certification of customer TLS/IdP integration, production enforced routing, HA or performance. Detection has false positives/negatives; local audit is not immutable.
 
 ## License
 
-MIT. Enterprise implementation and internal operating assets are not included in this repository.
+MIT for Community. Private Enterprise code and customer assets are not included.

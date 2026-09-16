@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "trapdefense-community"
-version = "0.2.0"
+version = "0.3.0"
 description = "TrapDefense AI Firewall: post-decryption HTTP/MCP proxy inspection"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -17,9 +17,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+console = ["psutil>=6,<8"]
 dev = ["pytest>=8.3,<9", "pytest-asyncio>=0.24,<1"]
 
 [project.scripts]
+trapdefense-console = "asr_proxy.console.app:main"
 trapdefense-inspector = "asr_proxy.inspection.server:main"
 trapdefense-demo = "asr_proxy.inspection.community_demo:main"
 

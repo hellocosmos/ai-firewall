@@ -258,7 +258,7 @@ class InspectionEngine:
                      coverage="incomplete")
 
   def _redact_sse(self, body: bytes, entities: list[str]) -> bytes:
-    """완료된 지원 SSE만 재조립한다. 모르는 delta 의미를 추측하지 않는다."""
+    """Reassemble only complete, supported SSE streams; do not infer unknown delta semantics."""
     text = body.decode("utf-8").removeprefix("\ufeff").replace("\r\n", "\n").replace("\r", "\n")
     if not text.endswith("\n\n"):
       raise InspectionError("incomplete_sse_event")

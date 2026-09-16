@@ -1,4 +1,4 @@
-"""Community 실행 경계: 기업 패키지 없이 신뢰된 전달 홉만 검증한다."""
+"""Community boundary: verify the trusted forwarding hop without an Enterprise package."""
 import json
 from dataclasses import replace
 from uuid import uuid4

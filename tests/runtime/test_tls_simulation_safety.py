@@ -1,7 +1,8 @@
-"""로컬 TLS 테스트 helper의 프레이밍·고정 목적지·정리 경계를 검증한다.
+"""Verify framing, fixed destinations and cleanup in the local TLS test helper.
 
-TLS 연결은 loopback만 사용하며 인증서는 해당 클라이언트에만 명시적으로 신뢰시킨다.
-실장비 인증, 운영 인증서 설치, 외부 호스트 연결을 수행하는 테스트가 아니다.
+TLS connections use loopback; certificates are explicitly trusted by each test
+client. Tests do not authenticate real appliances, install production certificates
+or connect to external hosts.
 """
 # ruff: noqa: SIM117 - nested scopes make TLS socket and listener teardown explicit
 from __future__ import annotations
