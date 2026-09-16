@@ -47,7 +47,7 @@ cd ai-firewall
 
 대시보드와 요청 증거, 로컬 허용·차단 정책, 전역·경로·도구별 PII 정책과 Mirror `would_*` 평가, 합성 HTTP 시나리오, 감사, 비밀번호 변경, 인터페이스 목록, 리스너·업스트림 설정, 소유한 Envoy 컨테이너의 검증·적용·롤백을 제공합니다.
 
-합성 요청은 실제 Envoy → gRPC 검사기 → HTTP 목적지를 통과합니다. 목적지 수신 증거와 응답 마스킹을 기록하며 엔진 직접 호출로 대체하지 않습니다. 기본 리스너는 `127.0.0.1:18082`, 검사기는 `18081`, 합성 목적지는 `18090`입니다.
+합성 요청은 실제 Envoy → gRPC 검사기 → HTTP 목적지를 통과합니다. 목적지 수신 증거와 응답 마스킹을 기록하며 엔진 직접 호출로 대체하지 않습니다. 기본 리스너는 `127.0.0.1:18082`, 검사기는 `18101–18104`, 합성 목적지는 `18090`입니다.
 
 ## 범위와 에디션
 
@@ -86,3 +86,10 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 ## License
 
 Community는 MIT 라이선스입니다. 비공개 Enterprise 코드와 고객 자산은 포함하지 않습니다.
+
+
+## 동일 서버 운영 — 0.34
+
+Connections / System에서 PID·상태·재시작 횟수를 확인합니다. 관리자는 Settings → Inspector processes에서 1·2·4개를 선택하고 적용/시작/중지할 수 있습니다. Viewer는 조회만 가능합니다. 중지 중에는 인라인 트래픽이 차단됩니다.
+
+[Operations](docs/ko/operations.md) · [Inspector pool](docs/ko/inspector-pool.md)

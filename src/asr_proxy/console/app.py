@@ -21,6 +21,11 @@ class Login(BaseModel):
 class Password(BaseModel):
   current_password:str=Field(min_length=1,max_length=128)
   new_password:str=Field(min_length=8,max_length=128)
+class Inspectors(BaseModel):
+  model_config=ConfigDict(extra='forbid')
+  action:Literal['start','stop','apply']
+  replicas:Literal[1,2,4]=1
+
 class Run(BaseModel):
   model_config=ConfigDict(extra='forbid')
 
@@ -152,6 +157,8 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
 
   if getattr(runtime,'integrated',False):
     from .network import NetworkConfig
+    @router.post('/inspectors')
+    def inspectors(payload:Inspectors):return runtime.inspector_control(payload.action,payload.replicas)
     @router.get('/network')
     def network_status():return runtime.network_status()
     @router.post('/network/validate')

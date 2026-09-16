@@ -21,3 +21,7 @@
 호스트 부하, Docker 버전, 전원 모드, 시나리오, 반복 횟수, 정책이 같을 때만 비교하세요. 최소 세 번 실행하고 중앙 결과를 보관하는 것이 좋습니다. 병렬 용량, 연결 재사용, 대형 본문, 장시간 SSE, 장애 복구, 다중 노드는 별도 벤치마크가 필요합니다.
 
 [콘솔 안내](console.md), [아키텍처](architecture.md), [에디션](editions.md), [보안 범위](security.md)를 참고하세요.
+
+## Community 검사기 다중 프로세스
+
+[Community 검사기 다중 프로세스](inspector-pool.md)

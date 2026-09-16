@@ -20,6 +20,7 @@ LANGUAGE_ENTITIES: dict[str, tuple[str, ...]] = {
 }
 _ENTITY_LABEL = re.compile(r"[A-Z][A-Z0-9_]{0,63}\Z")
 _IDENTIFIER_SEPARATORS = re.compile(r"[\s.-]+")
+_ASCII_PII_PREREQUISITE = re.compile(r"[@0-9]")
 
 
 def _compact_identifier(value: str) -> str:
@@ -144,6 +145,16 @@ def _create_analyzer(
   )
   from tldextract import TLDExtract
 
+  class FixedRegistryAnalyzer(AnalyzerEngine):
+    def analyze(self, text: str, **kwargs: Any) -> Any:
+      # Every identifier/phone recognizer below requires a digit on ASCII input;
+      # email requires @. This is specific to this pinned registry, not general NER.
+      # Revisit this prerequisite when adding recognizers. Unicode always takes
+      # the full path, preserving Unicode digits and language-specific behavior.
+      if text.isascii() and not _ASCII_PII_PREREQUISITE.search(text):
+        return []
+      return super().analyze(text=text, **kwargs)
+
   class OfflineEmailRecognizer(EmailRecognizer):
     # Disable initial network requests and cache writes in the default tldextract instance.
     def __init__(self) -> None:
@@ -249,7 +260,7 @@ def _create_analyzer(
   nlp_engine = NoOpNlpEngine(
     models=[{"lang_code": language, "model_name": ""} for language in languages],
   )
-  return AnalyzerEngine(
+  return FixedRegistryAnalyzer(
     registry=registry,
     nlp_engine=nlp_engine,
     supported_languages=languages,

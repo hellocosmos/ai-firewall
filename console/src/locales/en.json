@@ -427,5 +427,21 @@
   "Would allow": "Would allow",
   "Would block": "Would block",
   "Would redact": "Would redact",
-  "Would require approval": "Would require approval"
+  "Would require approval": "Would require approval",
+  "Inspector processes": "Inspector processes",
+  "Same-host recovery; not cross-server HA.": "Same-host recovery; not cross-server HA.",
+  "New requests use the committed policy. Applying restarts the pool and proxy; traffic fails closed during the interruption.": "New requests use the committed policy. Applying restarts the pool and proxy; traffic fails closed during the interruption.",
+  "Process count": "Process count",
+  "Apply / start": "Apply / start",
+  "Stop inspection": "Stop inspection",
+  "Restarts": "Restarts",
+  "Inspector operation completed.": "Inspector operation completed.",
+  "healthy": "healthy",
+  "degraded": "degraded",
+  "starting": "starting",
+  "restarting": "restarting",
+  "unhealthy": "unhealthy",
+  "unresponsive": "unresponsive",
+  "failed": "failed",
+  "stopped": "stopped"
 }

@@ -431,3 +431,20 @@ def test_invalid_capture_header_types_return_unknown_not_server_error(invalid_he
   assert result.json()["decision"] == "unknown"
   assert result.json()["enforcement_applied"] is False
   assert engine.calls == []
+
+
+def test_existing_nonce_store_gains_expiry_index_without_losing_replay_state(tmp_path):
+  path = tmp_path / "existing.sqlite"
+  with sqlite3.connect(path) as db:
+    db.execute("CREATE TABLE nonces (nonce TEXT PRIMARY KEY, expires INTEGER)")
+    db.execute("INSERT INTO nonces VALUES (?, ?)", ("already-seen", 4_000_000_000))
+  verifier = AttestationVerifier(KEY, str(path))
+  other = AttestationVerifier(KEY, str(path))
+  message = _signed(_message(), nonce="already-seen")
+  for instance in (verifier, other):
+    with pytest.raises(InspectionError, match="attestation_replay"):
+      instance.verify(message, consume=True)
+  with sqlite3.connect(path) as db:
+    plans = db.execute("EXPLAIN QUERY PLAN DELETE FROM nonces WHERE expires < ?", (0,)).fetchall()
+    assert any("USING INDEX nonces_expires" in row[3] for row in plans)
+    assert db.execute("SELECT COUNT(*) FROM nonces").fetchone()[0] == 1

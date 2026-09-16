@@ -427,5 +427,21 @@
   "Would allow": "Autoriserait",
   "Would block": "Bloquerait",
   "Would redact": "Masquerait",
-  "Would require approval": "Demanderait une approbation"
+  "Would require approval": "Demanderait une approbation",
+  "Inspector processes": "Processus d’inspection",
+  "Same-host recovery; not cross-server HA.": "Reprise sur un même hôte ; pas de HA entre serveurs.",
+  "New requests use the committed policy. Applying restarts the pool and proxy; traffic fails closed during the interruption.": "Les nouvelles requêtes utilisent la politique enregistrée. L’application redémarre les processus et le proxy ; le trafic est bloqué pendant l’interruption.",
+  "Process count": "Nombre de processus",
+  "Apply / start": "Appliquer / démarrer",
+  "Stop inspection": "Arrêter l’inspection",
+  "Restarts": "Redémarrages",
+  "Inspector operation completed.": "Opération d’inspection terminée.",
+  "healthy": "Sain",
+  "degraded": "Dégradé",
+  "starting": "Démarrage",
+  "restarting": "Redémarrage",
+  "unhealthy": "Défaillant",
+  "unresponsive": "Sans réponse",
+  "failed": "Échec",
+  "stopped": "Arrêté"
 }

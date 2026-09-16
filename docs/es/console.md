@@ -26,7 +26,7 @@ Seleccione el idioma en el acceso o la barra superior. El inglés es predetermin
 ```text
 Browser -> management API/UI :5176
                  -> signed synthetic sender -> Envoy :18082 -> HTTP destination :18090
-                                                 <-> gRPC inspector :18081
+                                                 <-> gRPC inspector :18101–18104
                  <- response inspection <- decision + receipt <- UI
 ```
 
@@ -53,7 +53,7 @@ En **Políticas → Excepción de PII**, configure cada herramienta de la demo p
 | Despliegue | L7 explícito, una interfaz loopback |
 | API/UI de gestión | `127.0.0.1:5176` |
 | Entrada del proxy | `127.0.0.1:18082`, puerto no privilegiado configurable |
-| Inspector | `127.0.0.1:18081`, gRPC ExtProc |
+| Inspector | `127.0.0.1:18101–18104`, gRPC ExtProc |
 | Destino | `127.0.0.1:18090`, solo HTTP sintético |
 | Tiempo de espera | 5 segundos, configurable entre 2 y 30 |
 | Límite de cuerpo | 1 MiB, configurable entre 1 KiB y 1 MiB |
@@ -69,7 +69,7 @@ El número de interfaces no es el de NIC físicas: incluye loopback, puentes y t
 
 `.runtime-state/console` guarda hashes de cuenta/sesión, políticas, configuración de red y eventos SQLite depurados. Use `TD_CONSOLE_STATE` para otro directorio privado. Haga copias con el servicio detenido; cambiar la ruta crea una instalación distinta. Se excluye de Git. La clave de firma es efímera dentro de la demo, sin provisionar saltos externos. Los contadores del destino se reinician con el proceso; las evidencias guardadas permanecen. La auditoría es local y modificable, no inmutable.
 
-Si falla el inicio, revise Docker y los puertos 5176/18081/18090 y el puerto del proxy. No termine servicios ajenos automáticamente. La ausencia de evidencias es un error, no un éxito. La latencia incluye efectos locales y del contenedor; no es un benchmark de producción. TLS real, IAM, enrutamiento forzado, HA y endurecimiento necesitan validación aparte.
+Si falla el inicio, revise Docker y los puertos 5176/18101–18104/18111–18114/18090 y el puerto del proxy. No termine servicios ajenos automáticamente. La ausencia de evidencias es un error, no un éxito. La latencia incluye efectos locales y del contenedor; no es un benchmark de producción. TLS real, IAM, enrutamiento forzado, HA y endurecimiento necesitan validación aparte.
 
 ## Verificar y mantener traducciones
 
@@ -82,3 +82,8 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 ```
 
 Sin `TD_CONSOLE_E2E=1` se omiten las pruebas Docker. Se comprueba la igualdad de claves y marcadores en los seis diccionarios y que el código esté en inglés. Actualice las claves inglesas y todos los JSON a la vez, sin cambiar los códigos API estables. En caso de discrepancia, la documentación inglesa es la referencia. Consulte [arquitectura](architecture.md), [ediciones](editions.md), [migración](migration.md) y [seguridad](security.md).
+
+
+## Operaciones en un mismo host — candidato 0.34
+
+[1 / 2 / 4 inspectors · Linux service](operations.md)

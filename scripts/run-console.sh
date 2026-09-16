@@ -5,7 +5,7 @@ cd "$repo_dir"
 [ -f console/dist/index.html ] || { echo 'Run ./scripts/install-console.sh first.' >&2; exit 1; }
 .venv/bin/python - <<'PY'
 import socket
-for port in (5176,18081,18090):
+for port in (5176,18090,18101,18102,18103,18104,18111,18112,18113,18114):
   with socket.socket() as listener:
     listener.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
     try:listener.bind(('127.0.0.1',port))

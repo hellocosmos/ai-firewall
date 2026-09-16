@@ -427,5 +427,21 @@
   "Would allow": "許可予定",
   "Would block": "ブロック予定",
   "Would redact": "マスキング予定",
-  "Would require approval": "承認要求予定"
+  "Would require approval": "承認要求予定",
+  "Inspector processes": "検査プロセス",
+  "Same-host recovery; not cross-server HA.": "同一ホスト内の復旧です。サーバー間HAではありません。",
+  "New requests use the committed policy. Applying restarts the pool and proxy; traffic fails closed during the interruption.": "新しいリクエストは保存済みポリシーを使用します。適用時にプールとプロキシを再起動し、中断中は通信を遮断します。",
+  "Process count": "プロセス数",
+  "Apply / start": "適用 / 開始",
+  "Stop inspection": "検査を停止",
+  "Restarts": "再起動回数",
+  "Inspector operation completed.": "検査プロセスの操作が完了しました。",
+  "healthy": "正常",
+  "degraded": "一部障害",
+  "starting": "起動中",
+  "restarting": "再起動中",
+  "unhealthy": "異常",
+  "unresponsive": "応答なし",
+  "failed": "失敗",
+  "stopped": "停止中"
 }

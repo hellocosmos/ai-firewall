@@ -37,6 +37,8 @@ class Runtime:
     self.grpc_server=None
     self.destination=None
     self.inspector_ready=False
+    from .workers import WorkerManager
+    self.workers=WorkerManager(self)
 
   def config(self,policy):
     if set(policy['rules'])!=set(TOOLS):raise ValueError('Every mapped tool must have an explicit rule')
@@ -61,7 +63,45 @@ class Runtime:
     verifier=AttestationVerifier(self.key,config.nonce_db,required_fields=('source_id',))
     return InspectionEngine(config,self.scanner,verifier,None)
 
-  def configure(self,policy):self.engine=self.build_engine(policy)
+  def configure(self,policy):
+    self.engine=self.build_engine(policy)
+    self.engine_revision=(policy['version'],self.network.current()['version'])
+
+  def stream_snapshot(self):
+    with self.lock:
+      policy=self.policy()
+      revision=(policy['version'],self.network.current()['version'])
+      if revision!=self.engine_revision:self.configure(policy)
+      return self.engine,policy
+
+  def inspector_control(self,action,replicas=None):
+    with self.network.lock:
+      if action=='stop':
+        self.workers.stop()
+      else:
+        previous=self.store.get('inspectors') or {'replicas':1}
+        candidate=replicas if replicas is not None else previous['replicas']
+        self.store.audit('inspectors.applying',f'{candidate} same-host processes; proxy interruption expected')
+        self.workers.stop()
+        try:
+          self.workers.start(candidate)
+          self.network.replicas=candidate
+          self.network.start()
+          self.store.set('inspectors',{'replicas':candidate})
+        except Exception:
+          self.workers.stop()
+          self.network.replicas=previous['replicas']
+          try:
+            self.workers.start(previous['replicas'])
+            self.network.start()
+            self.store.audit('inspectors.rolled_back',f'Restored {previous["replicas"]} processes')
+          except Exception:
+            self.workers.stop()
+            self.store.audit('inspectors.rollback_failed','Inspectors unavailable; inline traffic fails closed')
+          raise
+      result=self.workers.status()
+      self.store.audit('inspectors.'+action,f'{result["state"]} · {len(result["replicas"])} processes')
+      return result
 
   def apply(self,payload):
     with self.lock:
@@ -78,24 +118,25 @@ class Runtime:
     self.destination=create_destination()
     self.destination_thread=threading.Thread(target=self.destination.serve_forever,daemon=True)
     self.destination_thread.start()
-    self.grpc_server=grpc.aio.server()
-    rpc.add_ExternalProcessorServicer_to_server(ConsoleProcessor(self),self.grpc_server)
-    if not self.grpc_server.add_insecure_port('127.0.0.1:18081'):raise RuntimeError('Inspector port unavailable')
-    await self.grpc_server.start()
-    self.inspector_ready=True
-    try:await asyncio.to_thread(self.network.start)
+    replicas=(self.store.get('inspectors') or {'replicas':1})['replicas']
+    self.network.replicas=replicas
+    try:
+      await asyncio.to_thread(self.workers.start,replicas)
+      await asyncio.to_thread(self.network.start)
     except Exception:
       await self.stop()
       raise
     self.store.audit('installation.started','Envoy + gRPC inspector + synthetic HTTP destination')
 
   async def stop(self):
-    await asyncio.to_thread(self.network.stop)
-    self.inspector_ready=False
-    if self.grpc_server:await self.grpc_server.stop(1)
-    if self.destination:
-      await asyncio.to_thread(self.destination.shutdown)
-      self.destination.server_close()
+    try:
+      await asyncio.to_thread(self.network.stop)
+    finally:
+      self.inspector_ready=False
+      await asyncio.to_thread(self.workers.stop)
+      if self.destination:
+        await asyncio.to_thread(self.destination.shutdown)
+        self.destination.server_close()
 
   def update_network(self,payload):
     # No traffic generator runs across a listener replacement.
@@ -106,7 +147,8 @@ class Runtime:
 
   def network_status(self):
     result=self.network.status()
-    result['inspector_ready']=self.inspector_ready
+    result['inspectors']=self.workers.status()
+    result['inspector_ready']=result['inspectors']['state']=='healthy'
     try:
       with httpx.Client(timeout=.5,trust_env=False) as c:
         response=c.get('http://127.0.0.1:18090/_demo/stats')

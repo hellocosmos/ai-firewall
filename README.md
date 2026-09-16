@@ -69,7 +69,7 @@ Success means **Connections / System** reports the proxy, inspector and destinat
 
 Dashboard and request evidence; local allow/block policy; global, route and tool PII policy with Mirror `would_*` assessment; synthetic HTTP scenarios; audit; password change; interface inventory, listener/upstream settings and verified apply/rollback of the owned Envoy container.
 
-The synthetic requests traverse a real Envoy → gRPC inspector → HTTP destination path. The console records downstream receipts and response redaction; it does not substitute a direct engine call. The default listener is `127.0.0.1:18082`; the inspector uses `18081` and the synthetic destination `18090`.
+The synthetic requests traverse a real Envoy → gRPC inspector → HTTP destination path. The console records downstream receipts and response redaction; it does not substitute a direct engine call. The default listener is `127.0.0.1:18082`; the inspector uses `18101–18104` and the synthetic destination `18090`.
 
 ## Scope and editions
 
@@ -108,3 +108,10 @@ These are synthetic local checks, not certification of customer TLS/IdP integrat
 ## License
 
 MIT for Community. Private Enterprise code and customer assets are not included.
+
+
+## Same-host operations (0.34)
+
+Operate 1, 2 or 4 inspector processes from the console, view recovery state, and install an opt-in Linux user service. Same-host recovery is not cross-server HA.
+
+[Operations](docs/en/operations.md) · [Inspector pool](docs/en/inspector-pool.md)

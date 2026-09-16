@@ -427,5 +427,21 @@
   "Would allow": "허용 예정",
   "Would block": "차단 예정",
   "Would redact": "마스킹 예정",
-  "Would require approval": "승인 요청 예정"
+  "Would require approval": "승인 요청 예정",
+  "Inspector processes": "검사 프로세스",
+  "Same-host recovery; not cross-server HA.": "동일 서버 내 복구입니다. 서버 간 HA가 아닙니다.",
+  "New requests use the committed policy. Applying restarts the pool and proxy; traffic fails closed during the interruption.": "새 요청부터 저장된 정책을 사용합니다. 적용 시 검사 프로세스와 프록시를 재시작하며, 중단 중에는 트래픽이 차단됩니다.",
+  "Process count": "프로세스 수",
+  "Apply / start": "적용 / 시작",
+  "Stop inspection": "검사 중지",
+  "Restarts": "재시작 횟수",
+  "Inspector operation completed.": "검사 프로세스 작업을 완료했습니다.",
+  "healthy": "정상",
+  "degraded": "일부 장애",
+  "starting": "시작 중",
+  "restarting": "재시작 중",
+  "unhealthy": "비정상",
+  "unresponsive": "응답 없음",
+  "failed": "실패",
+  "stopped": "중지됨"
 }

@@ -10,17 +10,22 @@ class ScanPattern:
     regex: re.Pattern[str]
     severity: int
     description: str
+    # Necessary alternatives, not a separate detection rule. Unicode is never
+    # prefiltered. Revisit these prerequisites whenever the regex is changed.
+    required_ascii_any: tuple[str, ...] = ()
 
 
 DEFAULT_PATTERNS: tuple[ScanPattern, ...] = (
     ScanPattern(
         name="prompt_injection",
+        required_ascii_any=("ignore",),
         regex=re.compile(r"ignore\s+(all|any|previous|prior)\s+instructions", re.IGNORECASE),
         severity=2,
         description="Prompt-injection style instruction override detected.",
     ),
     ScanPattern(
         name="system_prompt_exfil",
+        required_ascii_any=("reveal",),
         regex=re.compile(r"reveal\s+(the\s+)?(system|developer)\s+prompt", re.IGNORECASE),
         severity=2,
         description="Prompt asks to reveal hidden system or developer instructions.",
@@ -45,6 +50,7 @@ DEFAULT_PATTERNS: tuple[ScanPattern, ...] = (
     ),
     ScanPattern(
         name="exfil_instruction",
+        required_ascii_any=("send", "post", "upload", "email"),
         regex=re.compile(
             r"(send|post|upload|email)\s+.*?(secret|credential|token|prompt|file)",
             re.IGNORECASE,

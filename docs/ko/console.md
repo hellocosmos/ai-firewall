@@ -26,7 +26,7 @@ cd ai-firewall
 ```text
 Browser -> management API/UI :5176
                  -> signed synthetic sender -> Envoy :18082 -> HTTP destination :18090
-                                                 <-> gRPC inspector :18081
+                                                 <-> gRPC inspector :18101–18104
                  <- response inspection <- decision + receipt <- UI
 ```
 
@@ -53,7 +53,7 @@ Browser -> management API/UI :5176
 | 배치 | 명시적 L7, 단일 loopback 인터페이스 |
 | 관리 API/UI | `127.0.0.1:5176` |
 | 프록시 수신 | `127.0.0.1:18082`, 비특권 포트 변경 가능 |
-| 검사기 | `127.0.0.1:18081`, gRPC ExtProc |
+| 검사기 | `127.0.0.1:18101–18104`, gRPC ExtProc |
 | 목적지 | `127.0.0.1:18090`, 합성 HTTP 전용 |
 | 요청 제한 시간 | 5초, 2–30초 설정 가능 |
 | 본문 상한 | 1 MiB, 1 KiB–1 MiB 설정 가능 |
@@ -69,7 +69,7 @@ Browser -> management API/UI :5176
 
 `.runtime-state/console`에 계정·세션 해시, 정책, 네트워크 설정, 정제된 SQLite 이벤트를 저장합니다. `TD_CONSOLE_STATE`로 별도 비공개 경로를 지정할 수 있습니다. 종료 상태에서 백업하며 경로를 바꾸면 별도 설치가 됩니다. Git에서 제외됩니다. 데모 서명 키는 프로세스 내부의 임시 키이며 외부 전달 장비를 구성하지 않습니다. 목적지 수신 카운터는 재시작하면 초기화되지만 저장한 트랜잭션 증거는 유지됩니다. 로컬 감사 저장소는 수정 가능하며 불변 저장소가 아닙니다.
 
-시작 실패 시 Docker와 5176/18081/18090 및 설정한 프록시 포트를 확인하세요. 관련 없는 서비스를 자동 종료하지 마세요. 검사 증거 누락은 성공이 아니라 오류입니다. 지연은 로컬·컨테이너 영향을 포함하며 운영 성능 벤치마크가 아닙니다. 실 TLS·IAM·강제 경로·HA·운영 강화는 별도 검증해야 합니다.
+시작 실패 시 Docker와 5176/18101–18104/18111–18114/18090 및 설정한 프록시 포트를 확인하세요. 관련 없는 서비스를 자동 종료하지 마세요. 검사 증거 누락은 성공이 아니라 오류입니다. 지연은 로컬·컨테이너 영향을 포함하며 운영 성능 벤치마크가 아닙니다. 실 TLS·IAM·강제 경로·HA·운영 강화는 별도 검증해야 합니다.
 
 ## 검증과 번역 관리
 
@@ -82,3 +82,8 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 ```
 
 `TD_CONSOLE_E2E=1`이 없으면 Docker 검증은 건너뜁니다. 언어 검사에서는 6개 사전의 키·치환자가 일치하고 애플리케이션 코드가 영어인지 확인합니다. 영어 키와 모든 JSON 번역을 함께 수정하고 API 코드는 유지하세요. 번역 간 차이가 있으면 영어 문서를 기준으로 합니다. [아키텍처](architecture.md), [에디션](editions.md), [이전](migration.md), [보안](security.md)도 참고하세요.
+
+
+## 동일 서버 운영 — 0.34 후보
+
+[1 / 2 / 4 inspectors · Linux service](operations.md)

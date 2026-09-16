@@ -2,9 +2,33 @@
 
 All notable changes to TrapDefense Community are documented here.
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases use the `0.31`, `0.32`, `0.33` numbering sequence.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases use the `0.31`, `0.32`, `0.33`, `0.34` numbering sequence.
 
 ## [Unreleased]
+
+## [0.34] - 2026-09-16
+
+### Operations
+
+- Same-host 1/2/4 inspector supervision, active Envoy health checks and bounded process recovery.
+- Console worker status and administrator apply/start/stop controls, with shared versioned policies and sanitized events.
+- New streams read the committed policy; in-flight streams retain the request policy snapshot.
+- Opt-in Linux systemd user-service installer and removal commands. Host boot/linger validation remains deployment-specific.
+- Six-language operation guides. Cross-server HA remains unimplemented.
+
+### Verified
+
+- Ubuntu 26.04 lab installation: 369 unit tests, 10 console tests and 6 real Envoy/pool tests passed; 31 opt-in tests were skipped in the default suite.
+- Real host reboot with linger: automatic startup before SSH login, two healthy inspectors, persisted policy/events and synthetic allow/block/redaction traffic.
+- Browser verification of inspector controls and English/Korean rendering; desktop/mobile landing operations layout checked.
+- Runtime pool tests now use the native Docker context on Linux instead of requiring Docker Desktop.
+
+### Performance and security
+
+- Equivalent ASCII candidate prefilters for fixed PII/signature patterns, native control-character cleanup and indexed nonce expiry.
+- Shared local replay state across workers; no automatic tool-call retry. Exhausted worker recovery stops the pool.
+- Process scaling changes briefly interrupt the proxy; failed changes attempt rollback, with unavailable inspection failing closed.
+
 
 ### Added
 

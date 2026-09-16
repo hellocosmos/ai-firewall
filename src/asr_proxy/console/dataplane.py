@@ -17,8 +17,7 @@ class StreamInspection:
   def __init__(self,runtime):
     self.runtime=runtime
     with runtime.lock:
-      self.engine=runtime.engine
-      self.policy=runtime.policy()
+      self.engine,self.policy=runtime.stream_snapshot()
     self.config=self.engine.config
     self.message=None
     self.identity={}

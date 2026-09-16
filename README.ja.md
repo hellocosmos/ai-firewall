@@ -49,7 +49,7 @@ cd ai-firewall
 
 ダッシュボード、要求の証拠、ローカル許可・遮断ポリシー、グローバル・ルート・ツール別 PII ポリシーと Mirror `would_*` 評価、合成 HTTP シナリオ、監査、パスワード変更、インターフェイス一覧、リスナー・上流設定、所有 Envoy コンテナーの検証・適用・ロールバック。
 
-合成要求は実際の Envoy → gRPC 検査器 → HTTP 宛先を通ります。宛先の受信記録と応答マスキングを記録し、エンジン直接呼び出しで代用しません。既定リスナーは `127.0.0.1:18082`、検査器は `18081`、合成宛先は `18090` です。
+合成要求は実際の Envoy → gRPC 検査器 → HTTP 宛先を通ります。宛先の受信記録と応答マスキングを記録し、エンジン直接呼び出しで代用しません。既定リスナーは `127.0.0.1:18082`、検査器は `18101–18104`、合成宛先は `18090` です。
 
 ## 範囲とエディション
 
@@ -88,3 +88,10 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 ## License
 
 Community は MIT ライセンスです。非公開 Enterprise コードと顧客資産は含みません。
+
+
+## 同一ホストの運用 — 0.34
+
+Connections / System で PID、状態、再起動回数を確認します。管理者は Settings → Inspector processes で 1・2・4 プロセスを選び、適用・開始・停止できます。Viewer は閲覧のみです。停止中はインライン通信を遮断します。
+
+[Operations](docs/ja/operations.md) · [Inspector pool](docs/ja/inspector-pool.md)

@@ -49,7 +49,7 @@ Le résultat attendu affiche proxy, inspecteur et destination prêts dans **Conn
 
 Tableau de bord et preuves des requêtes ; politique locale d’autorisation/blocage ; politique PII globale, par route et par outil avec évaluation Mirror `would_*` ; scénarios HTTP synthétiques ; audit ; mot de passe ; inventaire des interfaces, réglages listener/amont, validation, application et restauration du conteneur Envoy détenu.
 
-Les requêtes synthétiques traversent réellement Envoy → inspecteur gRPC → destination HTTP. La console enregistre les reçus et le masquage des réponses, sans appel direct au moteur en substitution. Listener par défaut : `127.0.0.1:18082` ; inspecteur : `18081` ; destination synthétique : `18090`.
+Les requêtes synthétiques traversent réellement Envoy → inspecteur gRPC → destination HTTP. La console enregistre les reçus et le masquage des réponses, sans appel direct au moteur en substitution. Listener par défaut : `127.0.0.1:18082` ; inspecteur : `18101–18104` ; destination synthétique : `18090`.
 
 ## Périmètre et éditions
 
@@ -88,3 +88,10 @@ Ce sont des vérifications synthétiques locales, pas une certification TLS/IdP 
 ## License
 
 Community est sous MIT. Le code Enterprise privé et les actifs clients sont exclus.
+
+
+## Exploitation sur un même hôte — 0.34
+
+Connections / System affiche les PID, états et redémarrages. Dans Settings → Inspector processes, l’administrateur choisit 1, 2 ou 4 processus et applique, démarre ou arrête l’inspection. Viewer dispose d’un accès en lecture seule. L’arrêt bloque le trafic inline.
+
+[Operations](docs/fr/operations.md) · [Inspector pool](docs/fr/inspector-pool.md)

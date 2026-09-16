@@ -29,7 +29,7 @@ class NetworkConfig(BaseModel):
 
   @model_validator(mode='after')
   def reserved(self):
-    if self.listen_port in {5176,5186,8181,8191,18081,18090}:
+    if self.listen_port in {5176,5186,8181,8191,18081,18090,18101,18102,18103,18104,18111,18112,18113,18114}:
       raise ValueError('Port is reserved for management, inspection or destination')
     return self
 
@@ -57,12 +57,18 @@ class NetworkManager:
     self.linux=platform.system()=='Linux'
     self.last_error=None
     self.running=False
+    self.replicas=(store.get('inspectors') or {'replicas':1})['replicas']
     if store.get('network') is None:store.set('network',NetworkConfig().model_dump())
 
   def current(self):return NetworkConfig.model_validate(self.store.get('network')).model_dump()
 
   def render(self,config):
-    value=yaml.safe_load(ENVOY_TEMPLATE.read_text())
+    from asr_proxy.inspection.pool import parser, render_envoy
+    args=parser().parse_args(['--config','unused','--key-file','unused',
+      '--state-directory','unused','--envoy-output','unused','--replicas',str(self.replicas),
+      '--proxy-port',str(config.listen_port),'--inspector-address',
+      '127.0.0.1' if self.linux else 'host.docker.internal'])
+    value=render_envoy(args)
     listener=value['static_resources']['listeners'][0]
     listener['address']['socket_address']={'address':'127.0.0.1' if self.linux else '0.0.0.0','port_value':config.listen_port}
     listener['per_connection_buffer_limit_bytes']=config.max_body_bytes
@@ -171,7 +177,7 @@ class NetworkManager:
   def status(self):
     return {'applied':self.current(),'interfaces':inventory(),'proxy_ready':self.probe(),
       'last_error':self.last_error,'host_os':platform.system(),'container':self.name,
-      'inspector_endpoint':'127.0.0.1:18081 (gRPC)', 'upstream_endpoint':'127.0.0.1:18090 (synthetic HTTP)',
+      'inspector_endpoint':f'127.0.0.1:18101–{18100+self.replicas} (gRPC)', 'upstream_endpoint':'127.0.0.1:18090 (synthetic HTTP)',
       'supported_topologies':['explicit_loopback'],'unavailable_topologies':['dual_nic_routed','transparent_bridge'],
       'egress_binding':'OS route / Docker host forwarding; no physical NIC pinning',
       'tls':'External decryptor not connected; trusted-hop simulator signs plaintext synthetic input'}

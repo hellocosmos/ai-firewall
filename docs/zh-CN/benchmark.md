@@ -21,3 +21,7 @@
 仅在主机负载、Docker 版本、电源模式、场景、迭代数和策略相同的情况下比较结果。建议至少运行三次并保留中位结果。并发容量、连接复用、大正文、持续 SSE、故障恢复和多节点行为需要单独测试。
 
 参见[控制台](console.md)、[架构](architecture.md)、[版本](editions.md)和[安全范围](security.md)。
+
+## Community 检查器进程池
+
+[Community 检查器进程池](inspector-pool.md)

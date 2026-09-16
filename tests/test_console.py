@@ -130,7 +130,7 @@ def test_real_community_console_proxy(tmp_path):
         response=await c.post('http://127.0.0.1:18092/mcp',headers={'host':'tools.demo.test'},json={'jsonrpc':'2.0','id':1,'method':'tools/call','params':{'name':'notes.read','arguments':{'message':'hello'}}})
         assert response.status_code==403
         count=len(runtime.destination.receipts)
-        await runtime.grpc_server.stop(0);runtime.inspector_ready=False
+        await asyncio.to_thread(runtime.workers.stop)
         response=await c.post('http://127.0.0.1:18092/mcp',json={})
         assert response.status_code>=500 and len(runtime.destination.receipts)==count
     finally:await runtime.stop()

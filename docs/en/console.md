@@ -26,7 +26,7 @@ Use the language selector on the sign-in page or top bar. English is the default
 ```text
 Browser -> management API/UI :5176
                  -> signed synthetic sender -> Envoy :18082 -> HTTP destination :18090
-                                                 <-> gRPC inspector :18081
+                                                 <-> gRPC inspector :18101–18104
                  <- response inspection <- decision + receipt <- UI
 ```
 
@@ -53,7 +53,7 @@ Use **Policies → PII override** to set each demo tool to inherit, redact or bl
 | Deployment | Explicit L7, single loopback interface |
 | Management API/UI | `127.0.0.1:5176` |
 | Proxy ingress | `127.0.0.1:18082`, configurable unprivileged port |
-| Inspector | `127.0.0.1:18081`, gRPC ExtProc |
+| Inspector | `127.0.0.1:18101–18104`, gRPC ExtProc |
 | Destination | `127.0.0.1:18090`, synthetic HTTP only |
 | Request timeout | 5 seconds; configurable 2–30 |
 | Body limit | 1 MiB; configurable 1 KiB–1 MiB |
@@ -69,7 +69,7 @@ Interface count is not physical NIC count: loopback, bridges and tunnels are inc
 
 `.runtime-state/console` stores account hashes, session hashes, policy, network settings and sanitized SQLite events. Set `TD_CONSOLE_STATE` to a different private directory if needed. Back it up while stopped; changing the path starts a separate installation. It is excluded from Git. The signing key is ephemeral within this demo; external trusted hops are not provisioned. Destination receipt counters reset on process restart; saved transaction evidence remains. Audit is local and editable, not immutable.
 
-If startup fails, check Docker availability and ports 5176/18081/18090 plus the configured proxy port. Do not stop unrelated services automatically. Missing inspection evidence is an error, not success. Runtime latency includes local/container effects and is not a production benchmark. Real TLS equipment, IAM, forced routing, HA and production hardening require separate validation.
+If startup fails, check Docker availability and ports 5176/18101–18104/18111–18114/18090 plus the configured proxy port. Do not stop unrelated services automatically. Missing inspection evidence is an error, not success. Runtime latency includes local/container effects and is not a production benchmark. Real TLS equipment, IAM, forced routing, HA and production hardening require separate validation.
 
 ## Verify and maintain translations
 
@@ -82,3 +82,8 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 ```
 
 Without `TD_CONSOLE_E2E=1`, Docker tests are skipped. Locale checks require identical keys and placeholders across all six dictionaries and English application source. Update English keys and all locale JSON files together; keep stable API codes unchanged. English documentation is the reference when translations differ. See [architecture](architecture.md), [editions](editions.md), [migration](migration.md) and [security](security.md).
+
+
+## Same-host operations (0.34)
+
+[1 / 2 / 4 inspectors · Linux service](operations.md)

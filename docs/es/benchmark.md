@@ -21,3 +21,7 @@ Use `p50_ms`, `p95_ms`, `mean_ms` y `sequential_requests_per_second` solo como r
 Compare solo con carga, Docker, modo de energía, escenario, iteraciones y política equivalentes. Ejecute al menos tres veces y conserve la ejecución mediana. La capacidad paralela, reutilización de conexiones, cuerpos grandes, SSE sostenido, recuperación y múltiples nodos requieren pruebas distintas.
 
 Consulte [consola](console.md), [arquitectura](architecture.md), [ediciones](editions.md) y [seguridad](security.md).
+
+## Grupo de inspectores Community
+
+[Grupo de inspectores Community](inspector-pool.md)

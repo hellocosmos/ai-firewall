@@ -47,7 +47,7 @@ cd ai-firewall
 
 仪表板、请求证据、本地放行/阻断策略、全局/路由/工具 PII 策略及 Mirror `would_*` 评估、合成 HTTP 场景、审计、密码修改、接口清单、监听/上游设置，以及所拥有 Envoy 容器的验证、应用与回滚。
 
-合成请求经过真实 Envoy → gRPC 检查器 → HTTP 目标路径，记录目标回执和响应脱敏，不以直接调用引擎代替。默认监听 `127.0.0.1:18082`，检查器使用 `18081`，合成目标使用 `18090`。
+合成请求经过真实 Envoy → gRPC 检查器 → HTTP 目标路径，记录目标回执和响应脱敏，不以直接调用引擎代替。默认监听 `127.0.0.1:18082`，检查器使用 `18101–18104`，合成目标使用 `18090`。
 
 ## 范围与版本
 
@@ -86,3 +86,10 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 ## License
 
 Community 采用 MIT 许可，不包含私有 Enterprise 代码和客户资产。
+
+
+## 同一主机运维 — 0.34
+
+在 Connections / System 查看 PID、状态和重启次数。管理员可在 Settings → Inspector processes 选择 1、2 或 4 个进程并应用、启动或停止。Viewer 仅可查看。停止期间阻止内联流量。
+
+[Operations](docs/zh-CN/operations.md) · [Inspector pool](docs/zh-CN/inspector-pool.md)

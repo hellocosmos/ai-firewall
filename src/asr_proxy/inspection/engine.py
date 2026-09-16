@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from urllib.parse import parse_qsl, unquote, urlsplit
 
-from .signatures import DEFAULT_PATTERNS
+from .signatures import DEFAULT_PATTERNS, ScanPattern
 
 from .budget import check_deadline
 from .authorization import AuthorizationRequest
@@ -29,12 +29,27 @@ def field_allowed(path: tuple[str, ...], patterns: list[str]) -> bool:
   return False
 
 
+class _BoundedSignature:
+  """Skip impossible ASCII matches without changing native regex semantics."""
+
+  def __init__(self, definition: ScanPattern):
+    import regex
+    self._regex = regex.compile(definition.regex.pattern, definition.regex.flags)
+    self._required_ascii_any = definition.required_ascii_any
+
+  def search(self, text: str, *, timeout: float):
+    if self._required_ascii_any and text.isascii():
+      lowered = text.lower()
+      if not any(literal in lowered for literal in self._required_ascii_any):
+        return None
+    return self._regex.search(text, timeout=timeout)
+
+
 class InspectionEngine:
   def __init__(self, config: InspectionConfig, pii, verifier: AttestationVerifier, broker):
     self.config, self.pii, self.verifier, self.broker = config, pii, verifier, broker
-    import regex
     # Own bounded copies: no global SDK rule changes and no uninterruptible stdlib regex.
-    self.signature_patterns = [regex.compile(pattern.regex.pattern, pattern.regex.flags)
+    self.signature_patterns = [_BoundedSignature(pattern)
                                for pattern in DEFAULT_PATTERNS if pattern.severity >= 2]
 
   def _find(self, text):

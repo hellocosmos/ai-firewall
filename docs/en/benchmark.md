@@ -21,3 +21,7 @@ Use `p50_ms`, `p95_ms`, `mean_ms` and `sequential_requests_per_second` only as a
 Compare results only when host load, Docker version, power mode, scenario, iteration count and policy are equivalent. Run at least three times and retain the median run. Parallel capacity, connection reuse, large bodies, sustained SSE, failure recovery and multi-node behavior require separate benchmarks.
 
 See the [console guide](console.md), [architecture](architecture.md), [editions](editions.md) and [security scope](security.md).
+
+## Same-host inspector pool
+
+[Same-host inspector pool](inspector-pool.md)

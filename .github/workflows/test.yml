@@ -16,7 +16,7 @@ jobs:
       - run: pip install -e '.[dev,console]'
       - run: python -c "import importlib.util; assert importlib.util.find_spec('trapdefense_enterprise') is None; assert importlib.util.find_spec('asr') is None"
       - run: pytest -q
-      - run: trapdefense-inspector --help && trapdefense-console --help && trapdefense-benchmark --help
+      - run: trapdefense-inspector-pool --help && trapdefense-inspector --help && trapdefense-console --help && trapdefense-benchmark --help
   console:
     runs-on: ubuntu-latest
     steps:
@@ -40,3 +40,4 @@ jobs:
       - run: pip install -e '.[dev,console]'
       - run: docker pull envoyproxy/envoy@sha256:57e14a549d7bd43c8d3f6d03e8cfa653e037d4b38e133acd9b54f38c524401b4
       - run: TD_CONSOLE_E2E=1 pytest tests/test_console.py -q
+      - run: TD_RUNTIME_SMOKE=1 pytest tests/runtime/test_inspector_pool_runtime.py tests/runtime/test_console_pool_runtime.py -q

@@ -26,7 +26,7 @@ cd ai-firewall
 ```text
 Browser -> management API/UI :5176
                  -> signed synthetic sender -> Envoy :18082 -> HTTP destination :18090
-                                                 <-> gRPC inspector :18081
+                                                 <-> gRPC inspector :18101–18104
                  <- response inspection <- decision + receipt <- UI
 ```
 
@@ -53,7 +53,7 @@ Browser -> management API/UI :5176
 | 部署 | 显式 L7，单个回环接口 |
 | 管理 API/UI | `127.0.0.1:5176` |
 | 代理入口 | `127.0.0.1:18082`，可修改非特权端口 |
-| 检查器 | `127.0.0.1:18081`，gRPC ExtProc |
+| 检查器 | `127.0.0.1:18101–18104`，gRPC ExtProc |
 | 目标 | `127.0.0.1:18090`，仅合成 HTTP |
 | 请求超时 | 5 秒，可设为 2–30 秒 |
 | 正文上限 | 1 MiB，可设为 1 KiB–1 MiB |
@@ -69,7 +69,7 @@ Browser -> management API/UI :5176
 
 `.runtime-state/console` 保存账户及会话哈希、策略、网络配置和清理后的 SQLite 事件。可用 `TD_CONSOLE_STATE` 指定其他私有目录。停止后备份；更改路径会创建独立安装。此目录被 Git 排除。演示签名密钥仅在进程中临时存在，不配置外部转发节点。目标接收计数在重启后清零，保存的交易证据保留。审计是可修改的本地存储，不是不可变存储。
 
-启动失败时检查 Docker、5176/18081/18090 及配置的代理端口，不要自动终止无关服务。缺少检查证据表示错误，而非成功。延迟包含本地和容器影响，不代表生产基准。真实 TLS、IAM、强制路由、HA 和生产加固需要另行验证。
+启动失败时检查 Docker、5176/18101–18104/18111–18114/18090 及配置的代理端口，不要自动终止无关服务。缺少检查证据表示错误，而非成功。延迟包含本地和容器影响，不代表生产基准。真实 TLS、IAM、强制路由、HA 和生产加固需要另行验证。
 
 ## 验证与翻译维护
 
@@ -82,3 +82,8 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 ```
 
 未设置 `TD_CONSOLE_E2E=1` 时跳过 Docker 测试。语言检查要求六个词典的键和占位符一致，并检查应用代码使用英语。修改英文键时同步更新全部 JSON，不改变稳定 API 代码。译文有差异时以英语为准。另见[架构](architecture.md)、[版本](editions.md)、[迁移](migration.md)和[安全](security.md)。
+
+
+## 同一主机运维 — 0.34 候选版
+
+[1 / 2 / 4 inspectors · Linux service](operations.md)

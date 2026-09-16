@@ -9,6 +9,8 @@ from urllib.parse import unquote, urlsplit
 
 from .contracts import HttpMessage, InspectionConfig, InspectionError, RouteRule
 
+_ASCII_CONTROLS = re.compile(r"[\x00-\x1f\x7f]")
+
 
 def strict_json(raw: bytes, max_depth: int = 32, max_nodes: int = 8192):
   def pairs(values):
@@ -222,7 +224,7 @@ def check_egress(value, config: InspectionConfig):
   for text in iter_strings(value):
     # Full nested URL-valued fields; prose URLs are scanned separately by signatures.
     candidate = text.strip()
-    normalized = "".join(char for char in candidate if ord(char) >= 32 and ord(char) != 127)
+    normalized = _ASCII_CONTROLS.sub("", candidate)
     decoded = unquote(normalized)
     looks_like_url = decoded.lower().startswith(("http:", "https:", "//"))
     if looks_like_url and (candidate != normalized or decoded != normalized):

@@ -427,5 +427,21 @@
   "Would allow": "将允许",
   "Would block": "将阻止",
   "Would redact": "将脱敏",
-  "Would require approval": "将请求审批"
+  "Would require approval": "将请求审批",
+  "Inspector processes": "检查进程",
+  "Same-host recovery; not cross-server HA.": "同一主机内恢复，不是跨服务器高可用。",
+  "New requests use the committed policy. Applying restarts the pool and proxy; traffic fails closed during the interruption.": "新请求使用已提交的策略。应用时重启进程池和代理，中断期间阻止流量。",
+  "Process count": "进程数",
+  "Apply / start": "应用 / 启动",
+  "Stop inspection": "停止检查",
+  "Restarts": "重启次数",
+  "Inspector operation completed.": "检查进程操作已完成。",
+  "healthy": "正常",
+  "degraded": "降级",
+  "starting": "启动中",
+  "restarting": "重启中",
+  "unhealthy": "异常",
+  "unresponsive": "无响应",
+  "failed": "失败",
+  "stopped": "已停止"
 }

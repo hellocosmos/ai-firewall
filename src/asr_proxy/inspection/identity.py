@@ -60,6 +60,7 @@ class AttestationVerifier:
     Path(nonce_db).parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(nonce_db) as db:
       db.execute("CREATE TABLE IF NOT EXISTS nonces (nonce TEXT PRIMARY KEY, expires INTEGER)")
+      db.execute("CREATE INDEX IF NOT EXISTS nonces_expires ON nonces (expires)")
     Path(nonce_db).chmod(0o600)
 
   def verify(self, message: HttpMessage, *, consume: bool) -> dict:

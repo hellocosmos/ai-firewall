@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import base64
+import os
 import time
 from pathlib import Path
 
@@ -276,7 +277,16 @@ def create_mirror_app(engine: InspectionEngine, audit: InspectionAudit) -> FastA
   return app
 
 
+async def watch_parent(web, parent_pid):
+  while os.getppid() == parent_pid:
+    await asyncio.sleep(.25)
+  web.should_exit = True
+
+
 async def run(args):
+  parent_pid = getattr(args, "parent_pid", None)
+  if parent_pid is not None and os.getppid() != parent_pid:
+    raise RuntimeError("inspector_parent_unavailable")
   from .pii import PresidioScanner
   config = InspectionConfig.model_validate(yaml.safe_load(Path(args.config).read_text()))
   authorizer = load_authorizer(config)
@@ -297,10 +307,15 @@ async def run(args):
     raise RuntimeError("grpc_bind_failed")
   await server.start()
   web = uvicorn.Server(uvicorn.Config(create_mirror_app(engine, audit), host=args.mirror_host,
-    port=args.mirror_port, access_log=False, limit_concurrency=32, timeout_keep_alive=5))
+    port=args.mirror_port, access_log=False, limit_concurrency=32, timeout_keep_alive=5,
+    timeout_graceful_shutdown=3 if parent_pid is not None else None))
+  watcher = asyncio.create_task(watch_parent(web, parent_pid)) if parent_pid is not None else None
   try:
     await web.serve()
   finally:
+    if watcher is not None:
+      watcher.cancel()
+      await asyncio.gather(watcher, return_exceptions=True)
     await server.stop(grace=2)
 
 
@@ -313,6 +328,7 @@ def main():
   parser.add_argument("--mirror-host", default="127.0.0.1")
   parser.add_argument("--mirror-port", type=int, default=18083)
   parser.add_argument("--stream-timeout", type=float, default=20)
+  parser.add_argument("--parent-pid", type=int, help=argparse.SUPPRESS)
   asyncio.run(run(parser.parse_args()))
 
 

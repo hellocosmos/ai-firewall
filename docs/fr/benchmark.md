@@ -21,3 +21,7 @@ Utilisez `p50_ms`, `p95_ms`, `mean_ms` et `sequential_requests_per_second` uniqu
 Comparez seulement avec charge, Docker, alimentation, scénario, itérations et politique équivalents. Exécutez au moins trois fois et conservez le résultat médian. Capacité parallèle, réutilisation des connexions, gros corps, SSE prolongé, reprise et multi-nœuds nécessitent d’autres tests.
 
 Consultez [console](console.md), [architecture](architecture.md), [éditions](editions.md) et [sécurité](security.md).
+
+## Pool d’inspecteurs Community
+
+[Pool d’inspecteurs Community](inspector-pool.md)
