@@ -4,7 +4,7 @@
 
 ## 導入条件と提供状況
 
-0.36 はアダプター、Envoy、検査器、管理 UI をまとめた Docker Compose プレビューです。イメージはソースからローカルでビルドします。TrapDefense Cloud は計画段階で、登録はできません。
+0.37 は接続キーまたは外部 JWT のゲートウェイ認証と独立した宛先資格情報を含む Docker Compose プレビューです。イメージはソースからビルドし、TrapDefense Cloud は計画段階です。
 
 [提供形態と互換性](deployment-fit.md)
 
@@ -28,4 +28,4 @@ Community は、このリポジトリの MIT ライセンスのプロキシラ�
 
 集中管理、分散 HA、ホスティング課金、不変監査ストレージは未提供です。商用範囲には非公開プロバイダー、導入、ポリシー連携、サポートを含められます。価格と支援条件は別途定めます。ローカル SQLite と JSONL は変更可能です。
 
-[Docker 0.36](self-hosting.md)
+[Docker 0.37](self-hosting.md) · [ゲートウェイ互換性](gateway-compatibility.md)

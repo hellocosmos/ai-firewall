@@ -457,6 +457,7 @@
   "Listener reachable": "리스너 연결 가능",
   "Body limit": "본문 크기 제한",
   "The connection key verifies deployment access, not agent or user identity.": "연결 키는 설치 환경 접근을 확인하며 에이전트나 사용자의 신원을 확인하지 않습니다.",
+  "Gateway and target credentials are separate. JWT gateway tokens are not forwarded to the target.": "게이트웨이와 대상 자격증명은 분리됩니다. 게이트웨이 JWT는 대상으로 전달되지 않습니다.",
   "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.": "JSON HTTP와 무상태 JSON MCP만 지원합니다. 이 구성은 OAuth 로그인 중개, 세션 및 장시간 SSE를 지원하지 않습니다.",
   "Configured routes": "설정된 경로",
   "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.": "목적지와 매핑은 deployment.yaml을 수정한 뒤 스택을 재생성하세요. 정책과 비밀번호는 여기서 관리합니다.",

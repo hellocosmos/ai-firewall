@@ -1,35 +1,36 @@
-# Docker self-hosting (0.36 Community Preview)
+# Docker self-hosting (0.37 Community Preview)
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
 ## Start here: does your client fit?
 
-This package supports **one fixed destination origin per installation** and an explicit list of HTTP routes/MCP actions. The client must let you change its API/MCP URL **and** add `X-TD-Client-Key`. Existing service credentials remain separate. Use a server-side client or a separately configured same-origin application; this package does not enable permissive browser CORS. If either setting is unavailable, this package is not a drop-in integration for that client.
+This package supports **one fixed destination origin per installation** and an explicit list of HTTP routes/MCP actions. The client must let you change its API/MCP URL and use either `X-TD-Client-Key` or an OAuth Bearer JWT. Target credentials remain separate. Use a server-side client or a separately configured same-origin application; this package does not enable permissive browser CORS. If the required settings are unavailable, this package is not a drop-in integration for that client. See the [gateway compatibility matrix](gateway-compatibility.md).
 
 ```text
-Client -- connection key + service credentials --> bundled adapter
-       --> private Envoy --> inspector --> configured MCP / HTTP API
+Client -- gateway key or JWT --> bundled adapter
+       -- separate target credential --> private Envoy --> inspector --> configured MCP / HTTP API
        <-- inspected, bounded response <--
 Operator --> console login --> policies and sanitized decision records
 ```
 
-The bundled adapter verifies the connection key, removes submitted forwarding identities, binds the actual request to a private signature and forwards only through Envoy. Clients never receive the signing key. `source_verified` means this trusted forwarding path was verified; it does **not** prove the user's or agent's identity.
+The bundled adapter verifies the connection key or configured JWT issuer/audience/scope, removes submitted forwarding identities, binds the actual request to a private signature and forwards only through Envoy. Clients never receive the signing key. `source_verified` means this trusted forwarding path was verified; it does **not** prove the user's or agent's identity. A validated JWT authenticates gateway access but does not create an Enterprise Agent IAM record.
 
 ## What works, and what does not
 
 | Connection | Package contract | Customer changes |
 |---|---|---|
 | JSON HTTP API | Exact method/path mapping; bounded request/response; fixed origin | Change base URL; set connection key; define route/action/resource and redaction fields |
-| Remote MCP | Stateless JSON POST; explicitly mapped control methods and tools | Change MCP URL; add connection key; server must return JSON and not require sessions |
-| Existing Bearer token / API Key | Pass through Bearer and known API key headers (`X-API-Key`, `API-Key`, `X-Goog-Api-Key`) to the same destination; service validates credentials | Keep `Authorization: Bearer …` / API key header; acquire and refresh tokens outside TrapDefense |
-| Fixed service account bearer | `static_bearer` injects a token from a private file; inbound Authorization is rejected | Mount a secret file; rotate it and recreate the app; every holder of the connection key shares this service identity |
+| Remote MCP | Stateless JSON POST; explicitly mapped control methods and tools | Change MCP URL; use client key or OAuth JWT; server must return JSON and not require sessions |
+| Gateway JWT | RS256, issuer, audience, time, subject and scope validation; RFC 9728 metadata and gateway challenge | Register TrapDefense as a resource in the external IdP; acquire tokens outside TrapDefense |
+| Existing target Bearer | `passthrough_bearer` with client-key mode only; legacy HTTP onboarding, not MCP OAuth compliance | Target validates the token; acquire and refresh it outside TrapDefense |
+| Fixed target credential | `static_bearer` or `static_api_key` injects a private file-backed credential; conflicting inbound credentials are rejected | Mount a secret file, rotate it and recreate the app; every allowed caller shares this service identity |
 | Console login | Locally initialized `admin`; password changes revoke sessions | Set a unique password during initialization |
 | Entra console SSO | Existing source-console capability; **not wired into this Docker profile** | See [identity guide](identity.md); never interpret console SSO as agent authorization |
-| OAuth discovery/login/token exchange, Basic auth | **Not supported by this profile**; target 401 stays 401, authentication challenges are not relayed | Use externally acquired service tokens or a separately validated integration |
+| OAuth login/token exchange/DCR/OBO, Basic auth | **Not provided by this profile**; an external authorization server owns OAuth issuance and the target challenge is not relayed | Use a supported IdP/credential provider and validate the complete client flow |
 | SSE, stateful MCP, cookies, WebSocket, uploads/binary content | **Not supported by this profile** | Use another explicitly validated profile; do not assume HTTP implies compatibility |
 | stdio, shell, local files, direct DB or closed SaaS-internal calls | Outside this proxy's visibility | Not covered |
 
-A previously acquired OAuth access token can be forwarded as a Bearer token. That is **token passthrough**, not an OAuth-capable MCP authorization server. TrapDefense neither grants new service permissions nor translates arbitrary credentials. Target services must enforce their own authorization. Community's shared connection key is not an agent registry or per-agent IAM.
+In JWT mode, TrapDefense is an OAuth resource server, not an authorization server. It validates a token issued for the configured TrapDefense audience and does not forward that token to the target. Target services still enforce their own permissions using an independent credential. Community's client key or JWT subject is not an agent registry, delegation record or per-agent IAM.
 
 ## Fresh installation
 
@@ -80,14 +81,14 @@ curl -sS http://localhost:18084/mcp \
   --data '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"notes.delete","arguments":{}}}'
 ```
 
-Expected: blocked by the configured action policy. The optional fixture is a small synthetic protocol target, not proof of a particular MCP vendor. The [real MCP SDK pilot](mcp-pilot.md) remains a separate verification path.
+Expected: blocked by the configured action policy. The optional fixture is a small synthetic protocol target, not proof of a particular MCP vendor. 0.37 also runs the pinned official Python MCP SDK through the adapter for initialization and discovery; see [gateway compatibility](gateway-compatibility.md). The broader [MCP pilot](mcp-pilot.md) remains a separate tool-operation path.
 
 ## Connect your own destination
 
 1. Stop the smoke stack with `docker compose --profile smoke down` (without `-v`).
 2. Edit `deployment.yaml`: replace `upstream`, each route's `authority`, exact paths, methods, tool/action/resource mappings and allowed redaction fields. Use a DNS HTTPS origin, for example `https://api.example.com`; no URL credentials, base path, query or fragment. Certificate-chain and hostname checks are enabled. For a private CA, mount the appropriate CA bundle into Envoy at `/etc/ssl/certs/ca-certificates.crt`; never disable verification.
 3. Plain HTTP requires `allow_plaintext_upstream: true`; use it only on an explicitly trusted segment. One installation cannot dynamically select destinations based on client URLs. Deploy separate instances for different origins.
-4. Select `passthrough` or configure `static_bearer` plus `bearer_file`. For static bearer, mount your file read-only into the app, readable by UID 10001 and mode 0600. Do not commit secret files. Restart the app after rotation. A supplied `Authorization` header in static mode is rejected to prevent ambiguous identity.
+4. Configure `gateway_auth` as `client_key` or `jwt`. Configure `target_auth` as `none`, `passthrough_bearer`, `static_bearer` or `static_api_key`. JWT cannot be combined with passthrough. For static modes, mount the secret file read-only into the app, readable by UID 10001 and mode 0600. Do not commit secret files. Restart the app after rotation. Conflicting caller credentials are rejected.
 5. If route/tool keys changed after initialization, explicitly migrate saved policies using the procedure below. Existing saved policies are never silently replaced by new YAML defaults.
 6. Run `docker compose run --rm app render` and `docker compose up -d --force-recreate` (without the smoke profile). Change the client's URL to your gateway and add its connection key. Send an allowed and blocked request; examine destination-side effects and console evidence.
 
@@ -100,12 +101,31 @@ services:
       - ./destination.secret:/run/secrets/destination:ro
 ```
 
-Corresponding configuration:
+Corresponding target configuration:
 
 ```yaml
-destination_auth: static_bearer
-bearer_file: /run/secrets/destination
+target_auth:
+  mode: static_bearer
+  secret_file: /run/secrets/destination
 ```
+
+JWT gateway configuration:
+
+```yaml
+gateway_auth:
+  mode: jwt
+  issuer: https://login.example.com/tenant/v2.0
+  audience: https://firewall.example.com/mcp
+  jwks_uri: https://login.example.com/tenant/discovery/v2.0/keys
+  resource: https://firewall.example.com/mcp
+  authorization_servers: [https://login.example.com/tenant/v2.0]
+  required_scopes: [mcp.invoke]
+target_auth:
+  mode: static_bearer
+  secret_file: /run/secrets/destination
+```
+
+Production identity and metadata URLs require HTTPS. `allow_insecure_loopback: true` exists only for explicit local synthetic tests. The resource-derived metadata URL for the example is `https://firewall.example.com/.well-known/oauth-protected-resource/mcp`.
 
 ## Integration acceptance checklist
 

@@ -457,6 +457,7 @@
   "Listener reachable": "Listener reachable",
   "Body limit": "Body limit",
   "The connection key verifies deployment access, not agent or user identity.": "The connection key verifies deployment access, not agent or user identity.",
+  "Gateway and target credentials are separate. JWT gateway tokens are not forwarded to the target.": "Gateway and target credentials are separate. JWT gateway tokens are not forwarded to the target.",
   "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.": "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.",
   "Configured routes": "Configured routes",
   "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.": "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.",

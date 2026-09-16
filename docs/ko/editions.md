@@ -4,7 +4,7 @@
 
 ## 배포 적합성과 제공 상태
 
-0.36은 어댑터·Envoy·검사기·운영 UI를 함께 실행하는 Docker Compose Preview입니다. 이미지는 소스에서 로컬 빌드합니다. TrapDefense Cloud는 계획 단계이며 가입할 수 없습니다.
+0.37은 연결 키 또는 외부 JWT 게이트웨이 인증과 별도 대상 자격증명을 포함한 Docker Compose Preview입니다. 이미지는 소스에서 빌드하며 TrapDefense Cloud는 계획 단계입니다.
 
 [제공 방식과 호환성](deployment-fit.md)
 
@@ -28,4 +28,4 @@ Community는 이 저장소의 MIT 라이선스 프록시 런타임과 로컬 운
 
 중앙 장비 관리, 분산 HA, 호스팅 과금, 변경 불가능한 감사 저장소는 출시 기능이 아닙니다. 상용 범위에는 비공개 제공자, 구축, 정책 연동과 지원이 포함될 수 있으며 가격·지원 조건은 별도입니다. 로컬 SQLite와 JSONL은 수정 가능한 저장소입니다.
 
-[Docker 0.36](self-hosting.md)
+[Docker 0.37](self-hosting.md) · [게이트웨이 호환성](gateway-compatibility.md)

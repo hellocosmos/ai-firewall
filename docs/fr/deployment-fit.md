@@ -4,7 +4,7 @@
 
 Protégez les appels HTTP API et MCP distants que vous pouvez acheminer via un chemin d’inspection pris en charge. Conservez l’authentification des serveurs MCP et connecteurs ; ne remplacez pas votre IAM.
 
-0.36 fournit un paquet Docker Compose en préversion : adaptateur, Envoy, inspecteur et console. L’image se construit localement depuis les sources. TrapDefense Cloud reste prévu, sans inscription disponible.
+0.37 fournit un paquet Docker Compose avec clé ou JWT externe pour la passerelle et identifiants indépendants pour la cible. L’image se construit depuis les sources ; TrapDefense Cloud reste prévu.
 
 Vous devez contrôler l’adresse du client, l’entrée du serveur ou un chemin d’inspection réseau compatible. Le service cible doit être joignable et le contournement empêché. Les appels internes SaaS, stdio local, shell, fichiers et accès directs aux bases de données sont hors périmètre du proxy HTTP.
 
@@ -12,4 +12,4 @@ Le pilote local 0.35 vérifie Streamable HTTP sans état avec réponses JSON. L�
 
 [Architecture](architecture.md) · [Delivery status](editions.md) · [MCP pilot](mcp-pilot.md)
 
-[Auto-hébergement Docker](self-hosting.md)
+[Auto-hébergement Docker](self-hosting.md) · [Compatibilité de la passerelle](gateway-compatibility.md)

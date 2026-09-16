@@ -4,7 +4,7 @@
 
 ## Deployment fit and availability
 
-Self-hosted Community 0.36 includes a source-built Docker Compose package for the adapter, Envoy, inspector and console. TrapDefense Cloud remains planned and is not available for sign-up.
+Self-hosted Community 0.37 includes a source-built Docker Compose package with client-key or external-JWT gateway authentication and independent target credentials. TrapDefense Cloud remains planned and is not available for sign-up.
 
 [Delivery and compatibility](deployment-fit.md)
 
@@ -20,7 +20,7 @@ Community includes single-tenant Microsoft Entra ID console SSO with Administrat
 
 Edition names describe product and licensing boundaries, not a claim that every Enterprise roadmap item is generally available.
 
-Community is the MIT-licensed proxy runtime and local operations console in this repository. It includes signed trusted-hop verification, explicit HTTP/MCP mappings, local policy, signature checks, PII redaction, bounded response/SSE inspection, sanitized audit evidence, local login/password changes and proxy settings. No private package or external model API is required.
+Community is the MIT-licensed proxy runtime and local operations console in this repository. It includes signed trusted-hop verification, client-key or external-JWT gateway authentication, independent fixed-target credentials, explicit HTTP/MCP mappings, local policy, signature checks, PII redaction, bounded response/SSE inspection, sanitized audit evidence, local login/password changes and proxy settings. It is not an OAuth authorization server or Agent IAM registry.
 
 The separately distributed Enterprise pilot implementation adds the Access Broker: user/agent/task delegation, access decisions and one-time, expiring, request-bound human approval. Existing IAM context must come from a trusted integration; real customer IdP validation remains necessary. The Community UI identifies these unavailable capabilities.
 
@@ -28,4 +28,4 @@ The private provider connects through the `trapdefense.authorizers` / `enterpris
 
 Central fleet management, distributed HA, hosted billing and immutable audit storage are not shipped features. Commercial scope can include the private provider, deployment, policy integration and support; pricing and support terms are separate. Local SQLite and JSONL storage remain mutable.
 
-[Docker 0.36](self-hosting.md)
+[Docker 0.37](self-hosting.md) · [Gateway compatibility](gateway-compatibility.md)

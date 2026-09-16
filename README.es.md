@@ -18,7 +18,7 @@ Flujo lógico del producto. Consulte la [arquitectura de despliegue](docs/es/arc
 
 Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise. [Entra SSO](docs/es/identity.md).
 
-## Autoalojamiento con Docker · 0.36
+## Autoalojamiento con Docker · 0.37
 
 [Autoalojamiento con Docker: integration contract, installation and verification](docs/es/self-hosting.md)
 
@@ -27,9 +27,9 @@ Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles
 
 Proteja llamadas HTTP API y MCP remoto que pueda dirigir por una ruta de inspección compatible. Mantenga la autenticación existente en servidores MCP y conectores; no sustituya su IAM.
 
-0.36 ofrece un paquete preliminar Docker Compose con adaptador, Envoy, inspector y consola. La imagen se compila localmente desde el código fuente. TrapDefense Cloud sigue previsto y no admite registros.
+0.37 ofrece adaptador, Envoy, inspector, consola y autenticación separada para gateway/destino. Valida una clave o JWT de IdP externo y usa una credencial independiente para el destino. La imagen se compila desde fuentes; TrapDefense Cloud sigue previsto.
 
-[Entrega y compatibilidad](docs/es/deployment-fit.md)
+[Entrega y compatibilidad](docs/es/deployment-fit.md) · [Compatibilidad del gateway](docs/es/gateway-compatibility.md)
 
 ## Por qué TrapDefense
 

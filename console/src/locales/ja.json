@@ -457,6 +457,7 @@
   "Listener reachable": "リスナーに接続可能",
   "Body limit": "本文サイズの上限",
   "The connection key verifies deployment access, not agent or user identity.": "接続キーは導入環境へのアクセスを確認し、エージェントやユーザーの本人確認は行いません。",
+  "Gateway and target credentials are separate. JWT gateway tokens are not forwarded to the target.": "ゲートウェイ資格情報と宛先資格情報は分離されています。ゲートウェイ JWT は宛先へ転送されません。",
   "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.": "JSON HTTP とステートレス JSON MCP のみ対応します。この構成では OAuth ログイン仲介、セッション、長時間 SSE は未対応です。",
   "Configured routes": "設定されたルート",
   "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.": "宛先とマッピングは deployment.yaml を編集し、スタックを再作成してください。ポリシーとパスワードはここで管理します。",

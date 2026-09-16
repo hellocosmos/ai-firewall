@@ -4,7 +4,7 @@
 
 ## Compatibilité et disponibilité
 
-0.36 fournit un paquet Docker Compose en préversion : adaptateur, Envoy, inspecteur et console. L’image se construit localement depuis les sources. TrapDefense Cloud reste prévu, sans inscription disponible.
+0.37 fournit un paquet Docker Compose avec clé ou JWT externe pour la passerelle et identifiants indépendants pour la cible. L’image se construit depuis les sources ; TrapDefense Cloud reste prévu.
 
 [Offres et compatibilité](deployment-fit.md)
 
@@ -28,4 +28,4 @@ Le fournisseur privé utilise le point d’entrée Python `trapdefense.authorize
 
 La gestion centralisée, la HA distribuée, la facturation hébergée et l’audit immuable ne sont pas livrés. L’offre commerciale peut comprendre fournisseur privé, déploiement, intégration de politiques et support ; tarifs et conditions sont définis séparément. SQLite et JSONL locaux restent modifiables.
 
-[Docker 0.36](self-hosting.md)
+[Docker 0.37](self-hosting.md) · [Compatibilité de la passerelle](gateway-compatibility.md)

@@ -273,6 +273,10 @@ git commit -m "Package the 0.37 gateway authentication contract"
 - Modify: `docs/*/console.md`
 - Modify: `pyproject.toml`
 - Modify: `CHANGELOG.md`
+- Modify: `console/package.json`
+- Modify: `console/package-lock.json`
+- Modify: `console/src/DeploymentSettings.jsx`
+- Modify: `console/src/locales/*.json`
 
 **Interfaces:**
 - Produces: English canonical instructions, six-language navigation and summaries, an evidence-labeled compatibility matrix, and version 0.37 metadata.

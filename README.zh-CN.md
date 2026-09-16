@@ -18,7 +18,7 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](docs/zh-CN/identity.md).
 
-## Docker 自托管 · 0.36
+## Docker 自托管 · 0.37
 
 [Docker 自托管: integration contract, installation and verification](docs/zh-CN/self-hosting.md)
 
@@ -27,9 +27,9 @@ Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看
 
 保护可通过受支持检查路径的 HTTP API 和远程 MCP 调用。保留 MCP 服务器和连接器中的现有服务认证，不替代 IAM。
 
-0.36 提供同时运行适配器、Envoy、检查器和管理界面的 Docker Compose 预览包。镜像从源码本地构建。TrapDefense Cloud 仍在规划中，尚未开放注册。
+0.37 提供适配器、Envoy、检查器、管理界面以及分离的网关/目标认证。它验证连接密钥或外部 IdP JWT，并使用独立目标凭据。镜像从源码构建，TrapDefense Cloud 仍在规划中。
 
-[交付与兼容性](docs/zh-CN/deployment-fit.md)
+[交付与兼容性](docs/zh-CN/deployment-fit.md) · [网关客户端兼容性](docs/zh-CN/gateway-compatibility.md)
 
 ## TrapDefense 的差异
 

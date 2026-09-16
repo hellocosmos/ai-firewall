@@ -1,19 +1,20 @@
-# Auto-hébergement Docker — 0.36 Community Preview
+# Auto-hébergement Docker — 0.37 Community Preview
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.36 fournit un paquet Docker Compose en préversion : adaptateur, Envoy, inspecteur et console. L’image se construit localement depuis les sources. TrapDefense Cloud reste prévu, sans inscription disponible.
+0.37 fournit adaptateur, Envoy, inspecteur, console et authentifications séparées pour passerelle et cible. L’image se construit localement depuis les sources. TrapDefense Cloud reste prévu.
 
-Le client doit permettre de modifier l’URL MCP/API et d’ajouter X-TD-Client-Key. Chaque déploiement possède une destination fixe et des routes/outils explicites. Sans ces réglages, l’intégration directe n’est pas possible.
+Le client doit pouvoir modifier l’URL MCP/API et utiliser `X-TD-Client-Key` ou un JWT Bearer OAuth. Chaque déploiement possède une cible fixe et des routes/outils explicites. Consultez la [matrice de compatibilité](gateway-compatibility.md).
 
 | Type | Contrat |
 |---|---|
 | HTTP API | JSON, method/path exacts, maximum 1 MiB, réponse bornée |
 | MCP | POST JSON sans état, méthodes de contrôle et outils explicites |
-| Authentification cible | Transmission du Bearer/API Key existant ou injection d’un Bearer fixe depuis un fichier |
-| Non pris en charge | Connexion OAuth intermédiaire, échange de jetons, cookies/sessions, SSE longue durée, WebSocket, stdio, appels internes de SaaS fermé |
+| Authentification passerelle | Clé ou JWT RS256 d’un IdP externe avec issuer/audience/scope et métadonnées RFC 9728 |
+| Authentification cible | none, Bearer hérité transmis, Bearer/API Key fixe depuis fichier |
+| Non pris en charge | Émission OAuth, connexion intermédiaire, DCR, OBO, cookies/sessions, SSE longue durée, WebSocket, stdio, SaaS interne fermé |
 
-Le mot de passe sert à la console. La clé de connexion autorise l’accès à TrapDefense sans prouver l’identité de l’agent. Le service cible vérifie son jeton et ses permissions. Transmettre un jeton OAuth déjà obtenu n’est pas fournir un intermédiaire OAuth. Le SSO Entra de la console source existante n’est pas raccordé à ce profil Docker.
+Le mot de passe sert à la console. La clé ou le JWT authentifie l’accès à TrapDefense. Le JWT est validé pour l’audience de la passerelle et n’est pas transmis à la cible, qui utilise un identifiant séparé. Ce n’est ni un registre Agent IAM ni un OAuth Authorization Server.
 
 ## Docker
 
@@ -30,7 +31,7 @@ docker compose run --rm app client-key
 
 Connectez-vous comme admin sur http://localhost:18080. Lisez la clé avec client-key et stockez-la dans les en-têtes secrets du client. La passerelle est sur http://localhost:18084 ; le jeton cible synthétique est Bearer synthetic-target-token.
 
-Pour votre service, modifiez upstream, authority, chemins, outils et resource dans deployment.yaml. HTTPS vérifie les certificats ; autorisez HTTP explicitement uniquement sur un réseau de confiance. passthrough conserve les en-têtes d’authentification. static_bearer exige un fichier 0600 lisible par UID 10001 et refuse Authorization entrant. Les détenteurs de la clé partagent les permissions du même compte de service.
+Pour votre service, modifiez upstream, authority, chemins, outils et resource. `gateway_auth` accepte `client_key` ou `jwt`; `target_auth` accepte `none`, `passthrough_bearer`, `static_bearer` et `static_api_key`. JWT et passthrough sont incompatibles. Les identifiants fixes utilisent un fichier 0600 lisible par UID 10001 et refusent les entrées en conflit.
 
 L’UI gère politiques et mots de passe. Pour changer les correspondances : sauvegardez, exécutez policy-reset, render puis recréez les services. Seules les politiques enregistrées sont réinitialisées ; comptes, clés et événements restent présents. Les nouvelles requêtes utilisent la nouvelle politique.
 
@@ -38,4 +39,4 @@ Les ports sont liés à la boucle locale. L’accès distant nécessite un proxy
 
 Les volumes conservent l’état après redémarrage. Arrêtez puis sauvegardez les deux volumes et la configuration. down -v détruit les données. Le retour arrière restaure l’ancienne image et sa sauvegarde correspondante. Un port accessible ne prouve pas l’authentification : testez autorisation, blocage et effets sur la cible. SSE longue durée, HA et IAM client réel nécessitent une validation distincte.
 
-[Detailed examples, backup and migration (English)](../en/self-hosting.md)
+[Compatibilité et VS Code](gateway-compatibility.md) · [Detailed examples, backup and migration (English)](../en/self-hosting.md)

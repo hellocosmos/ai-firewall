@@ -18,7 +18,7 @@ Flux logique du produit. Consultez l’[architecture de déploiement](docs/fr/ar
 
 Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](docs/fr/identity.md).
 
-## Auto-hébergement Docker · 0.36
+## Auto-hébergement Docker · 0.37
 
 [Auto-hébergement Docker: integration contract, installation and verification](docs/fr/self-hosting.md)
 
@@ -27,9 +27,9 @@ Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec 
 
 Protégez les appels HTTP API et MCP distants que vous pouvez acheminer via un chemin d’inspection pris en charge. Conservez l’authentification des serveurs MCP et connecteurs ; ne remplacez pas votre IAM.
 
-0.36 fournit un paquet Docker Compose en préversion : adaptateur, Envoy, inspecteur et console. L’image se construit localement depuis les sources. TrapDefense Cloud reste prévu, sans inscription disponible.
+0.37 fournit adaptateur, Envoy, inspecteur, console et authentifications séparées pour passerelle/cible. Il valide une clé ou un JWT d’IdP externe et utilise un identifiant cible indépendant. L’image se construit depuis les sources ; TrapDefense Cloud reste prévu.
 
-[Offres et compatibilité](docs/fr/deployment-fit.md)
+[Offres et compatibilité](docs/fr/deployment-fit.md) · [Compatibilité de la passerelle](docs/fr/gateway-compatibility.md)
 
 ## Pourquoi TrapDefense
 

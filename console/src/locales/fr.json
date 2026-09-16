@@ -457,6 +457,7 @@
   "Listener reachable": "Port d’écoute accessible",
   "Body limit": "Limite du corps",
   "The connection key verifies deployment access, not agent or user identity.": "La clé vérifie l’accès au déploiement, pas l’identité de l’agent ou de l’utilisateur.",
+  "Gateway and target credentials are separate. JWT gateway tokens are not forwarded to the target.": "Les identifiants de la passerelle et de la cible sont séparés. Le JWT de la passerelle n’est pas transmis à la cible.",
   "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.": "JSON HTTP et MCP JSON sans état uniquement. Ce profil ne prend pas en charge la connexion OAuth intermédiaire, les sessions ou le SSE longue durée.",
   "Configured routes": "Routes configurées",
   "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.": "Modifiez deployment.yaml pour les destinations et correspondances, puis recréez le déploiement. Gérez les politiques et mots de passe ici.",

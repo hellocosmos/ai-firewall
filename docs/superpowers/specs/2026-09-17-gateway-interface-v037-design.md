@@ -134,6 +134,6 @@ The existing complete Python suite, console type/build checks, and opt-in Docker
 
 ## Documentation and release
 
-English remains canonical. The README and six self-hosting guides describe the two authentication boundaries, supported modes, compatibility matrix, and explicit limitations. Public version references and the self-hosted image tag move from 0.36 to 0.37.
+English remains canonical. The README and six self-hosting guides describe the two authentication boundaries, supported modes, compatibility matrix, and explicit limitations. The deployment view shows the active gateway and target authentication modes without exposing secret paths or values. Public version references and the self-hosted image tag move from 0.36 to 0.37.
 
 No remote push, public release, landing-page deployment, real tenant change, or customer environment change is part of this implementation run.

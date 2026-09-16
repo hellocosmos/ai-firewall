@@ -457,6 +457,7 @@
   "Listener reachable": "监听器可访问",
   "Body limit": "正文大小限制",
   "The connection key verifies deployment access, not agent or user identity.": "连接密钥验证部署访问权限，而非代理或用户身份。",
+  "Gateway and target credentials are separate. JWT gateway tokens are not forwarded to the target.": "网关凭据与目标凭据相互独立。网关 JWT 不会转发给目标。",
   "JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.": "仅支持 JSON HTTP 和无状态 JSON MCP。此配置不支持 OAuth 登录代理、会话或长连接 SSE。",
   "Configured routes": "已配置的路由",
   "Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.": "修改 deployment.yaml 中的目标和映射后重建服务。策略和密码在此管理。",

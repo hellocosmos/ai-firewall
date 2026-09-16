@@ -2,9 +2,24 @@
 
 All notable changes to TrapDefense Community are documented here.
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases use the `0.31`, `0.32`, `0.33`, `0.34` numbering sequence.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases currently run from `0.31` through `0.37`.
 
 ## [Unreleased]
+
+## [0.37] - 2026-09-17
+
+### Gateway interface compatibility
+
+- Separate `gateway_auth` and `target_auth` configuration while retaining the 0.36 client-key and legacy configuration path.
+- Add external-issuer RS256 JWT validation for issuer, audience, time, subject and required scopes, plus RFC 9728 Protected Resource Metadata and gateway-owned OAuth challenges.
+- Consume gateway JWTs before forwarding and inject an independent fixed-target Bearer or API-key credential; reject JWT plus Bearer passthrough at configuration time.
+- Verify actual HTTP JWKS retrieval with ephemeral synthetic RSA material and complete the pinned official Python MCP SDK 1.30.0 initialize/notification/tool-discovery flow through the gateway.
+- Publish a six-language compatibility matrix and current VS Code configuration example, clearly separating source-checked configuration, synthetic integration evidence and unverified real IdP/client operation.
+
+### Boundaries
+
+- Community remains an OAuth resource server, not an authorization server, token vault, OBO broker, Agent IAM registry or general stateful streaming proxy.
+- Real Entra/Okta/Keycloak tenants, Conditional Access, revocation, VS Code execution, stateful MCP, long-lived SSE and customer routing remain deployment-specific validation.
 
 ## [0.36] - 2026-09-17
 

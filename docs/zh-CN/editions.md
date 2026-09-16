@@ -4,7 +4,7 @@
 
 ## 部署条件与提供状态
 
-0.36 提供同时运行适配器、Envoy、检查器和管理界面的 Docker Compose 预览包。镜像从源码本地构建。TrapDefense Cloud 仍在规划中，尚未开放注册。
+0.37 提供连接密钥或外部 JWT 网关认证以及独立目标凭据的 Docker Compose 预览包。镜像从源码构建，TrapDefense Cloud 仍在规划中。
 
 [交付与兼容性](deployment-fit.md)
 
@@ -28,4 +28,4 @@ Community 是本仓库采用 MIT 许可的代理运行时和本地控制台，�
 
 集中设备管理、分布式高可用、托管计费及不可变审计存储尚未交付。商业范围可包含私有提供程序、部署、策略集成和支持，价格及支持条款另行约定。本地 SQLite 和 JSONL 仍可修改。
 
-[Docker 0.36](self-hosting.md)
+[Docker 0.37](self-hosting.md) · [网关兼容性](gateway-compatibility.md)
