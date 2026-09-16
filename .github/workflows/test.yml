@@ -52,4 +52,4 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install pytest httpx PyYAML
-      - run: TD_SELFHOST_E2E=1 python -m pytest tests/runtime/test_selfhost_runtime.py -q
+      - run: TD_SELFHOST_E2E=1 python -m pytest tests/runtime/test_selfhost_runtime.py -q -s

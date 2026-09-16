@@ -66,11 +66,25 @@ def test_package_lifecycle(tmp_path,mode):
       'from asr_proxy.inspection.pool import atomic_write; atomic_write(Path("/state/destination.token"),"synthetic-target-token")')
     compose('up','-d');wait()
     key=compose('exec','-T','app','cat','/state/client.key')
+    if os.environ.get('GITHUB_ACTIONS')=='true':print('::add-mask::'+key,flush=True)
     headers={'x-td-client-key':key}
     if not static:headers['authorization']='Bearer synthetic-target-token'
     gateway=f'http://127.0.0.1:{gateway_port}'
     with httpx.Client(base_url=gateway,timeout=15) as c, httpx.Client(base_url=origin,timeout=5,
         headers={'origin':origin,'x-td-demo':'1'}) as admin:
+      # Compose starts Envoy after app health, but its listener/DNS may not yet be ready.
+      # Only this side-effect-free synthetic read is a readiness probe; the product never retries calls.
+      deadline=time.monotonic()+30
+      last_status=None
+      while time.monotonic()<deadline:
+        try:
+          probe=c.post('/api/notes',headers=headers,json={'message':'readiness probe'})
+          last_status=probe.status_code
+          if last_status==200:break
+          if last_status!=503:pytest.fail(f'Unexpected readiness status: {last_status}')
+        except httpx.ConnectError:pass
+        time.sleep(.5)
+      else:pytest.fail(f'Inspection path did not become ready; last status: {last_status}')
       assert c.post('/api/notes',json={'message':'safe'}).status_code==401
       assert c.post('/api/notes',headers=headers,json={'message':'safe'}).status_code==200
       redact=c.post('/api/notes',headers=headers,json={'message':'Contact alex@example.com'})
