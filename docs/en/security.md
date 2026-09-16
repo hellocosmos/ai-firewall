@@ -2,6 +2,8 @@
 
 [English](../en/security.md) · [한국어](../ko/security.md) · [简体中文](../zh-CN/security.md) · [日本語](../ja/security.md) · [Español](../es/security.md) · [Français](../fr/security.md)
 
+Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](identity.md).
+
 Report suspected vulnerabilities privately to **hellocosmos@gmail.com** , including revision, synthetic reproduction and impact. Never put customer data, tokens or live credentials in public issues. No fixed response SLA is promised.
 
 The boundary covers explicitly routed, supported HTTP/MCP traffic from a trusted signed forwarding hop. Local examples are synthetic demonstrations, not hardened appliances.

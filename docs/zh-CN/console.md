@@ -2,6 +2,8 @@
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
+Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](identity.md).
+
 ## 安装与启动
 
 需要 Python 3.11+、Node.js 22.12+ 或 24、npm，以及运行中的本地 Docker Engine/Desktop。仅需此仓库，无需 SDK、私有 Enterprise 包或模型 API。脚本优先使用已安装的 `uv`，否则使用 Python venv/pip。不要使用 sudo，并保持 Docker 在本地运行。

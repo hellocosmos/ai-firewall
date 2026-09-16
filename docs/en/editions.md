@@ -2,6 +2,8 @@
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
+Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](identity.md).
+
 Community is the MIT-licensed proxy runtime and local operations console in this repository. It includes signed trusted-hop verification, explicit HTTP/MCP mappings, local policy, signature checks, PII redaction, bounded response/SSE inspection, sanitized audit evidence, local login/password changes and proxy settings. No private package or external model API is required.
 
 Enterprise adds the separately distributed Access Broker: user/agent/task delegation, access decisions and one-time, expiring, request-bound human approval. Existing IAM context must come from a trusted integration; real customer IdP validation remains necessary. The Community UI identifies these unavailable capabilities.

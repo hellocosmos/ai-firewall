@@ -160,7 +160,6 @@
   "The proxy path was applied and the new listener responded.": "프록시 경로가 적용됐고 새 수신 포트의 응답을 확인했습니다.",
   "Apply path": "경로 적용",
   "Physical NIC count and proxy topology are separate. This installation uses loopback only. Dual-NIC routing, transparent bridging and physical egress pinning are not supported. OS IP addresses and routes are not changed.": "물리 NIC 1개/2개와 프록시 배치는 별개입니다. 이 설치는 아래 호스트 인터페이스 중 loopback만 사용합니다. 2-NIC 라우팅·투명 브리지·물리 송출 NIC 고정은 아직 지원하지 않습니다. OS IP/라우팅은 변경하지 않습니다.",
-  "No TLS decryptor or real IAM is connected. Traffic goes to a harmless synthetic destination.": "TLS 복호화 장비와 실제 IAM은 미연결입니다. 외부 서비스 대신 무해한 합성 목적지를 사용합니다.",
   "Detected host interfaces": "감지된 설치 호스트 인터페이스",
   "Live OS addresses and link state · this is not a physical port count.": "운영체제에서 조회한 실제 주소와 링크 상태 · 물리 포트 개수와 동일하지 않습니다.",
   "IPv4 interfaces only": "IPv4 인터페이스만",
@@ -400,5 +399,18 @@
   "JSON required": "JSON 요청이 필요합니다.",
   "Request too large": "요청이 너무 큽니다.",
   "Scenario not found": "시나리오를 찾을 수 없습니다.",
-  "Explicit L7 · loopback": "명시적 L7 · loopback"
+  "Explicit L7 · loopback": "명시적 L7 · loopback",
+  "Sign in with Synthetic Entra": "합성 Entra로 로그인",
+  "Sign in with Microsoft Entra ID": "Microsoft Entra ID로 로그인",
+  "Synthetic identity demo. No Microsoft account is used.": "합성 인증 데모입니다. Microsoft 계정을 사용하지 않습니다.",
+  "Use your assigned organization account.": "역할이 할당된 조직 계정을 사용하세요.",
+  "Console sign-in is separate from Enterprise agent authorization.": "콘솔 로그인과 Enterprise 에이전트 권한 통제는 별개입니다.",
+  "Viewer": "조회자",
+  "Administrator": "관리자",
+  "Read-only access: settings and scenario execution are disabled.": "읽기 전용: 설정 변경과 시나리오 실행이 비활성화됩니다.",
+  "Console identity": "콘솔 사용자 인증",
+  "Console SSO authenticates operators. Proxy source verification does not establish agent identity.": "콘솔 SSO는 운영자를 인증합니다. 프록시 출처 검증이 에이전트 신원을 보장하지는 않습니다.",
+  "Sign-in configuration unavailable.": "로그인 설정을 불러올 수 없습니다.",
+  "Entra sign-in failed. Check your assigned app role.": "Entra 로그인에 실패했습니다. 할당된 앱 역할을 확인하세요.",
+  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "이 합성 트래픽 경로에는 에이전트 신원이 연결되지 않습니다. 콘솔 SSO는 별도로 설정합니다."
 }

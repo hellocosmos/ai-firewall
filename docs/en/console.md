@@ -2,6 +2,8 @@
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
+Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](identity.md).
+
 ## Install and start
 
 Requirements: Python 3.11+, Node.js 22.12+ (or 24), npm, and a running local Docker Engine/Desktop. Install from this repository; no SDK, private Enterprise package or model API is required. Scripts use an existing `uv` installation when available, otherwise Python venv/pip. Run without sudo and keep Docker local.

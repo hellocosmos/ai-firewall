@@ -160,7 +160,6 @@
   "The proxy path was applied and the new listener responded.": "プロキシ経路を適用し、新しい待受ポートの応答を確認しました。",
   "Apply path": "経路を適用",
   "Physical NIC count and proxy topology are separate. This installation uses loopback only. Dual-NIC routing, transparent bridging and physical egress pinning are not supported. OS IP addresses and routes are not changed.": "物理 NIC 数とプロキシ構成は別の概念です。このインストールはループバックのみを使用します。2 NIC ルーティング、透過ブリッジ、物理送信 NIC の固定は未対応です。OS の IP や経路は変更しません。",
-  "No TLS decryptor or real IAM is connected. Traffic goes to a harmless synthetic destination.": "TLS 復号装置や実 IAM には接続していません。通信先は無害な合成宛先です。",
   "Detected host interfaces": "検出されたホストインターフェース",
   "Live OS addresses and link state · this is not a physical port count.": "OS から取得した実際のアドレスとリンク状態です。物理ポート数とは異なります。",
   "IPv4 interfaces only": "IPv4 インターフェースのみ",
@@ -400,5 +399,18 @@
   "JSON required": "JSON リクエストが必要です。",
   "Request too large": "リクエストが大きすぎます。",
   "Scenario not found": "シナリオが見つかりません。",
-  "Explicit L7 · loopback": "明示的 L7 · ループバック"
+  "Explicit L7 · loopback": "明示的 L7 · ループバック",
+  "Sign in with Synthetic Entra": "合成 Entra でサインイン",
+  "Sign in with Microsoft Entra ID": "Microsoft Entra ID でサインイン",
+  "Synthetic identity demo. No Microsoft account is used.": "合成認証デモです。Microsoft アカウントは使用しません。",
+  "Use your assigned organization account.": "ロールが割り当てられた組織アカウントを使用してください。",
+  "Console sign-in is separate from Enterprise agent authorization.": "コンソールの認証と Enterprise のエージェント認可は別の機能です。",
+  "Viewer": "閲覧者",
+  "Administrator": "管理者",
+  "Read-only access: settings and scenario execution are disabled.": "読み取り専用：設定変更とシナリオ実行は無効です。",
+  "Console identity": "コンソール認証",
+  "Console SSO authenticates operators. Proxy source verification does not establish agent identity.": "コンソール SSO は運用者を認証します。転送元の検証はエージェント認証ではありません。",
+  "Sign-in configuration unavailable.": "サインイン設定を取得できません。",
+  "Entra sign-in failed. Check your assigned app role.": "Entra サインインに失敗しました。アプリロールを確認してください。",
+  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "この合成通信経路にエージェント認証は接続されていません。コンソール SSO は別途設定します。"
 }

@@ -2,6 +2,8 @@
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
+Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다. [Entra SSO](identity.md).
+
 ## 설치와 실행
 
 필수 환경은 Python 3.11+, Node.js 22.12+ 또는 24, npm, 실행 중인 로컬 Docker Engine/Desktop입니다. 이 저장소만으로 설치하며 SDK·비공개 Enterprise 패키지·모델 API는 필요하지 않습니다. 스크립트는 설치된 `uv`가 있으면 사용하고, 없으면 Python venv/pip를 사용합니다. sudo 없이 실행하고 Docker는 로컬에서 사용하세요.

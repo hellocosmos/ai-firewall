@@ -2,6 +2,8 @@
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
+Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise. [Entra SSO](identity.md).
+
 Community es el runtime de proxy y la consola local con licencia MIT de este repositorio. Incluye verificación de salto firmado, mapeos HTTP/MCP explícitos, política local, detección por patrones, ocultación de PII, inspección limitada de respuestas/SSE, auditoría depurada, inicio de sesión local, cambio de contraseña y configuración del proxy. No requiere paquetes privados ni API de modelos externos.
 
 Enterprise añade Access Broker, distribuido por separado: delegación de usuario/agente/tarea, decisiones de acceso y aprobación humana de un solo uso, con caducidad y vinculada a la solicitud. El contexto IAM debe llegar mediante una integración de confianza; sigue siendo necesaria la validación con el IdP real del cliente. La UI Community señala las funciones no incluidas.

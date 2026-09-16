@@ -1,5 +1,6 @@
 """Loopback-only demo service. Never attached to the production API application."""
 import os
+import json
 from pathlib import Path
 from typing import Literal
 
@@ -25,16 +26,20 @@ class Run(BaseModel):
 
 
 
-def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None):
+def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,identity=None,local_login=True):
   runtime=runtime_factory(directory,seed=seed)
   app=FastAPI(title='TrapDefense Community Console',docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifespan)
   app.state.runtime=runtime
+  origins=ORIGINS | ({identity.origin} if identity else set())
+  if identity:
+    from .sso import install_sso
+    install_sso(app,identity,runtime.store,COOKIE)
 
   @app.middleware('http')
   async def boundaries(request,call_next):
     # Reject cross-origin writes, including login CSRF; no permissive CORS middleware.
     if request.method not in ('GET','HEAD','OPTIONS'):
-      if request.headers.get('origin') not in ORIGINS or request.headers.get('x-td-demo')!='1':
+      if request.headers.get('origin') not in origins or request.headers.get('x-td-demo')!='1':
         return JSONResponse({'detail':'Cross-origin or missing CSRF request rejected'},status_code=403)
       if request.headers.get('content-type','').split(';')[0]!='application/json':
         return JSONResponse({'detail':'JSON required'},status_code=415)
@@ -46,6 +51,10 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None):
         chunks.append(chunk)
       request._body=b''.join(chunks)
     response=await call_next(request)
+    actor=getattr(request.state,'principal',None)
+    if actor and request.method=='POST' and request.url.path!='/demo-api/logout':
+      runtime.store.audit('console.write',request.url.path+' / '+str(response.status_code),actor=(actor.get('tenant_id','local')+'/'+actor['username']))
+    response.headers['Referrer-Policy']='no-referrer'
     response.headers['Cache-Control']='no-store'
     response.headers['X-Content-Type-Options']='nosniff'
     return response
@@ -59,41 +68,53 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None):
     return JSONResponse({'detail':'Check the format and length of the input.'},status_code=422)
 
   def authenticated(request:Request):
-    if not runtime.store.authenticated(request.cookies.get(COOKIE)):raise HTTPException(401,'Sign in to continue.')
-    return 'admin'
+    principal=runtime.store.principal(request.cookies.get(COOKIE))
+    if not principal:raise HTTPException(401,'Sign in to continue.')
+    if principal['authentication']=='local' and not local_login:raise HTTPException(401,'Local login is disabled.')
+    if principal['authentication']!='local':
+      expected='synthetic_entra' if identity and identity.synthetic else 'entra'
+      if not identity or principal['authentication']!=expected or principal.get('tenant_id')!=identity.tenant or principal.get('client_id')!=identity.client:raise HTTPException(401,'Identity configuration changed. Sign in again.')
+    request.state.principal=principal
+    if request.method not in ('GET','HEAD','OPTIONS') and request.url.path!='/demo-api/logout' and principal['role']!='admin':raise HTTPException(403,'Viewer access is read-only.')
+    return principal
+
+  @app.get('/demo-api/auth/config')
+  def auth_config():return {'enabled':identity is not None,'synthetic':bool(identity and identity.synthetic),'local_login':local_login}
 
   @app.get('/demo-api/health')
   def health():return {'status':'ready','synthetic':True,'integrated':getattr(runtime,'integrated',False)}
 
   @app.post('/demo-api/login')
   def login(payload:Login,request:Request,response:Response):
+    if not local_login:raise HTTPException(403,'Local login is disabled.')
     with runtime.lock:
-      identity='local-admin'
-      if runtime.store.login_attempt(identity):raise HTTPException(429,'Too many login attempts. Try again in 60 seconds.')
+      login_identity='local-admin'
+      if runtime.store.login_attempt(login_identity):raise HTTPException(429,'Too many login attempts. Try again in 60 seconds.')
       valid=runtime.store.check_password(payload.password) and payload.username=='admin'
-      runtime.store.login_attempt(identity,valid)
+      runtime.store.login_attempt(login_identity,valid)
       if not valid:
         runtime.store.audit('account.login_failed','Invalid local credential',actor='anonymous')
         raise HTTPException(401,'Incorrect username or password.')
       runtime.store.logout(request.cookies.get(COOKIE))
       token=runtime.store.create_session()
-      response.set_cookie(COOKIE,token,httponly=True,samesite='strict',secure=False,path='/demo-api',max_age=8*3600)
-      runtime.store.audit('account.login','Local demo session started')
-      return {'username':'admin','password_changed':runtime.store.changed()}
+      response.set_cookie(COOKIE,token,httponly=True,samesite='strict',secure=bool(identity and identity.origin.startswith('https:')),path='/demo-api',max_age=8*3600)
+      runtime.store.audit('account.login','Local demo session started',actor='local/admin')
+      return {'username':'admin','role':'admin','authentication':'local','password_changed':runtime.store.changed()}
 
   router=APIRouter(prefix='/demo-api',dependencies=[Depends(authenticated)])
 
   @router.get('/session')
-  def session():return {'username':'admin','password_changed':runtime.store.changed()}
+  def session(request:Request):return {**request.state.principal,'password_changed':runtime.store.changed() if request.state.principal['authentication']=='local' else True}
 
   @router.post('/logout')
   def logout(request:Request,response:Response):
     runtime.store.logout(request.cookies.get(COOKIE));response.delete_cookie(COOKIE,path='/demo-api')
-    runtime.store.audit('account.logout','Local session ended')
+    runtime.store.audit('account.logout','Console session ended',actor=request.state.principal.get('tenant_id','local')+'/'+request.state.principal['username'])
     return {'ok':True}
 
   @router.post('/password')
-  def password(payload:Password,response:Response):
+  def password(payload:Password,response:Response,request:Request):
+    if request.state.principal['authentication']!='local':raise HTTPException(403,'Manage your password in Entra.')
     if payload.current_password==payload.new_password:raise HTTPException(400,'The new password must differ from the current password.')
     if not runtime.store.change_password(payload.current_password,payload.new_password):raise HTTPException(400,'The current password is incorrect.')
     response.delete_cookie(COOKIE,path='/demo-api')
@@ -104,7 +125,7 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None):
     network=runtime.network_status() if getattr(runtime,'integrated',False) else None
     return {'events':runtime.store.events(),'broker':{'agents':[],'delegations':[],'approvals':[]},'edition':'community','capabilities':{'broker':False},'policy':runtime.policy(),
       'scenarios':[{'id':key,'label':value['label']} for key,value in CASES.items()],
-      'system':{'inspector':('ready' if network and network['inspector_ready'] else 'unavailable'),'broker':'not_included','database':'ready','proxy':('ready' if network['proxy_ready'] else 'unavailable') if network else 'not_connected','iam':'synthetic','tls':'synthetic'},'synthetic':True,'integrated':getattr(runtime,'integrated',False),
+      'system':{'inspector':('ready' if network and network['inspector_ready'] else 'unavailable'),'broker':'not_included','database':'ready','proxy':('ready' if network['proxy_ready'] else 'unavailable') if network else 'not_connected','iam':('synthetic_entra' if identity.synthetic else 'entra') if identity else 'not_configured','tls':'synthetic'},'synthetic':True,'integrated':getattr(runtime,'integrated',False),
       'network':network}
 
   @router.get('/events')
@@ -159,7 +180,16 @@ def from_env():
   directory=Path(os.environ.get('TD_CONSOLE_STATE',str(repository/'.runtime-state/console')))
   assets=Path(os.environ.get('TD_CONSOLE_ASSETS',str(repository/'console/dist')))
   if not (assets/'index.html').is_file():raise RuntimeError('Build console assets with scripts/install-console.sh')
-  app=create_app(directory,seed=False,lifespan=lifecycle)
+  identity=None
+  from .identity import Identity
+  config_path=os.environ.get('TD_ENTRA_CONFIG')
+  synthetic=os.environ.get('TD_SYNTHETIC_ENTRA')=='1'
+  if config_path and synthetic:raise RuntimeError('Choose real or synthetic Entra, never both.')
+  if config_path:identity=Identity(json.loads(Path(config_path).read_text()))
+  elif synthetic:identity=Identity({'tenant_id':'11111111-1111-4111-8111-111111111111','client_id':'22222222-2222-4222-8222-222222222222','redirect_uri':'http://127.0.0.1:5176/demo-api/auth/callback'},synthetic=True)
+  local_login=os.environ.get('TD_CONSOLE_LOCAL_LOGIN','0' if config_path else '1')=='1'
+  if not identity and not local_login:raise RuntimeError('No console authentication method enabled.')
+  app=create_app(directory,seed=False,lifespan=lifecycle,identity=identity,local_login=local_login)
   app.mount('/',StaticFiles(directory=assets,html=True),name='console')
   return app
 

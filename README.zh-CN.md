@@ -14,6 +14,8 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 这是产品的逻辑流程。可信转发、流量可见性和强制路由要求请参阅[部署架构](docs/zh-CN/architecture.md)。
 
+Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](docs/zh-CN/identity.md).
+
 ## 安装并打开控制台
 
 需要 Python 3.11+、Node.js 22.12+ 或 24、npm 和本地 Docker Engine/Desktop。采用源码安装，不表示已发布到 PyPI。
@@ -35,7 +37,7 @@ cd ai-firewall
 
 ## 范围与版本
 
-Community 包含本地策略、显式 HTTP/MCP 映射、可信跳签名、有界响应/SSE 检查及净化本地证据。Enterprise Access Broker 实现单独分发；Community 不提供用户/代理身份、委派访问或审批。
+Community 包含本地策略、显式 HTTP/MCP 映射、可信跳签名、有界响应/SSE 检查及净化本地证据。Enterprise Access Broker 实现单独分发；Community 控制台 SSO 不授予智能体身份、委派访问或审批。
 
 提供 NIC 清单和拓扑说明。回环演示不配置系统地址、双网卡路由、透明桥或物理出口。inline 检查失败时阻断。控制台 Mirror 观察同步路径；独立 mirror 收集器不能阻断原始流量。
 

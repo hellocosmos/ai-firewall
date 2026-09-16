@@ -2,6 +2,8 @@
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
+Community は単一テナントの Microsoft Entra ID コンソール SSO と管理者・閲覧者ロールを提供します。コンソール認証はエージェントの実行認可ではなく、委任と承認は Enterprise の機能です。 [Entra SSO](identity.md).
+
 ## インストールと起動
 
 Python 3.11+、Node.js 22.12+ または 24、npm、稼働中のローカル Docker Engine/Desktop が必要です。このリポジトリだけで導入でき、SDK・非公開 Enterprise パッケージ・モデル API は不要です。スクリプトは既存の `uv` を優先し、なければ Python venv/pip を使います。sudo を使わず、Docker はローカルで実行してください。

@@ -2,6 +2,8 @@
 
 [English](../en/security.md) · [한국어](../ko/security.md) · [简体中文](../zh-CN/security.md) · [日本語](../ja/security.md) · [Español](../es/security.md) · [Français](../fr/security.md)
 
+Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](identity.md).
+
 Signalez les vulnérabilités en privé à **hellocosmos@gmail.com** , avec révision, reproduction synthétique et impact. Ne publiez pas de données client, jetons ou identifiants réels dans les issues. Aucun SLA de réponse fixe n’est promis.
 
 Le périmètre couvre les flux HTTP/MCP pris en charge et explicitement routés depuis un relais signé de confiance. Les exemples locaux sont synthétiques, pas des appliances de production durcies.

@@ -33,6 +33,8 @@ class Store:
         CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT,payload TEXT);
         CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY AUTOINCREMENT,ts TEXT,actor TEXT,event TEXT,detail TEXT);
       ''')
+      columns={row[1] for row in db.execute('PRAGMA table_info(sessions)')}
+      if 'principal' not in columns:db.execute("ALTER TABLE sessions ADD COLUMN principal TEXT")
       if not db.execute('SELECT 1 FROM account').fetchone():
         salt=secrets.token_hex(16)
         db.execute('INSERT INTO account VALUES(?,?,?,0)',('admin',salt,password_hash('1234',salt)))
@@ -55,18 +57,20 @@ class Store:
   def changed(self):
     with self.connect() as db:return bool(db.execute('SELECT changed FROM account').fetchone()[0])
 
-  def create_session(self):
+  def create_session(self,principal=None,ttl=8*3600):
     token=secrets.token_urlsafe(32)
     with self.connect() as db:
       db.execute('DELETE FROM sessions WHERE expires < ?',(time.time(),))
-      db.execute('INSERT INTO sessions VALUES(?,?)',(hashlib.sha256(token.encode()).hexdigest(),time.time()+8*3600))
+      db.execute('INSERT INTO sessions(digest,expires,principal) VALUES(?,?,?)',(hashlib.sha256(token.encode()).hexdigest(),time.time()+min(ttl,8*3600),json.dumps(principal or {'username':'admin','role':'admin','authentication':'local'})))
     return token
 
-  def authenticated(self,token):
-    if not token:return False
+  def principal(self,token):
+    if not token:return None
     with self.connect() as db:
-      return bool(db.execute('SELECT 1 FROM sessions WHERE digest=? AND expires>?',
-        (hashlib.sha256(token.encode()).hexdigest(),time.time())).fetchone())
+      row=db.execute('SELECT principal FROM sessions WHERE digest=? AND expires>?',(hashlib.sha256(token.encode()).hexdigest(),time.time())).fetchone()
+    return json.loads(row[0]) if row and row[0] else None
+
+  def authenticated(self,token):return self.principal(token) is not None
 
   def logout(self,token):
     with self.connect() as db:db.execute('DELETE FROM sessions WHERE digest=?',(hashlib.sha256((token or '').encode()).hexdigest(),))
@@ -101,7 +105,7 @@ class Store:
   def set(self,key,value):
     with self.connect() as db:db.execute('INSERT OR REPLACE INTO settings VALUES(?,?)',(key,json.dumps(value)))
 
-  def audit(self,event,detail,actor='admin'):
+  def audit(self,event,detail,actor='system'):
     with self.connect() as db:db.execute('INSERT INTO audit(ts,actor,event,detail) VALUES(?,?,?,?)',(now(),actor,event,detail))
 
   def audits(self):
@@ -123,4 +127,4 @@ class Store:
     with self.connect() as db:
       db.execute('INSERT OR REPLACE INTO settings VALUES(?,?)',('policy',json.dumps(policy)))
       db.execute('INSERT INTO audit(ts,actor,event,detail) VALUES(?,?,?,?)',
-        (now(),'admin','policy.applied',f"v{policy['version']} · {policy['mode']} · PII {policy['pii_action']}"))
+        (now(),'system','policy.applied',f"v{policy['version']} · {policy['mode']} · PII {policy['pii_action']}"))

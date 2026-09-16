@@ -14,6 +14,8 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 Flujo lógico del producto. Consulte la [arquitectura de despliegue](docs/es/architecture.md) para los requisitos de reenvío de confianza, visibilidad del tráfico y enrutamiento.
 
+Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise. [Entra SSO](docs/es/identity.md).
+
 ## Instalar y abrir la consola
 
 Requiere Python 3.11+, Node.js 22.12+ o 24, npm y Docker Engine/Desktop local. Instalación desde fuentes; no implica publicación en PyPI.
@@ -35,7 +37,7 @@ Las solicitudes sintéticas recorren Envoy → inspector gRPC → destino HTTP r
 
 ## Alcance y ediciones
 
-Community incluye política local, mapeos HTTP/MCP explícitos, firmas del salto fiable, inspección limitada de respuestas/SSE y pruebas locales depuradas. Enterprise Access Broker se distribuye aparte; Community no acredita identidad humana/de agentes ni ofrece delegación o aprobaciones.
+Community incluye política local, mapeos HTTP/MCP explícitos, firmas del salto fiable, inspección limitada de respuestas/SSE y pruebas locales depuradas. Enterprise Access Broker se distribuye aparte; el SSO de consola Community no acredita identidad de agentes ni ofrece delegación o aprobaciones.
 
 Incluye inventario de interfaces y explicación de topología. La demo loopback no configura direcciones del SO, rutas de dos NIC, puentes transparentes ni salidas físicas. Los fallos inline bloquean. Mirror de consola observa su ruta síncrona; el colector mirror separado no bloquea originales.
 

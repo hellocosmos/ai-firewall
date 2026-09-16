@@ -160,7 +160,6 @@
   "The proxy path was applied and the new listener responded.": "代理路径已应用，新监听端口已响应。",
   "Apply path": "应用路径",
   "Physical NIC count and proxy topology are separate. This installation uses loopback only. Dual-NIC routing, transparent bridging and physical egress pinning are not supported. OS IP addresses and routes are not changed.": "物理网卡数量与代理拓扑不同。本安装仅使用回环接口，不支持双网卡路由、透明桥接或物理出口绑定，不修改操作系统 IP 或路由。",
-  "No TLS decryptor or real IAM is connected. Traffic goes to a harmless synthetic destination.": "未连接 TLS 解密设备或真实 IAM，流量发往无害的合成目标。",
   "Detected host interfaces": "检测到的主机接口",
   "Live OS addresses and link state · this is not a physical port count.": "来自操作系统的实时地址和链路状态，不等同于物理端口数量。",
   "IPv4 interfaces only": "仅显示 IPv4 接口",
@@ -400,5 +399,18 @@
   "JSON required": "需要 JSON 请求。",
   "Request too large": "请求过大。",
   "Scenario not found": "未找到场景。",
-  "Explicit L7 · loopback": "显式 L7 · 回环"
+  "Explicit L7 · loopback": "显式 L7 · 回环",
+  "Sign in with Synthetic Entra": "使用合成 Entra 登录",
+  "Sign in with Microsoft Entra ID": "使用 Microsoft Entra ID 登录",
+  "Synthetic identity demo. No Microsoft account is used.": "合成身份演示，不使用 Microsoft 账户。",
+  "Use your assigned organization account.": "请使用已分配角色的组织账户。",
+  "Console sign-in is separate from Enterprise agent authorization.": "控制台登录与 Enterprise 智能体授权相互独立。",
+  "Viewer": "查看者",
+  "Administrator": "管理员",
+  "Read-only access: settings and scenario execution are disabled.": "只读访问：设置修改和场景执行已禁用。",
+  "Console identity": "控制台身份",
+  "Console SSO authenticates operators. Proxy source verification does not establish agent identity.": "控制台 SSO 验证操作员，代理来源验证不代表智能体身份。",
+  "Sign-in configuration unavailable.": "无法获取登录配置。",
+  "Entra sign-in failed. Check your assigned app role.": "Entra 登录失败，请检查应用角色分配。",
+  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "此合成流量路径未连接智能体身份。控制台 SSO 单独配置。"
 }

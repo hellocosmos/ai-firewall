@@ -2,6 +2,8 @@
 
 [English](../en/security.md) · [한국어](../ko/security.md) · [简体中文](../zh-CN/security.md) · [日本語](../ja/security.md) · [Español](../es/security.md) · [Français](../fr/security.md)
 
+Community は単一テナントの Microsoft Entra ID コンソール SSO と管理者・閲覧者ロールを提供します。コンソール認証はエージェントの実行認可ではなく、委任と承認は Enterprise の機能です。 [Entra SSO](identity.md).
+
 脆弱性の疑いは、リビジョン、合成データによる再現手順、影響を添えて **hellocosmos@gmail.com** へ非公開で報告してください。公開 Issue に顧客データ、トークン、実際の資格情報を含めないでください。固定応答 SLA はありません。
 
 保護境界は、信頼された署名付き転送ホップから明示的にルーティングされた対応 HTTP/MCP 通信です。ローカル例は合成デモであり、強化済み本番装置ではありません。

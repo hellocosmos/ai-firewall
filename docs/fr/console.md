@@ -2,6 +2,8 @@
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
+Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](identity.md).
+
 ## Installer et démarrer
 
 Prérequis : Python 3.11+, Node.js 22.12+ ou 24, npm et Docker Engine/Desktop local en cours d’exécution. Ce dépôt suffit : aucun SDK, paquet Enterprise privé ni API de modèle n’est requis. Les scripts utilisent `uv` s’il est présent, sinon Python venv/pip. Exécutez sans sudo et gardez Docker local.

@@ -2,6 +2,8 @@
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
+Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise. [Entra SSO](identity.md).
+
 ## Instalar e iniciar
 
 Requisitos: Python 3.11+, Node.js 22.12+ o 24, npm y Docker Engine/Desktop local en ejecución. Solo hace falta este repositorio: no requiere SDK, paquete Enterprise privado ni API de modelos. Los scripts usan `uv` si está instalado; en caso contrario, Python venv/pip. Ejecute sin sudo y mantenga Docker local.

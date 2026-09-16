@@ -14,6 +14,8 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 제품의 논리적 흐름입니다. 신뢰 전달, 트래픽 가시성, 경로 강제 조건은 [배치 아키텍처](docs/ko/architecture.md)를 확인하세요.
 
+Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다. [Entra SSO](docs/ko/identity.md).
+
 ## 콘솔 설치와 실행
 
 Python 3.11+, Node.js 22.12+ 또는 24, npm, 로컬 Docker Engine/Desktop이 필요합니다. 소스 설치이며 PyPI 배포를 의미하지 않습니다.
@@ -35,7 +37,7 @@ cd ai-firewall
 
 ## 범위와 에디션
 
-Community에는 로컬 정책, 명시적 HTTP/MCP 매핑, 신뢰 홉 서명, 제한된 응답/SSE 검사와 정제된 로컬 증거가 포함됩니다. Enterprise Access Broker 구현은 별도 배포하며 Community는 사용자·에이전트 신원, 위임 접근, 승인을 제공하지 않습니다.
+Community에는 로컬 정책, 명시적 HTTP/MCP 매핑, 신뢰 홉 서명, 제한된 응답/SSE 검사와 정제된 로컬 증거가 포함됩니다. Enterprise Access Broker 구현은 별도 배포하며 Community 콘솔 SSO가 에이전트 신원, 위임 접근, 승인을 제공하는 것은 아닙니다.
 
 NIC 목록과 토폴로지 설명을 제공합니다. loopback 데모는 OS 주소, 2-NIC 라우팅, 투명 브리지, 물리 출구를 설정하지 않습니다. inline 검사 실패는 차단합니다. 콘솔 Mirror는 동기 경로를 관찰하며 별도 mirror 수집기는 원본을 차단할 수 없습니다.
 

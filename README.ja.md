@@ -14,6 +14,8 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 製品の論理的な流れです。信頼済み転送、通信の可視性、経路の要件は[配置アーキテクチャ](docs/ja/architecture.md)を参照してください。
 
+Community は単一テナントの Microsoft Entra ID コンソール SSO と管理者・閲覧者ロールを提供します。コンソール認証はエージェントの実行認可ではなく、委任と承認は Enterprise の機能です。 [Entra SSO](docs/ja/identity.md).
+
 ## コンソールのインストールと起動
 
 Python 3.11+、Node.js 22.12+ または 24、npm、ローカル Docker Engine/Desktop が必要です。ソースからのインストールであり、PyPI 公開を意味しません。
@@ -35,7 +37,7 @@ cd ai-firewall
 
 ## 範囲とエディション
 
-Community はローカルポリシー、明示的 HTTP/MCP マッピング、信頼ホップ署名、上限付き応答/SSE 検査、機密情報を除いた証拠を含みます。Enterprise Access Broker は別配布です。Community はユーザー・エージェントの本人確認、委任アクセス、承認を提供しません。
+Community はローカルポリシー、明示的 HTTP/MCP マッピング、信頼ホップ署名、上限付き応答/SSE 検査、機密情報を除いた証拠を含みます。Enterprise Access Broker は別配布です。Community のコンソール SSO はエージェントの本人確認、委任アクセス、承認を提供しません。
 
 NIC 一覧と構成説明を含みます。ループバックのデモは OS アドレス、2 NIC ルーティング、透過ブリッジ、物理出口を設定しません。inline 検査失敗は遮断します。コンソール Mirror は同期経路を観察し、別の mirror コレクターは原本を遮断できません。
 

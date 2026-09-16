@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "trapdefense-community"
 version = "0.3.0"
-description = "TrapDefense AI Firewall: post-decryption HTTP/MCP proxy inspection"
+description = "TrapDefense AI Firewall: AI action control, data protection and HTTP/MCP inspection"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -13,7 +13,7 @@ authors = [{name = "Jaemyung Kim"}]
 dependencies = [
   "fastapi>=0.115,<1", "httpx>=0.27,<1", "pydantic>=2.8,<3",
   "PyYAML>=6,<7", "uvicorn>=0.30,<1", "presidio-analyzer==2.2.364",
-  "regex==2026.9.3", "xds-protos==1.83.1",
+  "PyJWT[crypto]>=2.10,<3", "regex==2026.9.3", "xds-protos==1.83.1",
 ]
 
 [project.optional-dependencies]

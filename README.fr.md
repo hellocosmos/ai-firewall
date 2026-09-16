@@ -14,6 +14,8 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 Flux logique du produit. Consultez l’[architecture de déploiement](docs/fr/architecture.md) pour les exigences de transfert de confiance, de visibilité du trafic et de routage.
 
+Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](docs/fr/identity.md).
+
 ## Installer et ouvrir la console
 
 Prérequis : Python 3.11+, Node.js 22.12+ ou 24, npm et Docker Engine/Desktop local. Installation depuis les sources ; aucune publication PyPI n’est impliquée.
@@ -35,7 +37,7 @@ Les requêtes synthétiques traversent réellement Envoy → inspecteur gRPC →
 
 ## Périmètre et éditions
 
-Community comprend politique locale, mappages HTTP/MCP explicites, signatures du relais fiable, inspection bornée des réponses/SSE et preuves locales nettoyées. Enterprise Access Broker est distribué séparément ; Community ne prouve pas l’identité utilisateur/agent et ne fournit ni délégation ni approbation.
+Community comprend politique locale, mappages HTTP/MCP explicites, signatures du relais fiable, inspection bornée des réponses/SSE et preuves locales nettoyées. Enterprise Access Broker est distribué séparément ; le SSO Community n’établit pas l’identité des agents et ne fournit ni délégation ni approbation.
 
 L’inventaire NIC et la topologie sont expliqués. La démo loopback ne configure pas les adresses du système, le routage à deux cartes, les ponts transparents ou la sortie physique. Les erreurs inline bloquent. Mirror de la console observe son trajet synchrone ; le collecteur mirror séparé ne bloque pas les originaux.
 

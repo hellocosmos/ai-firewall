@@ -2,6 +2,8 @@
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
+Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](identity.md).
+
 Community est le runtime proxy et la console locale sous licence MIT de ce dépôt. Il comprend la vérification du relais signé, les mappages HTTP/MCP explicites, la politique locale, la détection par signatures, le masquage PII, l’inspection bornée des réponses/SSE, l’audit nettoyé, la connexion locale, le changement de mot de passe et les réglages proxy. Aucun paquet privé ni API de modèle externe n’est requis.
 
 Enterprise ajoute Access Broker, distribué séparément : délégation utilisateur/agent/tâche, décisions d’accès et approbation humaine à usage unique, avec expiration et liée à la requête. Le contexte IAM doit provenir d’une intégration de confiance ; la validation avec l’IdP réel du client reste nécessaire. L’interface Community indique les fonctions non incluses.

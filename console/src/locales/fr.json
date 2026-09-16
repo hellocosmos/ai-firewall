@@ -160,7 +160,6 @@
   "The proxy path was applied and the new listener responded.": "Le chemin du proxy a été appliqué et le nouveau port a répondu.",
   "Apply path": "Appliquer le chemin",
   "Physical NIC count and proxy topology are separate. This installation uses loopback only. Dual-NIC routing, transparent bridging and physical egress pinning are not supported. OS IP addresses and routes are not changed.": "Le nombre de cartes réseau physiques et la topologie du proxy sont distincts. Cette installation utilise uniquement la boucle locale. Le routage à deux cartes, le pont transparent et la fixation de l’interface physique de sortie ne sont pas pris en charge. Aucune IP ni route du système n’est modifiée.",
-  "No TLS decryptor or real IAM is connected. Traffic goes to a harmless synthetic destination.": "Aucun déchiffreur TLS ni IAM réel n’est connecté. Le trafic va vers une destination synthétique sans effet métier.",
   "Detected host interfaces": "Interfaces hôte détectées",
   "Live OS addresses and link state · this is not a physical port count.": "Adresses et état des liens lus dans le système ; ce n’est pas le nombre de ports physiques.",
   "IPv4 interfaces only": "Interfaces IPv4 uniquement",
@@ -400,5 +399,18 @@
   "JSON required": "JSON requis.",
   "Request too large": "Requête trop volumineuse.",
   "Scenario not found": "Scénario introuvable.",
-  "Explicit L7 · loopback": "L7 explicite · boucle locale"
+  "Explicit L7 · loopback": "L7 explicite · boucle locale",
+  "Sign in with Synthetic Entra": "Se connecter avec Entra synthétique",
+  "Sign in with Microsoft Entra ID": "Se connecter avec Microsoft Entra ID",
+  "Synthetic identity demo. No Microsoft account is used.": "Démonstration d’identité synthétique, sans compte Microsoft.",
+  "Use your assigned organization account.": "Utilisez votre compte professionnel avec un rôle attribué.",
+  "Console sign-in is separate from Enterprise agent authorization.": "La connexion à la console est distincte de l’autorisation des agents Enterprise.",
+  "Viewer": "Lecteur",
+  "Administrator": "Administrateur",
+  "Read-only access: settings and scenario execution are disabled.": "Lecture seule : modification des paramètres et exécution désactivées.",
+  "Console identity": "Identité de la console",
+  "Console SSO authenticates operators. Proxy source verification does not establish agent identity.": "Le SSO authentifie les opérateurs ; vérifier la source du proxy n’authentifie pas les agents.",
+  "Sign-in configuration unavailable.": "Configuration de connexion indisponible.",
+  "Entra sign-in failed. Check your assigned app role.": "Échec de connexion Entra. Vérifiez votre rôle d’application.",
+  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "L’identité des agents n’est pas connectée à ce trajet synthétique. Le SSO de console se configure séparément."
 }

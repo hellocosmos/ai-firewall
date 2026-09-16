@@ -2,6 +2,8 @@
 
 [English](../en/security.md) · [한국어](../ko/security.md) · [简体中文](../zh-CN/security.md) · [日本語](../ja/security.md) · [Español](../es/security.md) · [Français](../fr/security.md)
 
+Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](identity.md).
+
 请通过 **hellocosmos@gmail.com** 私下报告疑似漏洞，附上版本、合成复现步骤和影响。不要在公开问题中包含客户数据、令牌或真实凭证。不承诺固定响应 SLA。
 
 边界覆盖来自可信签名转发跳、经过明确路由的受支持 HTTP/MCP 流量。本地示例是合成演示，不是加固后的生产设备。

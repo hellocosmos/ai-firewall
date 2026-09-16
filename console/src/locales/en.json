@@ -160,7 +160,6 @@
   "The proxy path was applied and the new listener responded.": "The proxy path was applied and the new listener responded.",
   "Apply path": "Apply path",
   "Physical NIC count and proxy topology are separate. This installation uses loopback only. Dual-NIC routing, transparent bridging and physical egress pinning are not supported. OS IP addresses and routes are not changed.": "Physical NIC count and proxy topology are separate. This installation uses loopback only. Dual-NIC routing, transparent bridging and physical egress pinning are not supported. OS IP addresses and routes are not changed.",
-  "No TLS decryptor or real IAM is connected. Traffic goes to a harmless synthetic destination.": "No TLS decryptor or real IAM is connected. Traffic goes to a harmless synthetic destination.",
   "Detected host interfaces": "Detected host interfaces",
   "Live OS addresses and link state · this is not a physical port count.": "Live OS addresses and link state · this is not a physical port count.",
   "IPv4 interfaces only": "IPv4 interfaces only",
@@ -400,5 +399,18 @@
   "JSON required": "JSON required",
   "Request too large": "Request too large",
   "Scenario not found": "Scenario not found",
-  "Explicit L7 · loopback": "Explicit L7 · loopback"
+  "Explicit L7 · loopback": "Explicit L7 · loopback",
+  "Sign in with Synthetic Entra": "Sign in with Synthetic Entra",
+  "Sign in with Microsoft Entra ID": "Sign in with Microsoft Entra ID",
+  "Synthetic identity demo. No Microsoft account is used.": "Synthetic identity demo. No Microsoft account is used.",
+  "Use your assigned organization account.": "Use your assigned organization account.",
+  "Console sign-in is separate from Enterprise agent authorization.": "Console sign-in is separate from Enterprise agent authorization.",
+  "Viewer": "Viewer",
+  "Administrator": "Administrator",
+  "Read-only access: settings and scenario execution are disabled.": "Read-only access: settings and scenario execution are disabled.",
+  "Console identity": "Console identity",
+  "Console SSO authenticates operators. Proxy source verification does not establish agent identity.": "Console SSO authenticates operators. Proxy source verification does not establish agent identity.",
+  "Sign-in configuration unavailable.": "Sign-in configuration unavailable.",
+  "Entra sign-in failed. Check your assigned app role.": "Entra sign-in failed. Check your assigned app role.",
+  "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately.": "Agent identity is not connected to this synthetic traffic path. Console SSO is configured separately."
 }

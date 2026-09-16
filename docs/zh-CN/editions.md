@@ -2,6 +2,8 @@
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
+Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](identity.md).
+
 Community 是本仓库采用 MIT 许可的代理运行时和本地控制台，包含受信转发跳签名验证、显式 HTTP/MCP 映射、本地策略、特征检测、PII 脱敏、有界响应/SSE 检查、净化审计记录、本地登录、密码修改和代理设置。无需私有软件包或外部模型 API。
 
 Enterprise 通过单独分发的 Access Broker 增加用户、代理、任务委派，访问决策以及一次性、有期限、绑定请求的人工审批。现有 IAM 上下文必须来自可信集成，仍须验证真实客户 IdP。Community 界面会标明未包含的功能。
