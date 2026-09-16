@@ -4,7 +4,7 @@
 
 > **Community Preview:** 로컬 평가와 연동 작업용입니다. 운영 트래픽·HA·용량·고객 신원 경로는 별도로 검증해야 합니다.
 
-**AI의 행동을 통제하고 데이터를 보호합니다.**
+**프롬프트에서 실제 행동까지의 경로를 통제합니다.**
 
 TrapDefense Community는 로컬 운영 UI를 갖춘 자체 호스팅 AI 방화벽입니다. 지원되는 HTTP·MCP 도구 호출을 검사하고, 실행 정책을 적용하며, 민감정보를 마스킹하고 판단 근거를 기록합니다. 기존 SDK는 [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security)에 유지됩니다.
 
@@ -17,6 +17,18 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 제품의 논리적 흐름입니다. 신뢰 전달, 트래픽 가시성, 경로 강제 조건은 [배치 아키텍처](docs/ko/architecture.md)를 확인하세요.
 
 Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다. [Entra SSO](docs/ko/identity.md).
+
+## TrapDefense가 다른 점
+
+TrapDefense는 모델의 출력이 실제 행동으로 바뀌는 지점을 통제합니다. 프록시 기반 집행 경계, 로컬 데이터 보호, 명확한 신원 의미를 하나의 운영 경로로 결합합니다.
+
+| 경계 | TrapDefense가 명확히 하는 것 |
+|---|---|
+| **독립 집행점** | 지원되는 HTTP·MCP 호출은 설정된 목적지에 도달하기 전에 Envoy와 검사기를 통과합니다. 애플리케이션에 기존 SDK를 넣을 필요가 없습니다. 배치 환경에서는 우회 방지 라우팅이 필요합니다. |
+| **양방향 데이터 통제** | 지원되는 SSE를 포함한 완전하고 제한된 요청·응답에 행동·PII·Secret 정책을 적용해 허용·차단·마스킹할 수 있습니다. |
+| **명확한 신원 경계** | Community Entra ID SSO는 콘솔 운영자를 인증합니다. 별도 Enterprise 파일럿은 사용자·에이전트·위임·작업·자원·행동을 함께 평가합니다. |
+| **정직한 실패 의미** | Inline 검사 실패는 차단합니다. Mirror는 원본 트래픽과 승인 상태를 바꾸지 않고 `would_*` 가상 결과만 기록합니다. |
+| **운영 가능한 증거** | 로컬 콘솔에서 판단, 정책 적용 범위, 목적지 수신증과 정제된 증거를 확인하며 보호 대상 원문은 감사 기록에 복사하지 않습니다. |
 
 ## 5분 로컬 평가
 

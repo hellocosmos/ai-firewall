@@ -4,7 +4,7 @@
 
 > **Community Preview：** 适用于本地评估和集成工作。生产流量、高可用、容量和客户身份路径需要单独验证。
 
-**控制 AI 操作，保护数据。**
+**控制从提示词到真实操作的完整路径。**
 
 TrapDefense Community 是带本地运维界面的自托管 AI 防火墙。检查受支持的 HTTP 和 MCP 工具调用，执行操作策略，对敏感数据脱敏并记录决策证据。旧 SDK 保留在 [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security)。
 
@@ -17,6 +17,18 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 这是产品的逻辑流程。可信转发、流量可见性和强制路由要求请参阅[部署架构](docs/zh-CN/architecture.md)。
 
 Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](docs/zh-CN/identity.md).
+
+## TrapDefense 的差异
+
+TrapDefense 控制模型输出转化为真实操作的边界，将基于代理的执行点、本地数据保护和明确的身份语义结合在同一运行路径中。
+
+| 边界 | TrapDefense 明确保障的内容 |
+|---|---|
+| **独立执行点** | 受支持的 HTTP 和 MCP 调用在到达配置目标之前经过 Envoy 和检查器，无需在应用中嵌入旧 SDK。部署路由必须防止绕过。 |
+| **双向数据控制** | 对完整且有界的请求与响应（包括受支持的 SSE）应用操作、PII 和 Secret 策略，执行放行、阻断或脱敏。 |
+| **明确的身份边界** | Community Entra ID SSO 认证控制台操作员；独立的 Enterprise 试点综合评估用户、智能体、委派、任务、资源和操作。 |
+| **明确的故障语义** | Inline 检查失败时关闭放行。Mirror 仅记录 `would_*` 假设结果，不修改原始流量或审批状态。 |
+| **可运营的证据** | 本地控制台展示决策、策略覆盖、目标回执和净化证据，且不会把受保护原文复制到审计记录。 |
 
 ## 五分钟本地评估
 

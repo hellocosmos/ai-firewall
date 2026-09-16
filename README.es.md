@@ -4,7 +4,7 @@
 
 > **Community Preview:** apto para evaluación local e integración. El tráfico de producción, HA, capacidad y rutas de identidad del cliente requieren validación aparte.
 
-**Controle las acciones de IA. Proteja sus datos.**
+**Controle toda la ruta desde el prompt hasta la acción.**
 
 TrapDefense Community es un AI Firewall autoalojado con consola local. Inspeccione llamadas HTTP y MCP compatibles, aplique políticas de acción, oculte datos sensibles y conserve evidencias de las decisiones. El SDK anterior permanece en [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
 
@@ -17,6 +17,18 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 Flujo lógico del producto. Consulte la [arquitectura de despliegue](docs/es/architecture.md) para los requisitos de reenvío de confianza, visibilidad del tráfico y enrutamiento.
 
 Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise. [Entra SSO](docs/es/identity.md).
+
+## Por qué TrapDefense
+
+TrapDefense gobierna el punto en que la salida del modelo se convierte en una acción real. Combina un punto de aplicación basado en proxy, protección local de datos y límites de identidad explícitos.
+
+| Límite | Lo que TrapDefense hace explícito |
+|---|---|
+| **Punto de aplicación independiente** | Las llamadas HTTP y MCP compatibles atraviesan Envoy y el inspector antes de llegar al destino configurado. La aplicación no necesita incorporar el SDK anterior. El despliegue debe impedir rutas alternativas. |
+| **Control bidireccional de datos** | Las solicitudes y respuestas completas y acotadas, incluido SSE compatible, pueden permitirse, bloquearse o redactarse mediante políticas de acción, PII y secretos. |
+| **Límite de identidad explícito** | Entra ID SSO de Community autentica al operador de consola. El piloto Enterprise separado evalúa usuario, agente, delegación, tarea, recurso y acción. |
+| **Semántica de fallo clara** | Inline bloquea cuando la inspección falla. Mirror registra resultados hipotéticos `would_*` sin cambiar el tráfico original ni el estado de aprobación. |
+| **Evidencia operativa** | La consola local muestra decisiones, cobertura de políticas, recibos del destino y evidencia saneada sin copiar contenido protegido al registro de auditoría. |
 
 ## Evaluación local en cinco minutos
 

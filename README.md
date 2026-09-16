@@ -9,7 +9,7 @@
 
 > **Community Preview:** suitable for local evaluation and integration work. Production traffic, HA, capacity and customer identity paths require separate validation.
 
-**Control AI actions. Protect your data.**
+**Control the path from prompt to action.**
 
 TrapDefense Community is a self-hosted AI Firewall with a local operations UI. Inspect supported HTTP and MCP tool calls, enforce action policy, redact sensitive data and keep decision evidence. The earlier SDK remains in [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
 
@@ -22,6 +22,18 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 Logical product flow. See [deployment architecture](docs/en/architecture.md) for trusted forwarding, transport visibility and routing requirements.
 
 Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](docs/en/identity.md).
+
+## Why TrapDefense
+
+TrapDefense governs the point where model output becomes a real action. It combines a proxy-based enforcement boundary with local data protection and explicit identity semantics.
+
+| Boundary | What TrapDefense makes explicit |
+|---|---|
+| **Independent enforcement point** | Supported HTTP and MCP calls traverse Envoy and the inspector before reaching a configured destination. Applications do not need to embed the earlier SDK. Deployment routing must prevent bypass. |
+| **Bidirectional data control** | Complete, bounded requests and responses—including supported SSE—can be allowed, blocked or redacted using action, PII and secret policies. |
+| **Explicit identity boundary** | Community Entra ID SSO authenticates the console operator. The separate Enterprise pilot evaluates authority across user, agent, delegation, task, resource and action. |
+| **Honest failure semantics** | Inline inspection fails closed. Mirror records hypothetical `would_*` outcomes and never changes the original traffic or approval state. |
+| **Operational evidence** | The local console exposes decisions, policy coverage, destination receipts and sanitized evidence without copying protected content into audit records. |
 
 ## See it in action
 

@@ -4,7 +4,7 @@
 
 > **Community Preview :** adapté à l’évaluation locale et à l’intégration. Le trafic de production, la HA, la capacité et les chemins d’identité client nécessitent une validation distincte.
 
-**Contrôlez les actions de l’IA. Protégez vos données.**
+**Contrôlez tout le chemin du prompt à l’action.**
 
 TrapDefense Community est un AI Firewall auto-hébergé avec console locale. Inspectez les appels HTTP et MCP pris en charge, appliquez les politiques d’action, masquez les données sensibles et conservez les preuves des décisions. L’ancien SDK reste dans [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
 
@@ -17,6 +17,18 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 Flux logique du produit. Consultez l’[architecture de déploiement](docs/fr/architecture.md) pour les exigences de transfert de confiance, de visibilité du trafic et de routage.
 
 Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](docs/fr/identity.md).
+
+## Pourquoi TrapDefense
+
+TrapDefense gouverne le point où la sortie du modèle devient une action réelle. Il réunit un point d’application par proxy, une protection locale des données et des limites d’identité explicites.
+
+| Limite | Ce que TrapDefense rend explicite |
+|---|---|
+| **Point d’application indépendant** | Les appels HTTP et MCP pris en charge traversent Envoy et l’inspecteur avant d’atteindre la destination configurée. L’application n’intègre pas l’ancien SDK. Le déploiement doit empêcher les chemins de contournement. |
+| **Contrôle bidirectionnel des données** | Les requêtes et réponses complètes et bornées, y compris SSE pris en charge, peuvent être autorisées, bloquées ou masquées par les politiques d’action, de PII et de secrets. |
+| **Limite d’identité explicite** | Le SSO Entra ID de Community authentifie l’opérateur de console. Le pilote Enterprise séparé évalue utilisateur, agent, délégation, tâche, ressource et action. |
+| **Sémantique de panne claire** | Inline bloque en cas d’échec d’inspection. Mirror enregistre les résultats hypothétiques `would_*` sans modifier le trafic d’origine ni l’état d’approbation. |
+| **Preuves exploitables** | La console locale présente décisions, couverture des politiques, reçus de destination et preuves nettoyées sans copier le contenu protégé dans l’audit. |
 
 ## Évaluation locale en cinq minutes
 
