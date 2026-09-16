@@ -4,7 +4,7 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 LANGUAGES = ('en', 'ko', 'zh-CN', 'ja', 'es', 'fr')
-PAGES = ('console', 'architecture', 'editions', 'migration', 'security')
+PAGES = ('console', 'architecture', 'editions', 'benchmark', 'migration', 'security')
 
 
 def test_localized_documentation_links_and_setup():

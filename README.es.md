@@ -2,6 +2,8 @@
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
+> **Community Preview:** apto para evaluación local e integración. El tráfico de producción, HA, capacidad y rutas de identidad del cliente requieren validación aparte.
+
 **Controle las acciones de IA. Proteja sus datos.**
 
 TrapDefense Community es un AI Firewall autoalojado con consola local. Inspeccione llamadas HTTP y MCP compatibles, aplique políticas de acción, oculte datos sensibles y conserve evidencias de las decisiones. El SDK anterior permanece en [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
@@ -16,7 +18,7 @@ Flujo lógico del producto. Consulte la [arquitectura de despliegue](docs/es/arc
 
 Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise. [Entra SSO](docs/es/identity.md).
 
-## Instalar y abrir la consola
+## Evaluación local en cinco minutos
 
 Requiere Python 3.11+, Node.js 22.12+ o 24, npm y Docker Engine/Desktop local. Instalación desde fuentes; no implica publicación en PyPI.
 
@@ -29,6 +31,8 @@ cd ai-firewall
 
 Abra [http://127.0.0.1:5176](http://127.0.0.1:5176). Inicie sesión con `admin` / `1234` y cambie la contraseña en Configuración. El idioma predeterminado es inglés. Puede elegir idioma antes o después de entrar; el navegador recuerda la selección.
 
+El resultado correcto muestra proxy, inspector y destino listos en **Conexiones / Sistema**; **Leer notas de negocio** debe producir HTTP 200 y un recibo del destino. La contraseña inicial es solo para la demo loopback y debe cambiarse de inmediato. Este flujo no configura un servicio público, rutas de producción ni un destino empresarial real.
+
 ## Funciones operativas
 
 Panel y pruebas de solicitudes; política local de permiso/bloqueo; política PII global, por ruta y por herramienta con evaluación Mirror `would_*`; escenarios HTTP sintéticos; auditoría; cambio de contraseña; interfaces, listeners y destinos; aplicación validada y reversión del contenedor Envoy propio.
@@ -37,13 +41,23 @@ Las solicitudes sintéticas recorren Envoy → inspector gRPC → destino HTTP r
 
 ## Alcance y ediciones
 
-Community incluye política local, mapeos HTTP/MCP explícitos, firmas del salto fiable, inspección limitada de respuestas/SSE y pruebas locales depuradas. Enterprise Access Broker se distribuye aparte; el SSO de consola Community no acredita identidad de agentes ni ofrece delegación o aprobaciones.
+Community incluye política local, mapeos HTTP/MCP explícitos, firmas del salto fiable, inspección limitada de respuestas/SSE y pruebas locales depuradas. Enterprise Access Broker es un piloto privado distribuido aparte; el SSO de consola Community no acredita identidad de agentes ni ofrece delegación o aprobaciones.
 
 Incluye inventario de interfaces y explicación de topología. La demo loopback no configura direcciones del SO, rutas de dos NIC, puentes transparentes ni salidas físicas. Los fallos inline bloquean. Mirror de consola observa su ruta síncrona; el colector mirror separado no bloquea originales.
 
+## Línea base de rendimiento local
+
+Detenga la consola y mida secuencialmente la misma ruta Envoy → inspector gRPC → destino HTTP sintético.
+
+```bash
+.venv/bin/trapdefense-benchmark --scenario read --iterations 30
+```
+
+La latencia p50/p95 y los recuentos del JSON sirven para regresión local, no acreditan rendimiento ni capacidad de producción. Consulte [Benchmarking](docs/es/benchmark.md).
+
 ## Documentación y verificación
 
-[Guía de consola](docs/es/console.md) · [Architecture](docs/es/architecture.md) · [Community / Enterprise](docs/es/editions.md) · [SDK → Proxy](docs/es/migration.md) · [Security](docs/es/security.md)
+[Guía de consola](docs/es/console.md) · [Architecture](docs/es/architecture.md) · [Community / Enterprise](docs/es/editions.md) · [Benchmarking](docs/es/benchmark.md) · [SDK → Proxy](docs/es/migration.md) · [Security](docs/es/security.md)
 
 El código de aplicación está en inglés y mantiene seis diccionarios UI completos. La inspección PII sin conexión admite patrones y validadores explícitos en inglés, coreano, chino simplificado, japonés, español y francés. No ofrece NER general de nombres, ubicaciones o direcciones. Cada guía tiene un selector de idioma al principio.
 

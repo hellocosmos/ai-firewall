@@ -3,8 +3,11 @@
 [![Community verification](https://github.com/hellocosmos/ai-firewall/actions/workflows/test.yml/badge.svg)](https://github.com/hellocosmos/ai-firewall/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2563EB.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-0F172A.svg)](pyproject.toml)
+[![Status: Community Preview](https://img.shields.io/badge/status-Community%20Preview-F59E0B.svg)](docs/en/editions.md)
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
+
+> **Community Preview:** suitable for local evaluation and integration work. Production traffic, HA, capacity and customer identity paths require separate validation.
 
 **Control AI actions. Protect your data.**
 
@@ -35,7 +38,7 @@ Community includes single-tenant Microsoft Entra ID console SSO with Administrat
 
 Screens show the local synthetic demo. They are not evidence of a production Entra tenant or customer traffic deployment.
 
-## Install and open the console
+## 5-minute local evaluation
 
 Requires Python 3.11+, Node.js 22.12+ (or 24), npm and local Docker Engine/Desktop. Source installation; no PyPI release is implied.
 
@@ -48,6 +51,8 @@ cd ai-firewall
 
 Open [http://127.0.0.1:5176](http://127.0.0.1:5176). Sign in with `admin` / `1234`, then change the password in Settings. English is the default. Use the language selector before or after login; the browser remembers your choice.
 
+Success means **Connections / System** reports the proxy, inspector and destination ready, and **Read business notes** produces HTTP 200 with a destination receipt. The initial password is only for the loopback demo; change it immediately. This flow does not configure an Internet-facing service, production routing or a real business destination.
+
 ## What you can operate
 
 Dashboard and request evidence; local allow/block policy; global, route and tool PII policy with Mirror `would_*` assessment; synthetic HTTP scenarios; audit; password change; interface inventory, listener/upstream settings and verified apply/rollback of the owned Envoy container.
@@ -56,13 +61,23 @@ The synthetic requests traverse a real Envoy → gRPC inspector → HTTP destina
 
 ## Scope and editions
 
-Community includes local policy, explicit HTTP/MCP mappings, trusted-hop signatures, bounded response/SSE inspection and sanitized local evidence. Enterprise Access Broker implementation is separately distributed; Community console SSO does not confer agent identity, delegated access or approvals.
+Community includes local policy, explicit HTTP/MCP mappings, trusted-hop signatures, bounded response/SSE inspection and sanitized local evidence. The Enterprise Access Broker is a separately distributed private pilot; Community console SSO does not confer agent identity, delegated access or approvals.
 
 NIC inventory and topology explanation are included. The loopback demo does not configure OS addresses, two-NIC routing, transparent bridges or physical egress. Inline inspection failures block. Console Mirror observes its synchronous path; the separate mirror collector cannot block original traffic.
 
+## Local performance baseline
+
+Stop the console, then run a repeatable sequential baseline through the same Envoy → gRPC inspector → synthetic HTTP path:
+
+```bash
+.venv/bin/trapdefense-benchmark --scenario read --iterations 30
+```
+
+The JSON report includes p50/p95 round-trip latency, outcome counts and host characteristics. It is a local regression baseline, not a production throughput or capacity claim. See [Benchmarking](docs/en/benchmark.md).
+
 ## Documentation and verification
 
-[Console guide](docs/en/console.md) · [Architecture](docs/en/architecture.md) · [Community / Enterprise](docs/en/editions.md) · [SDK → Proxy](docs/en/migration.md) · [Security](docs/en/security.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
+[Console guide](docs/en/console.md) · [Architecture](docs/en/architecture.md) · [Community / Enterprise](docs/en/editions.md) · [Benchmarking](docs/en/benchmark.md) · [SDK → Proxy](docs/en/migration.md) · [Security](docs/en/security.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
 English application source and six complete UI dictionaries are maintained together. Offline PII inspection covers explicit English, Korean, Simplified Chinese, Japanese, Spanish and French patterns and validators. It does not provide general name, location or address NER. Localized guides have a language switch at the top.
 

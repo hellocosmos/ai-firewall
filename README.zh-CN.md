@@ -2,6 +2,8 @@
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
+> **Community Preview：** 适用于本地评估和集成工作。生产流量、高可用、容量和客户身份路径需要单独验证。
+
 **控制 AI 操作，保护数据。**
 
 TrapDefense Community 是带本地运维界面的自托管 AI 防火墙。检查受支持的 HTTP 和 MCP 工具调用，执行操作策略，对敏感数据脱敏并记录决策证据。旧 SDK 保留在 [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security)。
@@ -16,7 +18,7 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](docs/zh-CN/identity.md).
 
-## 安装并打开控制台
+## 五分钟本地评估
 
 需要 Python 3.11+、Node.js 22.12+ 或 24、npm 和本地 Docker Engine/Desktop。采用源码安装，不表示已发布到 PyPI。
 
@@ -37,13 +39,23 @@ cd ai-firewall
 
 ## 范围与版本
 
-Community 包含本地策略、显式 HTTP/MCP 映射、可信跳签名、有界响应/SSE 检查及净化本地证据。Enterprise Access Broker 实现单独分发；Community 控制台 SSO 不授予智能体身份、委派访问或审批。
+Community 包含本地策略、显式 HTTP/MCP 映射、可信跳签名、有界响应/SSE 检查及净化本地证据。Enterprise Access Broker 是单独分发的私有试点；Community 控制台 SSO 不授予智能体身份、委派访问或审批。
 
 提供 NIC 清单和拓扑说明。回环演示不配置系统地址、双网卡路由、透明桥或物理出口。inline 检查失败时阻断。控制台 Mirror 观察同步路径；独立 mirror 收集器不能阻断原始流量。
 
+## 本地性能基线
+
+停止控制台，然后通过同一 Envoy → gRPC 检查器 → 合成 HTTP 路径执行顺序测量。
+
+```bash
+.venv/bin/trapdefense-benchmark --scenario read --iterations 30
+```
+
+JSON 中的 p50/p95 延迟和结果计数只用于本地回归比较，不代表生产吞吐量或容量。参见[基准测试](docs/zh-CN/benchmark.md)。
+
 ## 文档与验证
 
-[控制台指南](docs/zh-CN/console.md) · [Architecture](docs/zh-CN/architecture.md) · [Community / Enterprise](docs/zh-CN/editions.md) · [SDK → Proxy](docs/zh-CN/migration.md) · [Security](docs/zh-CN/security.md)
+[控制台指南](docs/zh-CN/console.md) · [Architecture](docs/zh-CN/architecture.md) · [Community / Enterprise](docs/zh-CN/editions.md) · [基准测试](docs/zh-CN/benchmark.md) · [SDK → Proxy](docs/zh-CN/migration.md) · [Security](docs/zh-CN/security.md)
 
 应用源码使用英语，并维护六套完整 UI 字典。离线 PII 检查支持英语、韩语、简体中文、日语、西班牙语和法语的显式模式与校验器；不提供覆盖姓名、位置和地址的通用 NER。每份本地化指南顶部均可切换语言。
 

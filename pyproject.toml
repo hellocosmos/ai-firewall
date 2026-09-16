@@ -22,6 +22,7 @@ dev = ["pytest>=8.3,<9", "pytest-asyncio>=0.24,<1"]
 
 [project.scripts]
 trapdefense-console = "asr_proxy.console.app:main"
+trapdefense-benchmark = "asr_proxy.console.benchmark:main"
 trapdefense-inspector = "asr_proxy.inspection.server:main"
 trapdefense-demo = "asr_proxy.inspection.community_demo:main"
 

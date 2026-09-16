@@ -2,6 +2,8 @@
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
+> **Community Preview:** 로컬 평가와 연동 작업용입니다. 운영 트래픽·HA·용량·고객 신원 경로는 별도로 검증해야 합니다.
+
 **AI의 행동을 통제하고 데이터를 보호합니다.**
 
 TrapDefense Community는 로컬 운영 UI를 갖춘 자체 호스팅 AI 방화벽입니다. 지원되는 HTTP·MCP 도구 호출을 검사하고, 실행 정책을 적용하며, 민감정보를 마스킹하고 판단 근거를 기록합니다. 기존 SDK는 [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security)에 유지됩니다.
@@ -16,7 +18,7 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다. [Entra SSO](docs/ko/identity.md).
 
-## 콘솔 설치와 실행
+## 5분 로컬 평가
 
 Python 3.11+, Node.js 22.12+ 또는 24, npm, 로컬 Docker Engine/Desktop이 필요합니다. 소스 설치이며 PyPI 배포를 의미하지 않습니다.
 
@@ -37,13 +39,23 @@ cd ai-firewall
 
 ## 범위와 에디션
 
-Community에는 로컬 정책, 명시적 HTTP/MCP 매핑, 신뢰 홉 서명, 제한된 응답/SSE 검사와 정제된 로컬 증거가 포함됩니다. Enterprise Access Broker 구현은 별도 배포하며 Community 콘솔 SSO가 에이전트 신원, 위임 접근, 승인을 제공하는 것은 아닙니다.
+Community에는 로컬 정책, 명시적 HTTP/MCP 매핑, 신뢰 홉 서명, 제한된 응답/SSE 검사와 정제된 로컬 증거가 포함됩니다. Enterprise Access Broker는 별도 배포하는 비공개 파일럿이며 Community 콘솔 SSO가 에이전트 신원, 위임 접근, 승인을 제공하는 것은 아닙니다.
 
 NIC 목록과 토폴로지 설명을 제공합니다. loopback 데모는 OS 주소, 2-NIC 라우팅, 투명 브리지, 물리 출구를 설정하지 않습니다. inline 검사 실패는 차단합니다. 콘솔 Mirror는 동기 경로를 관찰하며 별도 mirror 수집기는 원본을 차단할 수 없습니다.
 
+## 로컬 성능 기준선
+
+콘솔을 중지한 뒤 같은 Envoy → gRPC 검사기 → 합성 HTTP 경로를 순차 측정합니다.
+
+```bash
+.venv/bin/trapdefense-benchmark --scenario read --iterations 30
+```
+
+JSON 결과의 p50/p95 지연과 결과 개수는 로컬 회귀 비교용이며 운영 처리량이나 용량을 입증하지 않습니다. [벤치마크 안내](docs/ko/benchmark.md)를 참고하세요.
+
 ## 문서와 검증
 
-[콘솔 안내](docs/ko/console.md) · [Architecture](docs/ko/architecture.md) · [Community / Enterprise](docs/ko/editions.md) · [SDK → Proxy](docs/ko/migration.md) · [Security](docs/ko/security.md)
+[콘솔 안내](docs/ko/console.md) · [Architecture](docs/ko/architecture.md) · [Community / Enterprise](docs/ko/editions.md) · [벤치마크](docs/ko/benchmark.md) · [SDK → Proxy](docs/ko/migration.md) · [Security](docs/ko/security.md)
 
 애플리케이션 코드는 영어로 작성하고 UI 사전 6개를 함께 유지합니다. 오프라인 PII 검사는 영어·한국어·중국어 간체·일본어·스페인어·프랑스어의 명시적 패턴과 검증기를 지원합니다. 이름·위치·주소를 포괄하는 범용 NER은 제공하지 않습니다. 각 번역 문서 상단에서 언어를 전환할 수 있습니다.
 

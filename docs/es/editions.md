@@ -4,9 +4,19 @@
 
 Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise. [Entra SSO](identity.md).
 
+## Estado actual de entrega
+
+| Límite | Estado | Evidencia y límite |
+|---|---|---|
+| Runtime y consola Community | **Community Preview público** | Publicado en este repositorio MIT; CI y la verificación sintética de la ruta Envoy pasan. El tráfico y la capacidad de producción requieren validación del cliente. |
+| Enterprise Access Broker | **Implementación piloto privada** | Existen el proveedor y el flujo de aprobación distribuidos aparte; no están en este repositorio ni se presentan como disponibilidad general. Requieren IAM real, política del cliente y validación de fallos. |
+| Fleet central, HA distribuida, auditoría inmutable y servicio alojado | **Hoja de ruta** | No entregados ni representados como funciones por las pantallas Community. |
+
+Los nombres de edición definen límites de producto y licencia; no afirman disponibilidad general de toda la hoja de ruta Enterprise.
+
 Community es el runtime de proxy y la consola local con licencia MIT de este repositorio. Incluye verificación de salto firmado, mapeos HTTP/MCP explícitos, política local, detección por patrones, ocultación de PII, inspección limitada de respuestas/SSE, auditoría depurada, inicio de sesión local, cambio de contraseña y configuración del proxy. No requiere paquetes privados ni API de modelos externos.
 
-Enterprise añade Access Broker, distribuido por separado: delegación de usuario/agente/tarea, decisiones de acceso y aprobación humana de un solo uso, con caducidad y vinculada a la solicitud. El contexto IAM debe llegar mediante una integración de confianza; sigue siendo necesaria la validación con el IdP real del cliente. La UI Community señala las funciones no incluidas.
+La implementación piloto Enterprise distribuida por separado añade Access Broker: delegación de usuario/agente/tarea, decisiones de acceso y aprobación humana de un solo uso, con caducidad y vinculada a la solicitud. El contexto IAM debe llegar mediante una integración de confianza; sigue siendo necesaria la validación con el IdP real del cliente. La UI Community señala las funciones no incluidas.
 
 El proveedor privado usa el punto de entrada Python `trapdefense.authorizers` / `enterprise`. `authorize(request)` aplica las decisiones; `evaluate(request)` evalúa mirror sin modificar estado. Elegir Enterprise sin proveedor impide iniciar. Los registros de tokens del Broker son pruebas de decisiones acotadas, no tokens OAuth de uso general.
 

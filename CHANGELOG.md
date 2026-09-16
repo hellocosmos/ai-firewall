@@ -4,6 +4,13 @@ All notable changes to TrapDefense Community are documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases use the `0.31`, `0.32`, `0.33` numbering sequence.
 
+## [Unreleased]
+
+### Added
+
+- A bounded `trapdefense-benchmark` command for repeatable sequential measurements through the local Envoy, gRPC inspector and synthetic destination path.
+- Community Preview maturity labels, five-minute evaluation success criteria and explicit shipped/private/roadmap edition status.
+
 ## [0.33] - 2026-09-16
 
 ### Added

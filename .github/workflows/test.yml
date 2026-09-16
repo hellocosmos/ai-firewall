@@ -16,7 +16,7 @@ jobs:
       - run: pip install -e '.[dev,console]'
       - run: python -c "import importlib.util; assert importlib.util.find_spec('trapdefense_enterprise') is None; assert importlib.util.find_spec('asr') is None"
       - run: pytest -q
-      - run: trapdefense-inspector --help && trapdefense-console --help
+      - run: trapdefense-inspector --help && trapdefense-console --help && trapdefense-benchmark --help
   console:
     runs-on: ubuntu-latest
     steps:
