@@ -1,0 +1,12 @@
+.venv/
+.runtime-bin/
+.runtime-state/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+dist/
+*.egg-info/
+.env
+*.key
+*.pem
+.DS_Store

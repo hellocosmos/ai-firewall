@@ -1,0 +1,19 @@
+name: Community verification
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  community:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '${{ matrix.python }}'
+      - run: pip install -e '.[dev]'
+      - run: python -c "import importlib.util; assert importlib.util.find_spec('trapdefense_enterprise') is None; assert importlib.util.find_spec('asr') is None"
+      - run: pytest -q
+      - run: trapdefense-inspector --help

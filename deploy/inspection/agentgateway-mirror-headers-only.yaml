@@ -1,0 +1,38 @@
+# LIMITATION PROBE ONLY: agentgateway v1.5.0 mirrors HEADERS but NO BODY.
+# Not suitable for PII/tool-argument detection. Use envoy-mirror.yaml or a trusted
+# external plaintext duplicator. Original responses are also NOT mirrored.
+config:
+  enableIpv6: false
+  adminAddr: "off"
+  statsAddr: "off"
+  readinessAddr: "off"
+  workerThreads: 2
+  sensitiveHeaders: [x-td-attestation, x-td-signature]
+frontendPolicies:
+  connect:
+    mode: deny
+  networkAuthorization:
+    rules:
+    - allow: 'source.address == "127.0.0.1"'
+  http:
+    maxBufferSize: 1048576
+    http1IdleTimeout: 5s
+gateways:
+  mirror-source:
+    port: 18084
+routes:
+- name: local-request-mirror
+  gateways: mirror-source
+  backends:
+  - host: 127.0.0.1:18090
+    policies:
+      requestHeaderModifier:
+        remove: [x-td-attestation, x-td-signature]
+  policies:
+    timeout:
+      requestTimeout: 5s
+      backendRequestTimeout: 3s
+    requestMirror:
+      backend:
+        host: 127.0.0.1:18083
+      percentage: 1.0

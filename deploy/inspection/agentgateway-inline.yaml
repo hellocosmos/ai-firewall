@@ -1,0 +1,45 @@
+# Local plaintext service-chain Spike. No TLS interception or MCP aggregation.
+config:
+  enableIpv6: false
+  adminAddr: "off"
+  statsAddr: "off"
+  readinessAddr: "off"
+  workerThreads: 2
+  sensitiveHeaders: [x-td-attestation, x-td-signature]
+frontendPolicies:
+  connect:
+    mode: deny
+  networkAuthorization:
+    rules:
+    - allow: 'source.address == "127.0.0.1"'
+  http:
+    maxBufferSize: 1048576
+    http1IdleTimeout: 5s
+gateways:
+  inspection:
+    port: 18080
+routes:
+- name: local-original-http
+  gateways: inspection
+  backends:
+  - host: 127.0.0.1:18090
+  policies:
+    timeout:
+      requestTimeout: 5s
+      backendRequestTimeout: 3s
+    extProc:
+      host: 127.0.0.1:18081
+      failureMode: failClosed
+      policies:
+        tcp:
+          connectTimeout: 1s
+        http:
+          requestTimeout: 2s
+      processingOptions:
+        requestHeaderMode: send
+        responseHeaderMode: send
+        requestBodyMode: buffered
+        responseBodyMode: buffered
+        requestTrailerMode: skip
+        responseTrailerMode: skip
+        allowModeOverride: false
