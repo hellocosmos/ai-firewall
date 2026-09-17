@@ -1,4 +1,4 @@
-# Docker self-hosting (0.38 Community Preview)
+# Docker self-hosting (0.39 Open Source Preview)
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
@@ -13,7 +13,7 @@ Client -- gateway key or JWT --> bundled adapter
 Operator --> console login --> policies and sanitized decision records
 ```
 
-The bundled adapter verifies the connection key or configured JWT issuer/audience/scope, removes submitted forwarding identities, binds the actual request to a private signature and forwards only through Envoy. Clients never receive the signing key. `source_verified` means this trusted forwarding path was verified; it does **not** prove the user's or agent's identity. A validated JWT authenticates gateway access but does not create an Enterprise Agent IAM record.
+The bundled adapter verifies the connection key or configured JWT issuer/audience/scope, removes submitted forwarding identities, binds the actual request to a private signature and forwards only through Envoy. Clients never receive the signing key. `source_verified` means this trusted forwarding path was verified; it does **not** prove the user's or agent's identity. A validated JWT authenticates gateway access. It creates broker identity only when `identity_claims` is configured and the built-in Access Broker is enabled.
 
 ## What works, and what does not
 
@@ -30,7 +30,7 @@ The bundled adapter verifies the connection key or configured JWT issuer/audienc
 | SSE, stateful MCP, cookies, WebSocket, uploads/binary content | **Not supported by this profile** | Use another explicitly validated profile; do not assume HTTP implies compatibility |
 | stdio, shell, local files, direct DB or closed SaaS-internal calls | Outside this proxy's visibility | Not covered |
 
-In JWT mode, TrapDefense is an OAuth resource server, not an authorization server. It validates a token issued for the configured TrapDefense audience and does not forward that token to the target. Target services still enforce their own permissions using an independent credential. Community's client key or JWT subject is not an agent registry, delegation record or per-agent IAM.
+In JWT mode, TrapDefense is an OAuth resource server, not an authorization server. It validates a token issued for the configured TrapDefense audience and does not forward that token to the target. Target services still enforce their own permissions using an independent credential. A client key or unmapped JWT subject is not an agent registry, delegation record or per-agent IAM.
 
 ## Fresh installation
 
@@ -81,7 +81,7 @@ curl -sS http://localhost:18084/mcp \
   --data '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"notes.delete","arguments":{}}}'
 ```
 
-Expected: blocked by the configured action policy. The optional fixture is a small synthetic protocol target, not proof of a particular MCP vendor. 0.38 runs the pinned official Python MCP SDK through the adapter for current-protocol initialization and discovery; see [gateway compatibility](gateway-compatibility.md). The broader [MCP pilot](mcp-pilot.md) remains a separate tool-operation path.
+Expected: blocked by the configured action policy. The optional fixture is a small synthetic protocol target, not proof of a particular MCP vendor. 0.39 runs the pinned official Python MCP SDK through the adapter for current-protocol initialization and discovery; see [gateway compatibility](gateway-compatibility.md). The broader [MCP pilot](mcp-pilot.md) remains a separate tool-operation path.
 
 ## Connect your own destination
 
@@ -121,12 +121,25 @@ gateway_auth:
   authorization_servers: [https://login.example.com/tenant/v2.0]
   required_scopes: [mcp.invoke]
   authorized_parties: [configured-client-id]
+  identity_claims:
+    tenant_id: tid
+    user_id: sub
+    agent_id: agent_id
+    delegation_id: delegation_id
+    task_id: task_id
+    agent_instance_id: agent_instance_id
+    approval_id: approval_id
+access_broker:
+  enabled: true
+  tenant_id: tenant-a
 target_auth:
   mode: static_bearer
   secret_file: /run/secrets/destination
 ```
 
-Production identity and metadata URLs require HTTPS. `allow_insecure_loopback: true` exists only for explicit local synthetic tests. The resource-derived metadata URL for the example is `https://firewall.example.com/.well-known/oauth-protected-resource/mcp`. `authorized_parties` is optional; when configured, the token must carry a matching `azp`, `appid` or `cid` client identifier. Scope validation accepts the OAuth `scope`/`scp` claim as a space-delimited string or string array. Entra application roles in `roles` are not treated as scopes in 0.38.
+Production identity and metadata URLs require HTTPS. `allow_insecure_loopback: true` exists only for explicit local synthetic tests. The resource-derived metadata URL for the example is `https://firewall.example.com/.well-known/oauth-protected-resource/mcp`. `authorized_parties` is optional; when configured, the token must carry a matching `azp`, `appid` or `cid` client identifier. Scope validation accepts the OAuth `scope`/`scp` claim as a space-delimited string or string array. Entra application roles in `roles` are not treated as scopes in 0.39.
+
+`identity_claims` is an explicit allowlist. The broker-enabled gateway copies only those verified claims into the signed inspector context. Required values are tenant, user, agent, delegation and task. The configured `access_broker.tenant_id` is the console management boundary and must match request identities. Register the agent and create a matching delegation in the console before sending traffic. High-risk requests can create an approval; the caller must obtain a new JWT carrying the returned `approval_id` (or otherwise place that value in the configured approval claim) and repeat the exact request once. Do not let an untrusted caller mint or rewrite these claims.
 
 ## Integration acceptance checklist
 
@@ -166,4 +179,4 @@ docker compose run --rm app render
 docker compose up -d --force-recreate
 ```
 
-Scale/HA, automatic credential rotation, per-agent identities, Cloud operations and universal MCP compatibility are outside this package. Validate these separately before making deployment commitments.
+Multi-node HA, automatic credential rotation, managed Cloud operations and universal MCP compatibility are outside this package. Per-agent identity is available through explicit verified JWT claim mapping and still requires customer validation.

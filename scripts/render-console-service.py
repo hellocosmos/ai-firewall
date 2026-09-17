@@ -11,7 +11,7 @@ def quote(value):
 def render(root):
   root=Path(root).resolve()
   return '\n'.join([
-    '[Unit]', 'Description=TrapDefense Community Console and Inspector Pool',
+    '[Unit]', 'Description=TrapDefense AI Firewall Console and Inspector Pool',
     'After=network-online.target', 'StartLimitIntervalSec=120', 'StartLimitBurst=3', '',
     '[Service]', 'Type=simple', 'WorkingDirectory='+str(root).replace('%','%%'),
     'Environment='+quote('TD_CONSOLE_ASSETS='+str(root/'console/dist')),

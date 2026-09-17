@@ -14,7 +14,7 @@ from asr_proxy.inspection.pool import atomic_write
 
 async def run(args):
   with Pilot(args.state_dir) as pilot:
-    result={'version':importlib.metadata.version('trapdefense-community'),
+    result={'version':importlib.metadata.version('trapdefense-ai-firewall'),
       'environment':{'os':platform.system(),'python':platform.python_version(),'mcp':importlib.metadata.version('mcp')},
       'model':{'evidence':'not_run','reason':'No explicit local model endpoint/name supplied'}}
     if args.model_url:

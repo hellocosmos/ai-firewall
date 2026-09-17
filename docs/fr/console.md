@@ -1,14 +1,14 @@
 # Installation et utilisation de la console
 
-> Docker 0.38 : [Auto-hébergement](self-hosting.md) · [Compatibilité de la passerelle](gateway-compatibility.md). Cette page décrit la démonstration synthétique distincte depuis les sources.
+> Docker 0.39 : [Auto-hébergement](self-hosting.md) · [Compatibilité de la passerelle](gateway-compatibility.md). Cette page décrit la démonstration synthétique distincte depuis les sources.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
-Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](identity.md).
+La console prend en charge le SSO Microsoft Entra ID à locataire unique avec les rôles Administrateur et Lecteur. L’identité de l’opérateur et l’autorisation de l’agent sont des frontières distinctes ; l’Access Broker intégré applique l’autorisation. [Entra SSO](identity.md).
 
 ## Installer et démarrer
 
-Prérequis : Python 3.11+, Node.js 22.12+ ou 24, npm et Docker Engine/Desktop local en cours d’exécution. Ce dépôt suffit : aucun SDK, paquet Enterprise privé ni API de modèle n’est requis. Les scripts utilisent `uv` s’il est présent, sinon Python venv/pip. Exécutez sans sudo et gardez Docker local.
+Prérequis : Python 3.11+, Node.js 22.12+ ou 24, npm et Docker Engine/Desktop local en cours d’exécution. Ce dépôt suffit : aucun SDK, package runtime privé ni API de modèle n’est requis. Les scripts utilisent `uv` s’il est présent, sinon Python venv/pip. Exécutez sans sudo et gardez Docker local.
 
 ```bash
 git clone https://github.com/hellocosmos/ai-firewall.git
@@ -32,7 +32,7 @@ Browser -> management API/UI :5176
                  <- response inspection <- decision + receipt <- UI
 ```
 
-L’émetteur simule un relais de confiance après déchiffrement TLS et signe les requêtes synthétiques exactes. Ce n’est ni un déchiffreur TLS ni un IdP. Envoy est réel et la destination dispose d’une écoute HTTP distincte, sans action métier externe. Community vérifie la source, pas l’identité de l’utilisateur ou de l’agent. La page Access Broker explique le paquet Enterprise distinct ; Community ne fournit pas de fausses approbations.
+L’émetteur simule un relais de confiance et signe les requêtes synthétiques exactes ; ce n’est ni un déchiffreur TLS ni un IdP. Envoy et la destination HTTP sont réels. La démo utilise le véritable Access Broker intégré avec des identités synthétiques et une approbation liée à la requête, sans action métier externe.
 
 ## Pages et premier parcours
 

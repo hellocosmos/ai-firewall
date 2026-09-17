@@ -79,13 +79,13 @@ def test_real_keycloak_token_is_accepted_and_consumed():
       receipts.append(request)
       assert request.headers.get('authorization') is None
       body={'jsonrpc':'2.0','id':1,'result':{'protocolVersion':'2025-11-25',
-        'capabilities':{},'serverInfo':{'name':'keycloak-target','version':'0.38'}}}
+        'capabilities':{},'serverInfo':{'name':'keycloak-target','version':'0.39'}}}
       return httpx.Response(200,headers={'content-type':'application/json'},
         stream=httpx.ByteStream(json.dumps(body).encode()))
     app=create_gateway(config,CLIENT_KEY,SIGNING_KEY,transport=httpx.MockTransport(target))
     response=TestClient(app).post('/mcp',headers={'authorization':'Bearer '+token},json={
       'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2025-11-25',
-      'capabilities':{},'clientInfo':{'name':'keycloak-test','version':'0.38'}}})
+      'capabilities':{},'clientInfo':{'name':'keycloak-test','version':'0.39'}}})
     assert response.status_code==200 and len(receipts)==1
   finally:
     subprocess.run(['docker','rm','--force',name],capture_output=True,text=True)

@@ -1,1 +1,1 @@
-"""Community operations console; no Enterprise implementation dependency."""
+"""Open-source operations console with the built-in Access Broker."""

@@ -1,8 +1,8 @@
-# Grupo de inspectores Community
+# Grupo de inspectores AI Firewall
 
 [English](../en/inspector-pool.md) · [한국어](../ko/inspector-pool.md) · [简体中文](../zh-CN/inspector-pool.md) · [日本語](../ja/inspector-pool.md) · [Español](../es/inspector-pool.md) · [Français](../fr/inspector-pool.md)
 
-Ejecuta 1, 2 o 4 inspectores en el mismo servidor y genera la configuración de Envoy. No inicia Docker ni sustituye la consola. Enterprise y HA entre servidores quedan fuera del alcance.
+Ejecuta 1, 2 o 4 inspectores en el mismo servidor y genera la configuración de Envoy. No inicia Docker ni sustituye la consola. El Broker integrado admite file locks en el mismo host; la HA entre servidores queda fuera del alcance.
 
 Todos los procesos comparten la misma base local antirrepetición y el registro de auditoría. No use bases separadas ni sistemas de archivos de red. Las rutas relativas parten del directorio de inicio. La política y la clave se fijan en una copia privada al arrancar; los cambios requieren reiniciar todo el grupo y coordinar Envoy y el emisor de firmas.
 

@@ -1,10 +1,30 @@
 # Changelog
 
-All notable changes to TrapDefense Community are documented here.
+All notable changes to TrapDefense AI Firewall are documented here.
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases currently run from `0.31` through `0.38`.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Source releases currently run from `0.31` through `0.39`.
 
 ## [Unreleased]
+
+## [0.39] - 2026-09-17
+
+### One open-source product
+
+- Ship the Runtime Gateway, Agent Registry, delegation, Access Broker, request-bound human approval, audit and operator console in one MIT-licensed repository.
+- Remove the Community/Enterprise edition switch and private `trapdefense.authorizers` provider dependency; `access_broker_enabled` selects the built-in broker.
+- Rename the Python distribution and Docker image to `trapdefense-ai-firewall`.
+
+### Identity and operations
+
+- Map an explicit allowlist of verified JWT claims to tenant, user, agent, delegation, task, instance and approval identity fields.
+- Fail startup when broker mode lacks JWT authentication, identity mapping or a configured tenant.
+- Operate agents, delegations and approvals from the console; the synthetic deployment scenario uses the real broker and proves one-time approval consumption.
+- Support the transactional file-backed broker with the same-host inspector pool while retaining the multi-host HA limitation.
+
+### Boundaries
+
+- Access Broker is Experimental pending production IdP, customer policy, routing, HA and capacity validation.
+- Managed cloud, fleet operations and immutable external audit remain planned services rather than shipped features.
 
 ## [0.38] - 2026-09-17
 
@@ -187,6 +207,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Com
 - Local audit storage is mutable, and content detection can produce false positives or false negatives.
 - Enterprise Access Broker, approvals and delegated authorization are distributed separately.
 
+[0.39]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.39
 [0.38]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.38
 [0.37]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.37
 [0.36]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.36

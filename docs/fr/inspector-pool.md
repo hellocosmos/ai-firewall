@@ -1,8 +1,8 @@
-# Pool d’inspecteurs Community
+# Pool d’inspecteurs AI Firewall
 
 [English](../en/inspector-pool.md) · [한국어](../ko/inspector-pool.md) · [简体中文](../zh-CN/inspector-pool.md) · [日本語](../ja/inspector-pool.md) · [Español](../es/inspector-pool.md) · [Français](../fr/inspector-pool.md)
 
-Exécute 1, 2 ou 4 inspecteurs sur le même hôte et génère la configuration Envoy. La commande ne démarre pas Docker et ne remplace pas la console. Enterprise et la haute disponibilité entre hôtes sont hors périmètre.
+Exécute 1, 2 ou 4 inspecteurs sur le même hôte et génère la configuration Envoy. La commande ne démarre pas Docker et ne remplace pas la console. Le Broker intégré prend en charge les file locks sur un même hôte ; la HA entre hôtes reste hors périmètre.
 
 Tous les processus partagent la même base locale anti-rejeu et le journal d’audit. N’utilisez ni bases séparées ni système de fichiers réseau. Les chemins relatifs dépendent du répertoire de lancement. Politique et clé sont figées dans une copie privée au démarrage ; toute modification impose le redémarrage du pool et la coordination avec Envoy et la source de signatures.
 

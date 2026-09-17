@@ -4,6 +4,8 @@ allow_plaintext_upstream: true
 console_origin: http://localhost:18080
 gateway_auth:
   mode: client_key
+access_broker:
+  enabled: false
 target_auth:
   mode: passthrough_bearer
 max_body_bytes: 1048576

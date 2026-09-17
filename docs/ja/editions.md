@@ -1,31 +1,22 @@
-# Community と Enterprise
+# 1 つのオープンソース製品
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
-## 導入条件と提供状況
+TrapDefense 0.39 は単一の MIT ライセンスコードベースです。Runtime Gateway と Agent Access Broker を同じ公開リポジトリで提供し、非公開 Python 配布物、provider entry point、license key、edition switch は不要です。
 
-0.38 は接続キーまたは外部 JWT のゲートウェイ認証と独立した宛先資格情報を含む Docker Compose プレビューです。イメージはソースからビルドし、TrapDefense Cloud は計画段階です。
+## 提供状況
 
-[提供形態と互換性](deployment-fit.md)
-
-Community は単一テナントの Microsoft Entra ID コンソール SSO と管理者・閲覧者ロールを提供します。コンソール認証はエージェントの実行認可ではなく、委任と承認は Enterprise の機能です。 [Entra SSO](identity.md).
-
-## 現在の提供状況
-
-| 境界 | 状況 | 証跡と制限 |
+| 境界 | 状態 | 証拠と制限 |
 |---|---|---|
-| Community ランタイムとコンソール | **公開 Community Preview** | この MIT リポジトリで公開され、CI と合成 Envoy 経路の検証に合格しています。本番通信と容量は顧客環境で別途検証が必要です。 |
-| Enterprise Access Broker | **非公開パイロット実装** | 別配布のプロバイダーと承認フローは存在しますが、このリポジトリには含まれず、一般提供とは表現しません。実 IAM、顧客ポリシー、障害経路の検証が必要です。 |
-| 集中 Fleet、分散 HA、不変監査、ホステッドサービス | **ロードマップ** | 未提供であり、Community 画面が実装済みであることを示すものではありません。 |
+| Runtime Gateway とコンソール | **Open Source Preview** | 公開ソース、CI、合成 Envoy 経路、HTTP/MCP ポリシー、PII/secret 制御、ローカル UI。実環境のルーティングと容量は個別検証が必要です。 |
+| 内蔵 Agent Access Broker | **Experimental** | registry、delegation、厳密な認可、tenant 分離、ファイルトランザクション、リクエストに結び付く一回限りの承認を公開。実顧客 IdP/ポリシーと multi-node 検証は未完了です。 |
+| Docker セルフホスト | **Preview** | adapter、Envoy、inspector、console、gateway 認証、独立した target credential をソースから構築。1 インストールにつき固定 destination 1 つです。 |
+| Managed cloud、fleet、multi-node HA、外部 immutable audit | **Planned** | 現在は提供していません。 |
 
-エディション名は製品とライセンスの境界を示し、すべての Enterprise ロードマップ項目が一般提供済みであることを意味しません。
+Gateway-only はローカル検査ポリシーと trusted source を検証します。Broker-enabled は検証済み JWT identity mapping、agent registry、delegation、resource/action 認可、approval を追加します。両方とも同じオープンソースパッケージです。
 
-Community は、このリポジトリの MIT ライセンスのプロキシランタイムとローカル運用コンソールです。信頼された転送ホップの署名検証、明示的な HTTP/MCP マッピング、ローカルポリシー、パターン検査、PII マスキング、上限付き応答/SSE 検査、機密情報を除いた監査記録、ローカルログイン、パスワード変更、プロキシ設定を提供します。非公開パッケージや外部モデル API は不要です。
+将来の有償サービスは、同じランタイムを運用する managed service、fleet lifecycle、multi-node HA、外部 audit、顧客 connector、ポリシー導入、SLA、サポートです。これはサービス運用の境界であり、ソース機能の制限ではありません。
 
-別配布の Enterprise パイロット実装は Access Broker により、ユーザー・エージェント・タスクの委任、アクセス判定、有効期限付きで一度だけ使えるリクエスト単位の承認を追加します。既存 IAM の情報は信頼できる連携から取得し、実際の顧客 IdP で検証する必要があります。Community UI は含まれない機能を明示します。
+ファイル store は同一ホストの POSIX プロセス向けで、分散 DB ではありません。NFS/SMB を使った multi-host HA には利用できません。合成テストは実 IdP、Conditional Access、顧客 MCP 認証、TLS ルーティング、容量の認証ではありません。
 
-非公開プロバイダーは Python の `trapdefense.authorizers` / `enterprise` エントリーポイントに接続します。`authorize(request)` は判定を適用し、`evaluate(request)` は状態を変更しない mirror 評価を行います。プロバイダーなしで Enterprise を選ぶと起動に失敗します。Broker のトークン記録は範囲付きの判定証拠であり、汎用 OAuth アクセストークンではありません。
-
-集中管理、分散 HA、ホスティング課金、不変監査ストレージは未提供です。商用範囲には非公開プロバイダー、導入、ポリシー連携、サポートを含められます。価格と支援条件は別途定めます。ローカル SQLite と JSONL は変更可能です。
-
-[Docker 0.38](self-hosting.md) · [ゲートウェイ互換性](gateway-compatibility.md)
+[Docker 0.39](self-hosting.md) · [アーキテクチャ](architecture.md) · [セキュリティ](security.md) · [互換性](gateway-compatibility.md)

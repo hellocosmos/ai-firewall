@@ -1,1 +1,1 @@
-"""Docker-first Community deployment with an explicit integration contract."""
+"""Docker-first open-source deployment with an explicit integration contract."""

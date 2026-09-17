@@ -4,11 +4,11 @@
 
 Protect the HTTP API and remote MCP calls you can route through a supported inspection path. Keep existing service authentication in your MCP servers and connectors; do not replace your IAM.
 
-Self-hosted Community 0.38 includes a source-built Docker Compose package with client-key or external-JWT gateway authentication and independent target credentials. TrapDefense Cloud remains planned and is not available for sign-up.
+Self-hosted TrapDefense 0.39 includes a source-built Docker Compose package with client-key or external-JWT gateway authentication and independent target credentials. TrapDefense Cloud remains planned and is not available for sign-up.
 
 You must control a client endpoint, server ingress or a compatible inspected network path. Gateway reachability and bypass prevention are deployment requirements. Closed SaaS-internal calls, local stdio, shell, filesystem and direct database operations are outside this HTTP proxy boundary.
 
-0.38 verifies stateless Streamable HTTP initialization/discovery with the pinned official Python MCP SDK and protocol-realistic JWT/JWKS behavior. It does not certify VS Code execution, a real identity tenant, stateful sessions or every streaming MCP server. Console Entra SSO is not Agent IAM or downstream authorization.
+0.39 verifies stateless Streamable HTTP initialization/discovery with the pinned official Python MCP SDK and protocol-realistic JWT/JWKS behavior. It does not certify VS Code execution, a real identity tenant, stateful sessions or every streaming MCP server. Console Entra SSO is not Agent IAM or downstream authorization.
 
 [Architecture](architecture.md) · [Delivery status](editions.md) · [MCP pilot](mcp-pilot.md)
 

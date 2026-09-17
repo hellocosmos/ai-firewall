@@ -2,7 +2,7 @@
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
-Community は単一テナントの Microsoft Entra ID コンソール SSO と管理者・閲覧者ロールを提供します。コンソール認証はエージェントの実行認可ではなく、委任と承認は Enterprise の機能です。 [Entra SSO](identity.md).
+コンソールは単一テナント Microsoft Entra ID SSO と管理者・閲覧者ロールをサポートします。コンソール運用者の認証とエージェント認可は別の境界で、認可は内蔵 Access Broker が行います。 [Entra SSO](identity.md).
 
 ```text
 AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
@@ -19,10 +19,10 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 1. TrapDefense 外部で経路を強制し、保護通信の迂回を防ぎます。
 2. 承認済みの既存 TLS 復号装置を使用します。デモは本番 TLS を復号しません。
 3. 信頼済みアダプターがクライアント由来の `x-td-*`、`x-asr-*` を除去し、実際に観察した要求へ署名します。method・authority・path/query・アプリケーションヘッダー・完全な本文を保持します。結合規則と除外項目は `inspection/identity.py` にあります。
-4. HMAC キーは信頼済みホップと検査器だけに保管し、エージェントへ渡しません。Community の `source_id` を許可リスト化し、平文と ExtProc の経路を隔離します。例は公開 gRPC 待受を認証しません。
+4. HMAC キーは信頼済みホップと検査器だけに保管し、エージェントへ渡しません。gateway-only の `source_id` を許可リスト化し、平文と ExtProc の経路を隔離します。例は公開 gRPC 待受を認証しません。
 5. Envoy は本文全体のバッファリング、サイズ・時間上限、`failure_mode_allow: false` を使い、転送前に証明ヘッダーを除去します。署名は元要求に、永続的承認がある場合はマスキング後の操作ダイジェストに結び付きます。
-6. Community は明示的な経路・ツール・リソース・操作のローカルルールと転送元を検証し、ユーザー認証や委任権限を保証しません。
-7. Enterprise は独立した非公開プロバイダーで身元・委任を追加検証します。従来設定の既定は Enterprise で、プロバイダー欠落時は黙って機能を落とさず起動に失敗します。
+6. Gateway-only モードは明示的な経路・ツール・リソース・操作のローカルルールと転送元を検証し、ユーザー認証や委任権限を保証しません。
+7. Broker モードは検証済み JWT identity claim と内蔵 registry、delegation、task、resource、action、1 回限りの approval を評価します。必須 identity がなければ fail closed します。
 
 任意の TLS 装置へ自動適用できる万能アダプターはありません。メタデータ偽装と上流への直接アクセスを防ぐ統合が必要です。
 

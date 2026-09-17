@@ -1,10 +1,10 @@
-# Compatibilité des clients de passerelle — 0.38
+# Compatibilité des clients de passerelle — 0.39
 
 [English](../en/gateway-compatibility.md) · [한국어](../ko/gateway-compatibility.md) · [简体中文](../zh-CN/gateway-compatibility.md) · [日本語](../ja/gateway-compatibility.md) · [Español](../es/gateway-compatibility.md) · [Français](../fr/gateway-compatibility.md)
 
 Le client doit pouvoir remplacer l’URL HTTP/MCP distante par TrapDefense et envoyer une clé de connexion ou un JWT Bearer OAuth. L’authentification client→TrapDefense reste séparée de TrapDefense→cible.
 
-| Chemin | Preuve 0.38 |
+| Chemin | Preuve 0.39 |
 |---|---|
 | JSON HTTP générique | Intégration synthétique vérifiée avec HTTPX |
 | SDK Python MCP officiel 1.30.0 | Initialisation, notification et liste d’outils MCP `2025-11-25` vérifiées en intégration synthétique |
@@ -15,7 +15,7 @@ Le client doit pouvoir remplacer l’URL HTTP/MCP distante par TrapDefense et en
 | MCP avec état, SSE longue durée, WebSocket, stdio | Non pris en charge ; session headers et upstream SSE échouent en mode fermé |
 | HA multinœud | Non prise en charge ; une instance avec SQLite, replay et audit state locaux |
 
-`gateway_auth` utilise `client_key` ou `jwt`. En mode JWT, TrapDefense est un OAuth Resource Server avec metadata RFC 9728 et `WWW-Authenticate`. `scope`/`scp` accepte une chaîne séparée par des espaces ou un tableau ; `authorized_parties` optionnel limite `azp`, `appid` ou `cid`. En 0.38, les app roles Entra dans `roles` ne sont pas interprétés comme des scopes.
+`gateway_auth` utilise `client_key` ou `jwt`. En mode JWT, TrapDefense est un OAuth Resource Server avec metadata RFC 9728 et `WWW-Authenticate`. `scope`/`scp` accepte une chaîne séparée par des espaces ou un tableau ; `authorized_parties` optionnel limite `azp`, `appid` ou `cid`. En 0.39, les app roles Entra dans `roles` ne sont pas interprétés comme des scopes.
 
 `target_auth` accepte `none`, `passthrough_bearer`, `static_bearer` et `static_api_key`. Le JWT de passerelle n’est pas transmis à la cible. L’IdP externe ou un credential provider séparé gère login, émission, refresh et OBO.
 

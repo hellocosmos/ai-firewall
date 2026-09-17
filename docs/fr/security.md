@@ -2,7 +2,7 @@
 
 [English](../en/security.md) · [한국어](../ko/security.md) · [简体中文](../zh-CN/security.md) · [日本語](../ja/security.md) · [Español](../es/security.md) · [Français](../fr/security.md)
 
-Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](identity.md).
+La console prend en charge le SSO Microsoft Entra ID à locataire unique avec les rôles Administrateur et Lecteur. L’identité de l’opérateur et l’autorisation de l’agent sont des frontières distinctes ; l’Access Broker intégré applique l’autorisation. [Entra SSO](identity.md).
 
 Signalez les vulnérabilités en privé à **hellocosmos@gmail.com** , avec révision, reproduction synthétique et impact. Ne publiez pas de données client, jetons ou identifiants réels dans les issues. Aucun SLA de réponse fixe n’est promis.
 
@@ -37,6 +37,6 @@ Le périmètre couvre les flux HTTP/MCP pris en charge et explicitement routés 
 - Configurez les limites de corps/durée, les mappages et le masquage par champ. SSE avec tampon est borné, pas un streaming illimité.
 - La protection anti-rejeu et l’audit SQLite local ne garantissent ni HA distribuée ni conservation immuable.
 - Les signatures et la détection PII produisent des faux positifs et négatifs.
-- Une source signée ne prouve pas l’identité humaine ou de l’agent. Enterprise exige une chaîne d’identité fiable distincte.
+- Une source signée ne prouve pas l’identité humaine ou de l’agent. Le mode Broker exige une chaîne JWT vérifiée et un mapping explicite des claims.
 
-Le compte initial est `admin`, mot de passe `1234` ; changez-le dans les paramètres. La gestion écoute sur loopback. Les réglages réseau gèrent le conteneur Envoy propre à la démo, pas les adresses des interfaces du système, les routes physiques ni les règles du pare-feu. Authentification, contrôles CSRF et hachage ne transforment pas cette démo en IAM de production. MIT couvre Community ; l’implémentation privée et les actifs clients sont exclus.
+Le compte initial est `admin`, mot de passe `1234` ; changez-le dans les paramètres. La gestion écoute sur loopback. Les réglages réseau gèrent le conteneur Envoy propre à la démo, pas les adresses des interfaces du système, les routes physiques ni les règles du pare-feu. Authentification, contrôles CSRF et hachage ne transforment pas cette démo en IAM de production. MIT couvre tout le runtime et l’Access Broker ; les actifs et credentials client restent hors du dépôt.

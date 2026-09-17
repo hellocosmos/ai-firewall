@@ -1,14 +1,14 @@
 # コンソールのインストールと運用
 
-> Docker 0.38: [セルフホスティング](self-hosting.md) · [ゲートウェイ互換性](gateway-compatibility.md)。このページは別のソース版合成デモを説明します。
+> Docker 0.39: [セルフホスティング](self-hosting.md) · [ゲートウェイ互換性](gateway-compatibility.md)。このページは別のソース版合成デモを説明します。
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
-Community は単一テナントの Microsoft Entra ID コンソール SSO と管理者・閲覧者ロールを提供します。コンソール認証はエージェントの実行認可ではなく、委任と承認は Enterprise の機能です。 [Entra SSO](identity.md).
+コンソールは単一テナント Microsoft Entra ID SSO と管理者・閲覧者ロールをサポートします。コンソール運用者の認証とエージェント認可は別の境界で、認可は内蔵 Access Broker が行います。 [Entra SSO](identity.md).
 
 ## インストールと起動
 
-Python 3.11+、Node.js 22.12+ または 24、npm、稼働中のローカル Docker Engine/Desktop が必要です。このリポジトリだけで導入でき、SDK・非公開 Enterprise パッケージ・モデル API は不要です。スクリプトは既存の `uv` を優先し、なければ Python venv/pip を使います。sudo を使わず、Docker はローカルで実行してください。
+Python 3.11+、Node.js 22.12+ または 24、npm、稼働中のローカル Docker Engine/Desktop が必要です。このリポジトリだけで導入でき、SDK・非公開ランタイムパッケージ・モデル API は不要です。スクリプトは既存の `uv` を優先し、なければ Python venv/pip を使います。sudo を使わず、Docker はローカルで実行してください。
 
 ```bash
 git clone https://github.com/hellocosmos/ai-firewall.git
@@ -32,7 +32,7 @@ Browser -> management API/UI :5176
                  <- response inspection <- decision + receipt <- UI
 ```
 
-送信器は TLS 復号後の信頼済み転送ホップを模擬し、正確な合成リクエストに署名します。TLS 復号器や IdP ではありません。実際の Envoy と独立した HTTP 宛先を使いますが、外部業務処理は行いません。Community が検証するのは転送元であり、ユーザーやエージェントの身元ではありません。Access Broker 画面は別の Enterprise 機能を案内し、Community に模擬承認を実装していません。
+送信器は信頼済み転送ホップを模擬し、正確な合成リクエストに署名します。TLS 復号器や IdP ではありません。実際の Envoy と独立した HTTP 宛先を使用します。デモは内蔵 Access Broker の実コード、合成 identity、リクエスト結合承認を使い、外部業務処理は行いません。
 
 ## 画面と最初の操作
 

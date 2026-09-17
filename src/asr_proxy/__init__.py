@@ -1,1 +1,1 @@
-"""TrapDefense Community proxy inspection runtime."""
+"""TrapDefense open-source proxy inspection runtime."""

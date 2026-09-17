@@ -1,4 +1,4 @@
-"""Real Envoy, real Community process and synthetic TLS decryption hop."""
+"""Real Envoy, real AI Firewall process and synthetic TLS decryption hop."""
 import json
 import os
 import ssl
@@ -6,14 +6,14 @@ import ssl
 import httpx
 import pytest
 
-from community_support import IDENTITY, destination, real_inspector, signed_request, tool_body
+from firewall_support import IDENTITY, destination, real_inspector, signed_request, tool_body
 from test_dataplane_transport import proxy_fixture
 from tls_simulation import tls_hop
 
 pytestmark = pytest.mark.skipif(os.environ.get("TD_RUNTIME_SMOKE") != "1", reason="opt-in real runtime")
 
 
-def test_community_real_proxy_allow_redact_block_response_and_missing_inspector(tmp_path):
+def test_firewall_real_proxy_allow_redact_block_response_and_missing_inspector(tmp_path):
   with destination() as (upstream, received), real_inspector(tmp_path) as inspector:
     with proxy_fixture("envoy", tmp_path, inspector["port"], upstream) as port:
       with httpx.Client(trust_env=False, timeout=10) as client:
@@ -36,7 +36,7 @@ def test_community_real_proxy_allow_redact_block_response_and_missing_inspector(
         assert len(received) == 3
 
 
-def test_https_decryptor_to_community_proxy_has_actual_enforcement(tmp_path):
+def test_https_decryptor_to_firewall_proxy_has_actual_enforcement(tmp_path):
   with destination() as (upstream, received), real_inspector(tmp_path) as inspector:
     with proxy_fixture("envoy", tmp_path, inspector["port"], upstream) as port:
       with tls_hop(tmp_path / "tls", port, key=inspector["key"], identity=IDENTITY) as hop:
@@ -57,7 +57,7 @@ def test_https_decryptor_to_community_proxy_has_actual_enforcement(tmp_path):
         assert any(e["source_verified"] and not e["identity_verified"] for e in events)
 
 
-def test_community_mirror_does_not_change_original(tmp_path):
+def test_firewall_mirror_does_not_change_original(tmp_path):
   with destination() as (upstream, received), real_inspector(tmp_path) as inspector:
     with proxy_fixture("envoy", tmp_path, None, upstream, inspector["mirror_port"]) as port:
       with httpx.Client(trust_env=False, timeout=10) as client:

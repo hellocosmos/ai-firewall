@@ -22,6 +22,6 @@ Comparez seulement avec charge, Docker, alimentation, scénario, itérations et 
 
 Consultez [console](console.md), [architecture](architecture.md), [éditions](editions.md) et [sécurité](security.md).
 
-## Pool d’inspecteurs Community
+## Pool d’inspecteurs AI Firewall
 
-[Pool d’inspecteurs Community](inspector-pool.md)
+[Pool d’inspecteurs AI Firewall](inspector-pool.md)

@@ -1,8 +1,8 @@
-# Docker 셀프호스팅 — 0.38 Community Preview
+# Docker 셀프호스팅 — 0.39 Open Source Preview
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.38은 어댑터·Envoy·검사기·운영 UI와 분리된 게이트웨이/대상 인증을 함께 제공하는 Docker Compose Preview입니다. 이미지는 소스에서 로컬 빌드합니다. TrapDefense Cloud는 계획 단계이며 가입할 수 없습니다.
+0.39은 어댑터·Envoy·검사기·운영 UI와 분리된 게이트웨이/대상 인증을 함께 제공하는 Docker Compose Preview입니다. 이미지는 소스에서 로컬 빌드합니다. TrapDefense Cloud는 계획 단계이며 가입할 수 없습니다.
 
 클라이언트에서 MCP/API URL을 바꾸고 `X-TD-Client-Key` 또는 OAuth Bearer JWT를 사용할 수 있어야 합니다. 설치별 목적지는 하나이며 경로·도구를 명시적으로 매핑합니다. 자세한 증거는 [호환성 표](gateway-compatibility.md)를 참고하세요.
 
@@ -40,3 +40,7 @@ UI는 정책·비밀번호를 관리합니다. 매핑 변경은 백업 후 `poli
 재시작 후 named volume의 정책·키·감사 기록은 유지됩니다. 중지 후 두 볼륨과 설정을 함께 백업하세요. `down -v`는 데이터를 삭제합니다. 롤백은 이전 이미지와 일치하는 백업을 함께 복원합니다. 리스너 정상만으로 연동 성공을 판단하지 말고 허용·차단 요청과 대상 효과를 확인하세요. 장시간 스트림·HA·실제 고객 IAM은 별도 검증 대상입니다.
 
 [상세 설정·VS Code·검증 표](gateway-compatibility.md) · [Detailed examples, backup and migration (English)](../en/self-hosting.md)
+
+## 내장 Access Broker 활성화
+
+`gateway_auth.mode: jwt`를 사용하고 `identity_claims`에 tenant, user, agent, delegation, task claim 이름을 명시하세요. 이어서 `access_broker.enabled: true`와 하나의 `access_broker.tenant_id`를 설정합니다. 콘솔에서 해당 tenant의 agent와 delegation을 먼저 등록해야 합니다. 필수 claim 누락과 tenant 불일치는 전달 전에 차단됩니다. 정확한 YAML 예시는 [영문 기준 문서](../en/self-hosting.md)를 따르세요. 로컬 file store는 동일 호스트용이며 multi-node HA가 아닙니다.

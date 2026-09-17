@@ -59,6 +59,13 @@ class SelfhostRuntime(Runtime):
     self.broker=load_authorizer(config)
     return InspectionEngine(config,self.scanner,verifier,self.broker)
 
+  def broker_tool_map(self):
+    # Dynamic resource pointers cannot be safely converted into registry scope
+    # from the console. Operators can manage fixed-resource routes here and use
+    # the broker API/store integration for resource instances discovered later.
+    return {name:(rule.action,rule.resource) for _,name,rule in self.deployment.entries()
+      if rule.resource is not None}
+
   def configure(self, policy):
     self.engine = self.build_engine(policy)
     self.engine_revision = policy['version']

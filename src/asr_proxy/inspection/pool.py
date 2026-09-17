@@ -1,4 +1,4 @@
-"""Same-host Community inspector supervision; never launches or replays tool traffic."""
+"""Same-host inspector supervision; never launches or replays tool traffic."""
 from __future__ import annotations
 
 import argparse

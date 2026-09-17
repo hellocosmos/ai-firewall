@@ -46,7 +46,7 @@ def app(receipt_path: Path):
     if method=='initialize':
       body={'jsonrpc':'2.0','id':payload['id'],'result':{'protocolVersion':'2025-11-25',
         'capabilities':{'tools':{}},
-        'serverInfo':{'name':'trapdefense-vscode-lab','version':'0.38'}}}
+        'serverInfo':{'name':'trapdefense-vscode-lab','version':'0.39'}}}
     elif method=='notifications/initialized':
       return httpx.Response(202,headers={'content-type':'application/json'},stream=httpx.ByteStream(b''))
     elif method=='tools/list':

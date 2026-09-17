@@ -1,4 +1,4 @@
-# Real MCP pilot — 0.35 Community Preview
+# Real MCP pilot — 0.35 Open Source Preview
 
 [English](../en/mcp-pilot.md) · [한국어](../ko/mcp-pilot.md) · [简体中文](../zh-CN/mcp-pilot.md) · [日本語](../ja/mcp-pilot.md) · [Español](../es/mcp-pilot.md) · [Français](../fr/mcp-pilot.md)
 
@@ -24,7 +24,7 @@ The command allocates available ports, starts only its own processes/container, 
 ```text
 Official MCP client / optional LLM agent
   -> authenticated local pilot adapter (owns the signing key)
-  -> Envoy -> existing Community inspector
+  -> Envoy -> existing AI Firewall inspector
   -> official MCP document server -> finite SQLite documents
 ```
 
@@ -69,4 +69,4 @@ The LLM discovers tools and chooses calls for a normal read/update task, a denie
 TD_MCP_PILOT=1 .venv/bin/python -m pytest tests/runtime/test_mcp_pilot_runtime.py -q
 ```
 
-The optional tests skip when MCP is not installed; the Docker test also requires `TD_MCP_PILOT=1`. The normal Community installation remains independent of MCP SDK dependencies. The existing CI proxy job installs the pilot extra and runs the real MCP regression when this change is published.
+The optional tests skip when MCP is not installed; the Docker test also requires `TD_MCP_PILOT=1`. The normal open-source installation remains independent of MCP SDK dependencies. The existing CI proxy job installs the pilot extra and runs the real MCP regression when this change is published.

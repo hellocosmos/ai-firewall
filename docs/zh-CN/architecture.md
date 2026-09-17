@@ -2,7 +2,7 @@
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
-Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](identity.md).
+控制台支持单租户 Microsoft Entra ID SSO 以及管理员、查看者角色。控制台操作员身份与智能体授权是独立边界；智能体授权由内置 Access Broker 执行。 [Entra SSO](identity.md).
 
 ```text
 AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
@@ -19,10 +19,10 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 1. 在 TrapDefense 外强制路由，防止受保护流量绕过代理。
 2. 使用已授权的现有 TLS 解密设备。演示不解密生产 TLS。
 3. 可信适配器删除客户端提供的 `x-td-*`、`x-asr-*` 上下文，对实际观察到的请求签名。保留 method、authority、path/query、应用标头和完整正文。规范绑定及排除项见 `inspection/identity.py`。
-4. HMAC 密钥仅留在可信节点和检查器，不分发给智能体。为 Community 配置 `source_id` 允许列表。隔离明文及 ExtProc 链路；示例不认证公开 gRPC 监听器。
+4. HMAC 密钥仅留在可信节点和检查器，不分发给智能体。为 gateway-only 配置 `source_id` 允许列表。隔离明文及 ExtProc 链路；示例不认证公开 gRPC 监听器。
 5. Envoy 使用完整缓冲、大小/时间上限和 `failure_mode_allow: false`，转发前移除证明标头。签名绑定原请求；若使用持久审批，则绑定脱敏后操作的摘要。
-6. Community 应用显式的本地路由/工具/资源/操作规则并验证来源，不确认用户身份或智能体委托权限。
-7. Enterprise 通过独立私有提供者验证身份和委托。旧配置默认 Enterprise；缺少提供者会启动失败，而非静默降级。
+6. Gateway-only 模式应用显式的本地路由/工具/资源/操作规则并验证来源，不确认用户身份或智能体委托权限。
+7. Broker 模式使用已验证的 JWT 身份 claims，并检查内置 registry、delegation、task、resource、action 与一次性 approval；缺少必需身份时 fail closed。
 
 没有适配任意 TLS 设备的通用自动适配器。集成必须防止元数据伪造并限制直接访问上游。
 

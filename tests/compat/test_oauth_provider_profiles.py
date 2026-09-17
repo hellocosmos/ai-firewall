@@ -45,7 +45,7 @@ def target(receipts):
     payload=json.loads(request.content)
     if payload['method']=='initialize':
       body={'jsonrpc':'2.0','id':payload['id'],'result':{'protocolVersion':'2025-11-25',
-        'capabilities':{},'serverInfo':{'name':'trapdefense-oauth-lab','version':'0.38'}}}
+        'capabilities':{},'serverInfo':{'name':'trapdefense-oauth-lab','version':'0.39'}}}
     elif payload['method']=='notifications/initialized':
       return httpx.Response(202,headers={'content-type':'application/json'},stream=httpx.ByteStream(b''))
     elif payload['method']=='tools/list':

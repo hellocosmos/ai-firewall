@@ -1,9 +1,9 @@
-name: Community verification
+name: Open source verification
 on: [push, pull_request]
 permissions:
   contents: read
 jobs:
-  community:
+  open-source:
     runs-on: ubuntu-latest
     strategy:
       matrix:

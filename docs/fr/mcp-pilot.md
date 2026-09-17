@@ -13,7 +13,7 @@ docker pull envoyproxy/envoy@sha256:57e14a549d7bd43c8d3f6d03e8cfa653e037d4b38e13
 .venv/bin/python -m examples.mcp_pilot --state-dir .runtime-state/mcp-pilot-run --samples 30
 ```
 
-Client → adaptateur local authentifié avec signature → Envoy/inspecteur Community → serveur MCP. L’agent ne reçoit pas la clé de signature. Le jeton autorise l’accès local sans vérifier l’identité de l’utilisateur ou de l’agent. Loopback et processus du même utilisateur ne constituent pas une isolation de production ; le routage doit empêcher le contournement.
+Client → adaptateur local authentifié avec signature → Envoy/inspecteur AI Firewall → serveur MCP. L’agent ne reçoit pas la clé de signature. Le jeton autorise l’accès local sans vérifier l’identité de l’utilisateur ou de l’agent. Loopback et processus du même utilisateur ne constituent pas une isolation de production ; le routage doit empêcher le contournement.
 
 Vérifie initialisation, découverte, lecture/écriture, suppression refusée avec conservation du document, expurgation des adresses e-mail et rejet des secrets fictifs en requête/réponse, réponse malveillante connue, outil inconnu, requête non signée et absence d’exécution lors d’une panne de l’inspecteur. Corps limité à 64 KiB. Seul Streamable HTTP JSON sans état est validé ; SSE persistant, OAuth et serveurs arbitraires exigent d’autres tests.
 

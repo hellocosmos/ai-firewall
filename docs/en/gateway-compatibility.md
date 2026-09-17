@@ -1,4 +1,4 @@
-# Gateway client compatibility — 0.38
+# Gateway client compatibility — 0.39
 
 [English](../en/gateway-compatibility.md) · [한국어](../ko/gateway-compatibility.md) · [简体中文](../zh-CN/gateway-compatibility.md) · [日本語](../ja/gateway-compatibility.md) · [Español](../es/gateway-compatibility.md) · [Français](../fr/gateway-compatibility.md)
 
@@ -10,7 +10,7 @@ Client -- gateway credential --> TrapDefense -- target credential --> MCP / API
 
 ## Evidence matrix
 
-| Client or flow | 0.38 status | Evidence and limit |
+| Client or flow | 0.39 status | Evidence and limit |
 |---|---|---|
 | Generic JSON HTTP client | **Synthetic integration verified** | HTTPX sends allowed and denied requests through the FastAPI adapter and fixed Envoy hop. |
 | Official Python MCP SDK 1.30.0 | **Synthetic integration verified** | The unmodified SDK completes Streamable HTTP `initialize`, `notifications/initialized` and `tools/list` using MCP `2025-11-25`. |
@@ -84,7 +84,7 @@ target_auth:
 
 The client sends a JWT issued for the TrapDefense resource. TrapDefense validates issuer, audience, time, subject and required scopes, optionally restricts the caller application through `azp`, `appid` or `cid`, and consumes the token. The configured target receives a separate target credential. The gateway JWT is never used as the target credential.
 
-OAuth `scope` or `scp` may be a space-delimited string or string array. Entra application roles in `roles` are not treated as scopes in 0.38; use a delegated scope token or keep that flow outside the stated compatibility claim.
+OAuth `scope` or `scp` may be a space-delimited string or string array. Entra application roles in `roles` are not treated as scopes in 0.39; use a delegated scope token or keep that flow outside the stated compatibility claim.
 
 For MCP, a missing or invalid token returns `401` plus a gateway-owned `WWW-Authenticate` header pointing to RFC 9728 metadata. A valid token without every required scope returns `403`. TrapDefense publishes resource metadata but does not provide authorization, token, callback, registration, refresh or logout endpoints; the configured external authorization server owns those functions.
 

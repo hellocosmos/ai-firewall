@@ -464,5 +464,6 @@
   "Inspection only": "検査のみ",
   "AI Firewall inspector": "AI Firewall 検査器",
   "Built-in Access Broker": "内蔵 Access Broker",
-  "Open-source broker · local file storage · request-bound one-time approval": "オープンソース Broker · ローカルファイル保存 · リクエストに結び付く一回限りの承認"
+  "Open-source broker · local file storage · request-bound one-time approval": "オープンソース Broker · ローカルファイル保存 · リクエストに結び付く一回限りの承認",
+  "Only fixed-resource route mappings can be registered from this console.": "このコンソールでは、固定リソースのルートマッピングのみ登録できます。"
 }

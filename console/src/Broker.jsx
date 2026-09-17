@@ -1,5 +1,5 @@
 import { t } from "./i18n";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, ArrowUpRight, Check, X, Play } from 'lucide-react';
 import { Panel, Badge, Drawer, Empty, SearchBox } from './components';
 import { request, date, reasons } from './client';
@@ -49,7 +49,7 @@ export default function Broker({
     agent_id: '',
     owner_id: '',
     risk_tier: 'medium',
-    allowed_tools: ['notes.read']
+    allowed_tools: [broker.tools?.[0]?.name || '']
   });
   const [delegation, setDelegation] = useState({
     agent_id: broker.agents[0]?.agent_id || '',
@@ -59,6 +59,11 @@ export default function Broker({
     ttl_seconds: 3600
   });
   const rows = broker[tab].filter(r => JSON.stringify(r).toLowerCase().includes(search.toLowerCase()));
+  useEffect(() => {
+    if (!delegation.agent_id && broker.agents[0]) {
+      setDelegation(current => ({...current, agent_id: broker.agents[0].agent_id}));
+    }
+  }, [broker.agents, delegation.agent_id]);
   const title = {
     agents: t("Agent"),
     delegations: t("Delegations"),
@@ -112,7 +117,7 @@ export default function Broker({
             })}><option value="low">{t("Low")}</option><option value="medium">{t("Medium")}</option><option value="high">{t("High")}</option></select></label><label>{t("Allowed tools")}<select value={agent.allowed_tools[0]} onChange={e => setAgent({
               ...agent,
               allowed_tools: [e.target.value]
-            })}><option>notes.read</option><option>notes.delete</option><option>infra.deploy</option></select></label></> : <><label>{t("Agent")}<select required value={delegation.agent_id} onChange={e => setDelegation({
+            })}>{(broker.tools || []).map(tool => <option key={tool.name} value={tool.name}>{tool.name}</option>)}</select><small className="td-block td-muted">{t("Only fixed-resource route mappings can be registered from this console.")}</small></label></> : <><label>{t("Agent")}<select required value={delegation.agent_id} onChange={e => setDelegation({
               ...delegation,
               agent_id: e.target.value
             })}>{broker.agents.map(a => <option key={a.agent_id}>{a.agent_id}</option>)}</select></label><label>{t("Delegator ID")}<input required minLength={1} maxLength={256} value={delegation.user_id} onChange={e => setDelegation({

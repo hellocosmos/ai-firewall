@@ -3,7 +3,7 @@ import json
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 from threading import Lock
 from uuid import uuid4
-from asr_proxy.inspection.community_demo import _read_demo_body
+from asr_proxy.inspection.demo import _read_demo_body
 from asr_proxy.inspection.identity import reserved_header
 
 

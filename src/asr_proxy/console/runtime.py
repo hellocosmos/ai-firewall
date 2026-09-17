@@ -36,7 +36,15 @@ class Runtime:
     self.lock=RLock()
     self.key=secrets.token_bytes(48)
     self.scanner=PresidioScanner()
-    if self.store.get('policy') is None:self.store.set('policy',Policy().model_dump())
+    stored_policy=self.store.get('policy')
+    if stored_policy is None:
+      self.store.set('policy',Policy().model_dump())
+    elif set(stored_policy.get('rules',{}))=={'notes.read','notes.delete'} and set(stored_policy.get('pii_rules',{}))=={'notes.read','notes.delete'}:
+      # The local synthetic console is disposable demo state. Preserve 0.38
+      # choices while adding the 0.39 approval scenario on first startup.
+      stored_policy['rules']['infra.deploy']='allow'
+      stored_policy['pii_rules']['infra.deploy']='inherit'
+      self.store.set('policy',stored_policy)
     self.network=NetworkManager(self.store)
     self.configure(self.policy())
     self.grpc_server=None
@@ -90,7 +98,9 @@ class Runtime:
         ttl_seconds=86400))
 
   def broker_snapshot(self):
-    if self.broker is None:return {'agents':[],'delegations':[],'approvals':[]}
+    tools=[{'name':name,'action':action,'resource':resource}
+      for name,(action,resource) in sorted(self.broker_tool_map().items())]
+    if self.broker is None:return {'agents':[],'delegations':[],'approvals':[],'tools':tools}
     with self.broker.store.read_transaction():
       tenant=self.broker_tenant
       return {
@@ -100,16 +110,21 @@ class Runtime:
           if item.tenant_id==tenant],
         'approvals':[item.model_dump(mode='json') for item in self.broker.store.list_approvals()
           if item.tenant_id==tenant],
+        'tools':tools,
       }
+
+  def broker_tool_map(self):
+    return TOOLS
 
   def register_agent(self,payload,actor):
     if self.broker is None:raise ValueError('Access Broker is disabled.')
+    tool_map=self.broker_tool_map()
     tools=payload['allowed_tools']
-    if any(tool not in TOOLS for tool in tools):raise ValueError('Unknown tool mapping.')
+    if not tools or any(tool not in tool_map for tool in tools):raise ValueError('Unknown tool mapping.')
     with self.broker.store.read_transaction():
       if self.broker.store.get_agent(payload['agent_id']) is not None:
         raise ValueError('Agent ID is already registered.')
-    resources=sorted({TOOLS[tool][1] for tool in tools})
+    resources=sorted({tool_map[tool][1] for tool in tools})
     record=AgentRecord(**payload,tenant_id=self.broker_tenant,runtime='console',
       allowed_resources=resources)
     return self.broker.register_agent(record,actor=actor).model_dump(mode='json')
@@ -119,7 +134,9 @@ class Runtime:
     with self.broker.store.read_transaction():
       agent=self.broker.store.get_agent(payload['agent_id'])
     if agent is None or agent.tenant_id!=self.broker_tenant:raise ValueError('Agent was not found.')
-    actions=sorted({TOOLS[tool][0] for tool in agent.allowed_tools if tool in TOOLS})
+    tool_map=self.broker_tool_map()
+    actions=sorted({tool_map[tool][0] for tool in agent.allowed_tools if tool in tool_map})
+    if not actions:raise ValueError('Agent has no manageable tool mappings.')
     request=DelegationCreateRequest(delegation_id='dlg-'+uuid4().hex[:12],
       tenant_id=self.broker_tenant,allowed_resources=agent.allowed_resources,
       allowed_actions=actions,**payload)

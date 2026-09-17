@@ -1,8 +1,8 @@
-# Community 검사기 다중 프로세스
+# AI Firewall 검사기 다중 프로세스
 
 [English](../en/inspector-pool.md) · [한국어](../ko/inspector-pool.md) · [简体中文](../zh-CN/inspector-pool.md) · [日本語](../ja/inspector-pool.md) · [Español](../es/inspector-pool.md) · [Français](../fr/inspector-pool.md)
 
-같은 서버에서 검사기를 1·2·4개 실행하고 Envoy 연결 설정을 생성합니다. Docker나 콘솔을 자동 실행·교체하지 않습니다. Enterprise 및 서버 간 HA는 지원 범위 밖입니다.
+같은 서버에서 검사기를 1·2·4개 실행하고 Envoy 연결 설정을 생성합니다. Docker나 콘솔을 자동 실행·교체하지 않습니다. 내장 Broker는 동일 호스트 file lock을 지원하지만 서버 간 HA는 지원 범위 밖입니다.
 
 모든 검사기는 같은 로컬 재전송 방지 DB와 감사 로그를 공유합니다. 프로세스별 DB 분리나 네트워크 파일시스템 사용은 금지합니다. 정책의 상대 경로는 실행 디렉터리 기준입니다. 정책·키는 시작 시 스냅샷으로 고정되므로 변경하려면 전체 풀을 재시작하고 Envoy 설정 및 서명 송신 측도 맞춰야 합니다.
 

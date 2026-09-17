@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "trapdefense-community"
-version = "0.38"
+name = "trapdefense-ai-firewall"
+version = "0.39"
 description = "TrapDefense AI Firewall: AI action control, data protection and HTTP/MCP inspection"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -27,7 +27,7 @@ trapdefense-console = "asr_proxy.console.app:main"
 trapdefense-benchmark = "asr_proxy.console.benchmark:main"
 trapdefense-inspector = "asr_proxy.inspection.server:main"
 trapdefense-inspector-pool = "asr_proxy.inspection.pool:main"
-trapdefense-demo = "asr_proxy.inspection.community_demo:main"
+trapdefense-demo = "asr_proxy.inspection.demo:main"
 
 [project.urls]
 Homepage = "https://trapdefense.com"

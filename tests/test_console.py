@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from asr_proxy.console.app import create_app
 from asr_proxy.console.runtime import Runtime
 from asr_proxy.console.network import NetworkConfig, NetworkManager
-from asr_proxy.console.scenarios import CASES
+from asr_proxy.console.scenarios import CASES, Policy
 from asr_proxy.console.store import Store
 
 HEADERS={'origin':'http://127.0.0.1:5176','x-td-demo':'1'}
@@ -58,6 +58,18 @@ def test_password_policy_and_persistence(tmp_path):
     assert saved['rules']['notes.read']=='block' and saved['pii_rules']['notes.read']=='block'
 
 
+def test_local_console_migrates_038_policy_without_losing_choices(tmp_path):
+  store=Store(tmp_path)
+  policy=Policy().model_dump()
+  policy['rules'].pop('infra.deploy');policy['pii_rules'].pop('infra.deploy')
+  policy['rules']['notes.read']='block';policy['pii_rules']['notes.read']='block'
+  store.set('policy',policy)
+  runtime=Runtime(tmp_path)
+  migrated=runtime.policy()
+  assert migrated['rules']=={'notes.read':'block','notes.delete':'block','infra.deploy':'allow'}
+  assert migrated['pii_rules']=={'notes.read':'block','notes.delete':'inherit','infra.deploy':'inherit'}
+
+
 def test_network_rejects_unsafe_settings_and_stale_revision(tmp_path):
   for values in ({'topology':'bridge'},{'listen_address':'0.0.0.0'},{'listen_port':5176},{'listen_port':18081},{'max_body_bytes':1}):
     with pytest.raises(ValueError):NetworkConfig(**values)
@@ -101,7 +113,7 @@ def test_stream_response_reuses_request_selected_pii_policy(tmp_path):
   assert (result.action,result.reason,result.pii_policy_scope)==('block','pii_block_policy','tool')
 
 
-def test_real_community_console_proxy(tmp_path):
+def test_real_open_source_console_proxy(tmp_path):
   import asyncio
   import os
   import socket

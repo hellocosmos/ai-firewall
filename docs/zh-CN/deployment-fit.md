@@ -4,7 +4,7 @@
 
 保护可通过受支持检查路径的 HTTP API 和远程 MCP 调用。保留 MCP 服务器和连接器中的现有服务认证，不替代 IAM。
 
-0.38 提供连接密钥或外部 JWT 网关认证以及独立目标凭据的 Docker Compose 预览包。镜像从源码构建，TrapDefense Cloud 仍在规划中。
+0.39 提供连接密钥或外部 JWT 网关认证以及独立目标凭据的 Docker Compose 预览包。镜像从源码构建，TrapDefense Cloud 仍在规划中。
 
 必须能够控制客户端地址、服务器入口或兼容的网络检查路径，并确保目标可达且无法绕过代理。SaaS 内部固定调用、本地 stdio、Shell、文件和直接数据库操作不在此 HTTP 代理范围内。
 

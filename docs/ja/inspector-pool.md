@@ -1,8 +1,8 @@
-# Community インスペクタープール
+# AI Firewall インスペクタープール
 
 [English](../en/inspector-pool.md) · [한국어](../ko/inspector-pool.md) · [简体中文](../zh-CN/inspector-pool.md) · [日本語](../ja/inspector-pool.md) · [Español](../es/inspector-pool.md) · [Français](../fr/inspector-pool.md)
 
-同一ホストで検査プロセスを 1・2・4 個起動し、Envoy 接続設定を生成します。Docker の起動やコンソールの置き換えは行いません。Enterprise とホスト間 HA は対象外です。
+同一ホストで検査プロセスを 1・2・4 個起動し、Envoy 接続設定を生成します。Docker の起動やコンソールの置き換えは行いません。内蔵 Broker は同一ホストの file lock をサポートしますが、ホスト間 HA は対象外です。
 
 全プロセスで同じローカル再送防止 DB と監査ログを共有します。プロセス別 DB やネットワークファイルシステムは使用しないでください。相対パスは起動ディレクトリ基準です。ポリシーと鍵は起動時の非公開スナップショットに固定され、変更にはプール全体の再起動と Envoy・署名側の調整が必要です。
 

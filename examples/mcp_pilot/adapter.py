@@ -10,7 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
 import uvicorn
 
-from asr_proxy.inspection.community_demo import validate_endpoint
+from asr_proxy.inspection.demo import validate_endpoint
 from asr_proxy.inspection.contracts import HttpMessage
 from asr_proxy.inspection.identity import sign_attestation, reserved_header, TRANSPORT_HEADERS
 

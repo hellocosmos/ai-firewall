@@ -1,6 +1,6 @@
-# Contributing to TrapDefense Community
+# Contributing to TrapDefense AI Firewall
 
-Thank you for helping improve the public AI Firewall. This repository contains the MIT Community edition: the local proxy, inspector, console, policy controls and sanitized evidence path. Enterprise Access Broker code and customer-specific assets are maintained separately and are not accepted into this repository.
+Thank you for helping improve the public AI Firewall. TrapDefense 0.39 is one MIT-licensed codebase: the Runtime Gateway, HTTP/MCP inspector, data controls, built-in Agent Access Broker, human approval, sanitized evidence, console and Docker self-hosting all live in this repository.
 
 ## Before opening a change
 
@@ -37,6 +37,7 @@ The Docker test exercises the local Envoy to gRPC inspector to synthetic HTTP de
 - Keep public code, identifiers, comments and documentation in English.
 - Preserve the separation between console authentication and agent action authorization.
 - Keep fail-closed behavior for inline inspection failures.
+- Keep approval decisions bound to the exact request digest and consume them once.
 - Add or update a focused test when behavior or a security boundary changes.
 - Update the English documentation and every affected locale when user-visible text changes.
 - Avoid new dependencies unless the change cannot be implemented safely with the current stack.
@@ -51,4 +52,4 @@ Explain the concrete trigger and the resulting behavior. Include:
 4. Tests or environments skipped, with the reason.
 5. Known limitations.
 
-Passing checks do not guarantee that a feature fits the Community scope. Maintainers may suggest a smaller design, an external integration pattern or an Enterprise boundary.
+Passing checks do not prove a production deployment. Maintainers may request a smaller design, stronger synthetic evidence or a customer-specific integration outside the generic product contract.

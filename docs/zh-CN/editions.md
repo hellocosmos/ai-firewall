@@ -1,31 +1,22 @@
-# Community 与 Enterprise
+# 单一开源产品
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
-## 部署条件与提供状态
+TrapDefense 0.39 使用一个 MIT 许可代码库。Runtime Gateway 与 Agent Access Broker 一同发布在本公开仓库中，不需要私有 Python 包、provider entry point、license key 或 edition switch。
 
-0.38 提供连接密钥或外部 JWT 网关认证以及独立目标凭据的 Docker Compose 预览包。镜像从源码构建，TrapDefense Cloud 仍在规划中。
-
-[交付与兼容性](deployment-fit.md)
-
-Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](identity.md).
-
-## 当前交付状态
+## 发布状态
 
 | 边界 | 状态 | 证据与限制 |
 |---|---|---|
-| Community 运行时与控制台 | **公开 Community Preview** | 已在本 MIT 仓库发布，并通过 CI 与合成 Envoy 路径验证。生产流量与容量仍需在客户环境验证。 |
-| Enterprise Access Broker | **私有试点实现** | 单独分发的提供程序和审批流程已经存在，但不在本仓库中，也不表示已全面上市。仍需验证真实 IAM、客户策略和故障路径。 |
-| 集中 Fleet、分布式 HA、不可变审计与托管服务 | **路线图** | 尚未交付，Community 界面也不代表已经实现。 |
+| Runtime Gateway 与控制台 | **Open Source Preview** | 提供公开源码、CI、合成 Envoy 路径、HTTP/MCP 策略、PII/secret 控制和本地运维 UI。生产路由与容量需按环境验证。 |
+| 内置 Agent Access Broker | **Experimental** | 已公开 registry、delegation、严格授权、tenant 隔离、文件事务和请求绑定的一次性审批。真实客户 IdP/策略与多节点验证仍待完成。 |
+| Docker 自托管 | **Preview** | 从源码构建 adapter、Envoy、inspector、console、gateway 认证与独立目标凭据。每个安装实例使用一个固定目标。 |
+| Managed cloud、fleet、多节点 HA、外部不可变审计 | **Planned** | 尚未发布，也不会表述为当前可用。 |
 
-版本名称表示产品和许可边界，并不声称所有 Enterprise 路线图项目都已全面提供。
+仅网关模式执行本地检查与可信来源验证。启用 Broker 后增加已验证 JWT 身份映射、agent registry、delegation、resource/action 授权和 approval。两种模式使用同一开源软件包。
 
-Community 是本仓库采用 MIT 许可的代理运行时和本地控制台，包含受信转发跳签名验证、显式 HTTP/MCP 映射、本地策略、特征检测、PII 脱敏、有界响应/SSE 检查、净化审计记录、本地登录、密码修改和代理设置。无需私有软件包或外部模型 API。
+未来付费方向可以运营同一开源 runtime，提供 managed service、fleet 生命周期、多节点 HA、外部审计、客户 connector、策略上线、SLA 与支持。这是服务与运维边界，不是源码功能门槛。
 
-单独分发的 Enterprise 试点实现通过 Access Broker 增加用户、代理、任务委派，访问决策以及一次性、有期限、绑定请求的人工审批。现有 IAM 上下文必须来自可信集成，仍须验证真实客户 IdP。Community 界面会标明未包含的功能。
+文件 store 通过 atomic replace 与 file lock 支持同主机 POSIX 进程，但不是分布式数据库，不能作为 NFS/SMB 多主机 HA。合成测试不等同于真实 IdP、Conditional Access、客户 MCP 认证、TLS 路由或容量认证。
 
-私有提供程序通过 Python `trapdefense.authorizers` / `enterprise` 入口连接。`authorize(request)` 执行授权，`evaluate(request)` 提供不修改状态的 mirror 评估。选择 Enterprise 而缺少提供程序时启动失败。Broker 令牌记录是限定范围的决策证据，不是通用 OAuth 访问令牌。
-
-集中设备管理、分布式高可用、托管计费及不可变审计存储尚未交付。商业范围可包含私有提供程序、部署、策略集成和支持，价格及支持条款另行约定。本地 SQLite 和 JSONL 仍可修改。
-
-[Docker 0.38](self-hosting.md) · [网关兼容性](gateway-compatibility.md)
+[Docker 0.39](self-hosting.md) · [架构](architecture.md) · [安全](security.md) · [兼容性](gateway-compatibility.md)

@@ -1,8 +1,8 @@
-# Microsoft Entra ID — Community console SSO
+# Microsoft Entra ID — TrapDefense console SSO
 
 [English](../en/identity.md) · [한국어](../ko/identity.md) · [简体中文](../zh-CN/identity.md) · [日本語](../ja/identity.md) · [Español](../es/identity.md) · [Français](../fr/identity.md)
 
-Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise.
+La consola admite SSO Microsoft Entra ID de un solo tenant con roles Administrador y Lector. La identidad del operador y la autorización del agente son límites distintos; el Access Broker integrado aplica la autorización.
 
 ## Configuration
 
@@ -37,3 +37,7 @@ El Lector consulta panel, eventos, política, red y auditoría; el servidor rech
 Authorization code + PKCE S256, browser-bound one-time state, nonce, RS256 signature, issuer, audience, tenant and app-role validation. Tokens and client secrets are never sent to browser storage or audit logs. Synthetic mode uses an ephemeral RSA issuer with local code redemption; no Microsoft token endpoint is called. Real mode uses Microsoft authorization/token/JWKS endpoints and does not register synthetic routes.
 
 [Microsoft authorization code flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
+
+## Mapeo de identidad JWT del agente
+
+El modo Broker valida issuer, audience y scope del JWT emitido por un IdP externo y solo transforma los valores declarados en `identity_claims` en identidad tenant, user, agent, delegation y task. Los claims arbitrarios y el token gateway no pasan a la evidencia ni al servicio destino. Un claim obligatorio ausente o un tenant distinto falla de forma cerrada. Puede usarse un issuer compatible como Entra, Okta o Keycloak, pero el cliente debe validar la emisión de claims y su vínculo con el workload. [Autoalojamiento](self-hosting.md) · [Seguridad](security.md)

@@ -1,4 +1,4 @@
-"""Executable evidence for capabilities the 0.38 profile does not claim."""
+"""Executable evidence for capabilities the 0.39 profile does not claim."""
 from pathlib import Path
 
 from fastapi.testclient import TestClient

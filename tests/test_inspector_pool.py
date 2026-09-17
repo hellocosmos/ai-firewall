@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from asr_proxy.inspection.community_demo import init_demo
+from asr_proxy.inspection.demo import init_demo
 from asr_proxy.inspection.pool import InspectorPool, atomic_write, parser, port_sets, render_envoy
 
 

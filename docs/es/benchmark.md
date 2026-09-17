@@ -22,6 +22,6 @@ Compare solo con carga, Docker, modo de energía, escenario, iteraciones y polí
 
 Consulte [consola](console.md), [arquitectura](architecture.md), [ediciones](editions.md) y [seguridad](security.md).
 
-## Grupo de inspectores Community
+## Grupo de inspectores AI Firewall
 
-[Grupo de inspectores Community](inspector-pool.md)
+[Grupo de inspectores AI Firewall](inspector-pool.md)

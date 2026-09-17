@@ -1,8 +1,8 @@
-# Auto-hébergement Docker — 0.38 Community Preview
+# Auto-hébergement Docker — 0.39 Open Source Preview
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.38 fournit adaptateur, Envoy, inspecteur, console et authentifications séparées pour passerelle et cible. L’image se construit localement depuis les sources. TrapDefense Cloud reste prévu.
+0.39 fournit adaptateur, Envoy, inspecteur, console et authentifications séparées pour passerelle et cible. L’image se construit localement depuis les sources. TrapDefense Cloud reste prévu.
 
 Le client doit pouvoir modifier l’URL MCP/API et utiliser `X-TD-Client-Key` ou un JWT Bearer OAuth. Chaque déploiement possède une cible fixe et des routes/outils explicites. Consultez la [matrice de compatibilité](gateway-compatibility.md).
 
@@ -40,3 +40,7 @@ Les ports sont liés à la boucle locale. L’accès distant nécessite un proxy
 Les volumes conservent l’état après redémarrage. Arrêtez puis sauvegardez les deux volumes et la configuration. down -v détruit les données. Le retour arrière restaure l’ancienne image et sa sauvegarde correspondante. Un port accessible ne prouve pas l’authentification : testez autorisation, blocage et effets sur la cible. SSE longue durée, HA et IAM client réel nécessitent une validation distincte.
 
 [Compatibilité et VS Code](gateway-compatibility.md) · [Detailed examples, backup and migration (English)](../en/self-hosting.md)
+
+## Activer l’Access Broker intégré
+
+Utilisez `gateway_auth.mode: jwt` et déclarez dans `identity_claims` les noms de claims tenant, user, agent, delegation et task. Configurez ensuite `access_broker.enabled: true` et un `access_broker.tenant_id`. Enregistrez d’abord l’agent et la delegation du même tenant dans la console. Un claim obligatoire absent ou un tenant différent est bloqué avant transfert. Suivez le YAML exact de la [référence anglaise](../en/self-hosting.md). Le file store local est prévu pour un seul hôte, pas pour la HA multinœud.

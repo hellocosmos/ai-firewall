@@ -1,8 +1,8 @@
-# Microsoft Entra ID — Community console SSO
+# Microsoft Entra ID — TrapDefense console SSO
 
 [English](../en/identity.md) · [한국어](../ko/identity.md) · [简体中文](../zh-CN/identity.md) · [日本語](../ja/identity.md) · [Español](../es/identity.md) · [Français](../fr/identity.md)
 
-Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다.
+콘솔은 관리자·조회자 역할의 단일 테넌트 Microsoft Entra ID SSO를 지원합니다. 콘솔 운영자 인증과 에이전트 인가는 별도 경계이며, 에이전트 인가는 내장 Access Broker가 담당합니다.
 
 ## Configuration
 
@@ -37,3 +37,7 @@ TD_SYNTHETIC_ENTRA=1 ./scripts/run-console.sh
 Authorization code + PKCE S256, browser-bound one-time state, nonce, RS256 signature, issuer, audience, tenant and app-role validation. Tokens and client secrets are never sent to browser storage or audit logs. Synthetic mode uses an ephemeral RSA issuer with local code redemption; no Microsoft token endpoint is called. Real mode uses Microsoft authorization/token/JWKS endpoints and does not register synthetic routes.
 
 [Microsoft authorization code flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
+
+## 에이전트 JWT identity mapping
+
+Broker 모드는 외부 IdP가 발급한 JWT의 issuer, audience, scope를 검증한 뒤 `identity_claims`에 명시된 값만 tenant, user, agent, delegation, task identity로 변환합니다. 임의 claim이나 gateway token은 검사 증거나 대상 서비스로 전달하지 않습니다. 필수 claim이 없거나 broker tenant와 다르면 fail closed 합니다. Entra, Okta, Keycloak 등 호환 issuer를 사용할 수 있지만 claim 발급과 workload binding의 신뢰성은 고객이 검증해야 합니다. [셀프호스팅](self-hosting.md) · [보안](security.md)

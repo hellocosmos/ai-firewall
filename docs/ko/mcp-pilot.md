@@ -1,4 +1,4 @@
-# 실제 MCP 파일럿 — 0.35 Community Preview
+# 실제 MCP 파일럿 — 0.35 Open Source Preview
 
 [English](../en/mcp-pilot.md) · [한국어](../ko/mcp-pilot.md) · [简体中文](../zh-CN/mcp-pilot.md) · [日本語](../ja/mcp-pilot.md) · [Español](../es/mcp-pilot.md) · [Français](../fr/mcp-pilot.md)
 
@@ -13,7 +13,7 @@ docker pull envoyproxy/envoy@sha256:57e14a549d7bd43c8d3f6d03e8cfa653e037d4b38e13
 .venv/bin/python -m examples.mcp_pilot --state-dir .runtime-state/mcp-pilot-run --samples 30
 ```
 
-클라이언트 → 로컬 인증·서명 어댑터 → Envoy·Community 검사기 → MCP 문서 서버 순서입니다. 에이전트에는 서명 키를 주지 않습니다. 어댑터 토큰은 로컬 접근용이며 사용자·에이전트 신원을 증명하지 않습니다. loopback과 같은 OS 사용자만으로 우회 방지가 보장되지는 않습니다. 운영 환경에서는 별도 라우팅·격리가 필요합니다.
+클라이언트 → 로컬 인증·서명 어댑터 → Envoy·AI Firewall 검사기 → MCP 문서 서버 순서입니다. 에이전트에는 서명 키를 주지 않습니다. 어댑터 토큰은 로컬 접근용이며 사용자·에이전트 신원을 증명하지 않습니다. loopback과 같은 OS 사용자만으로 우회 방지가 보장되지는 않습니다. 운영 환경에서는 별도 라우팅·격리가 필요합니다.
 
 초기화·도구 조회·읽기·수정, 삭제 차단과 원본 보존, 요청/응답 이메일 마스킹·가짜 Secret 차단, 알려진 악성 응답·미등록 도구·미서명 요청 차단, 검사기 장애 시 목적지 미실행을 확인합니다. 본문은 64 KiB로 제한합니다. 상태 없는 Streamable HTTP JSON 모드만 검증하며 장기 SSE·OAuth·임의 MCP 서버 호환성은 별도입니다.
 

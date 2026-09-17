@@ -1,4 +1,4 @@
-"""Synthetic Community runtime fixtures: no private package or business credentials."""
+"""Synthetic AI Firewall runtime fixtures: no private package or business credentials."""
 import contextlib
 import json
 import os
@@ -15,7 +15,7 @@ import yaml
 from test_dataplane_transport import free_port
 from asr_proxy.inspection.contracts import HttpMessage
 from asr_proxy.inspection.identity import sign_attestation
-from asr_proxy.inspection.community_demo import init_demo
+from asr_proxy.inspection.demo import init_demo
 ROOT = Path(__file__).resolve().parents[2]
 IDENTITY = {"source_id": "demo-decryptor", "tenant_id": "synthetic", "user_id": "synthetic",
             "agent_id": "synthetic", "delegation_id": "synthetic", "task_id": "synthetic"}
@@ -124,7 +124,7 @@ def signed_request(client, port, key, *, body=None, path="/mcp", identity=None, 
 
 @contextlib.contextmanager
 def real_inspector(tmp_path):
-  state = tmp_path / "community-state"
+  state = tmp_path / "firewall-state"
   init_demo(state)
   port, mirror_port = free_port(), free_port()
   key = (state / "attestation.key").read_bytes()
@@ -136,7 +136,7 @@ def real_inspector(tmp_path):
     try:
       for _ in range(160):
         if process.poll() is not None:
-          pytest.fail(f"Community inspector startup failed: {tmp_path / 'inspector.log'}")
+          pytest.fail(f"AI Firewall inspector startup failed: {tmp_path / 'inspector.log'}")
         try:
           if httpx.get(f"http://127.0.0.1:{mirror_port}/_trapdefense/health", timeout=.3).status_code == 200:
             break
@@ -144,7 +144,7 @@ def real_inspector(tmp_path):
           pass
         time.sleep(.05)
       else:
-        pytest.fail("Community readiness timed out")
+        pytest.fail("AI Firewall readiness timed out")
       yield {"port": port, "mirror_port": mirror_port, "key": key,
         "audit_path": state / "inspection.jsonl", "process": process}
     finally:

@@ -22,6 +22,6 @@
 
 [コンソール](console.md)、[アーキテクチャ](architecture.md)、[エディション](editions.md)、[セキュリティ](security.md)を参照してください。
 
-## Community インスペクタープール
+## AI Firewall インスペクタープール
 
-[Community インスペクタープール](inspector-pool.md)
+[AI Firewall インスペクタープール](inspector-pool.md)

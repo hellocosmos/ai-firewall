@@ -175,11 +175,13 @@ def test_selfhost_runtime_uses_built_in_broker_when_enabled(tmp_path,config):
   runtime=SelfhostRuntime(state,secured)
   assert runtime.broker is not None and runtime.config(runtime.policy()).access_broker_enabled
   agent=runtime.register_agent({'agent_id':'agent-a','owner_id':'owner-a','risk_tier':'medium',
-    'allowed_tools':['notes.read']},{'principal_id':'admin','tenant_id':'tenant-a','authentication':'local'})
+    'allowed_tools':['initialize']},{'principal_id':'admin','tenant_id':'tenant-a','authentication':'local'})
   delegation=runtime.create_delegation({'agent_id':'agent-a','user_id':'user-a','task_id':'task-a',
-    'purpose':'Read notes','ttl_seconds':3600},
+    'purpose':'Initialize MCP','ttl_seconds':3600},
     {'principal_id':'admin','tenant_id':'tenant-a','authentication':'local'})
-  assert agent['tenant_id']=='tenant-a' and delegation['tenant_id']=='tenant-a'
+  assert agent['tenant_id']=='tenant-a' and agent['allowed_tools']==['initialize']
+  assert delegation['tenant_id']=='tenant-a' and delegation['allowed_actions']==['initialize']
+  assert any(tool['name']=='initialize' for tool in runtime.broker_snapshot()['tools'])
 
 def test_gateway_signs_actual_request_and_separates_auth(config,tmp_path):
   calls=[]

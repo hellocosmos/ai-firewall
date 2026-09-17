@@ -1,31 +1,22 @@
-# Community y Enterprise
+# Un único producto de código abierto
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
-## Compatibilidad y disponibilidad
+TrapDefense 0.39 usa una sola base de código con licencia MIT. Runtime Gateway y Agent Access Broker se publican juntos en este repositorio; no se necesitan una distribución Python privada, provider entry point, license key ni edition switch.
 
-0.38 ofrece un paquete Docker Compose con clave o JWT externo para el gateway y credenciales independientes para el destino. La imagen se compila desde fuentes; TrapDefense Cloud sigue previsto.
-
-[Entrega y compatibilidad](deployment-fit.md)
-
-Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise. [Entra SSO](identity.md).
-
-## Estado actual de entrega
+## Estado de entrega
 
 | Límite | Estado | Evidencia y límite |
 |---|---|---|
-| Runtime y consola Community | **Community Preview público** | Publicado en este repositorio MIT; CI y la verificación sintética de la ruta Envoy pasan. El tráfico y la capacidad de producción requieren validación del cliente. |
-| Enterprise Access Broker | **Implementación piloto privada** | Existen el proveedor y el flujo de aprobación distribuidos aparte; no están en este repositorio ni se presentan como disponibilidad general. Requieren IAM real, política del cliente y validación de fallos. |
-| Fleet central, HA distribuida, auditoría inmutable y servicio alojado | **Hoja de ruta** | No entregados ni representados como funciones por las pantallas Community. |
+| Runtime Gateway y consola | **Open Source Preview** | Código público, CI, ruta Envoy sintética, políticas HTTP/MCP, controles PII/secret y UI local. El routing y la capacidad de producción requieren validación específica. |
+| Agent Access Broker integrado | **Experimental** | Registry, delegation, autorización estricta, aislamiento tenant, transacciones de archivo y aprobación única vinculada a la solicitud. Faltan validaciones con IdP/política reales y multi-node. |
+| Docker autoalojado | **Preview** | Adapter, Envoy, inspector, console, autenticación gateway y credenciales destino separadas compiladas desde fuente. Un origen fijo por instalación. |
+| Managed cloud, fleet, HA multinodo, auditoría externa inmutable | **Planned** | No se entrega ni se presenta como disponible. |
 
-Los nombres de edición definen límites de producto y licencia; no afirman disponibilidad general de toda la hoja de ruta Enterprise.
+El modo gateway-only aplica inspección local y verifica la fuente confiable. El modo broker-enabled añade identidad JWT verificada, agent registry, delegation, autorización resource/action y approval. Ambos usan el mismo paquete abierto.
 
-Community es el runtime de proxy y la consola local con licencia MIT de este repositorio. Incluye verificación de salto firmado, mapeos HTTP/MCP explícitos, política local, detección por patrones, ocultación de PII, inspección limitada de respuestas/SSE, auditoría depurada, inicio de sesión local, cambio de contraseña y configuración del proxy. No requiere paquetes privados ni API de modelos externos.
+Los futuros servicios de pago pueden operar el mismo runtime como managed service y añadir fleet lifecycle, HA, auditoría externa, conectores, onboarding de políticas, SLA y soporte. Es un límite de servicio y operación, no una puerta de funciones del código.
 
-La implementación piloto Enterprise distribuida por separado añade Access Broker: delegación de usuario/agente/tarea, decisiones de acceso y aprobación humana de un solo uso, con caducidad y vinculada a la solicitud. El contexto IAM debe llegar mediante una integración de confianza; sigue siendo necesaria la validación con el IdP real del cliente. La UI Community señala las funciones no incluidas.
+El file store funciona para procesos POSIX del mismo host con reemplazo atómico y locks; no es una base distribuida ni sirve para HA NFS/SMB. Las pruebas sintéticas no certifican IdP reales, Conditional Access, autenticación MCP de clientes, routing TLS ni capacidad.
 
-El proveedor privado usa el punto de entrada Python `trapdefense.authorizers` / `enterprise`. `authorize(request)` aplica las decisiones; `evaluate(request)` evalúa mirror sin modificar estado. Elegir Enterprise sin proveedor impide iniciar. Los registros de tokens del Broker son pruebas de decisiones acotadas, no tokens OAuth de uso general.
-
-La gestión centralizada, HA distribuida, facturación alojada y almacenamiento de auditoría inmutable no se ofrecen. El alcance comercial puede incluir proveedor privado, despliegue, integración de políticas y soporte; precios y condiciones se acuerdan aparte. SQLite y JSONL locales siguen siendo modificables.
-
-[Docker 0.38](self-hosting.md) · [Compatibilidad del gateway](gateway-compatibility.md)
+[Docker 0.39](self-hosting.md) · [Arquitectura](architecture.md) · [Seguridad](security.md) · [Compatibilidad](gateway-compatibility.md)

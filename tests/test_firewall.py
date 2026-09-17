@@ -11,7 +11,7 @@ from asr_proxy.inspection.engine import InspectionEngine
 from asr_proxy.inspection.identity import AttestationVerifier, sign_attestation
 from asr_proxy.inspection.pii import PresidioScanner
 
-KEY = b"synthetic-community-key-32-bytes-only"
+KEY = b"synthetic-firewall-key-32-bytes-only"
 
 
 @pytest.fixture(scope="module")

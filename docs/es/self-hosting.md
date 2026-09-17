@@ -1,8 +1,8 @@
-# Autoalojamiento con Docker — 0.38 Community Preview
+# Autoalojamiento con Docker — 0.39 Open Source Preview
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.38 ofrece adaptador, Envoy, inspector, consola y autenticación separada para gateway y destino. La imagen se compila localmente desde el código fuente. TrapDefense Cloud sigue previsto.
+0.39 ofrece adaptador, Envoy, inspector, consola y autenticación separada para gateway y destino. La imagen se compila localmente desde el código fuente. TrapDefense Cloud sigue previsto.
 
 El cliente debe poder cambiar la URL MCP/API y usar `X-TD-Client-Key` o un JWT Bearer OAuth. Cada despliegue tiene un destino fijo y rutas/herramientas explícitas. Consulte la [matriz de compatibilidad](gateway-compatibility.md).
 
@@ -40,3 +40,7 @@ Los puertos se enlazan a loopback. El uso remoto necesita proxy TLS y console_or
 El estado persiste en volúmenes. Detenga y respalde ambos volúmenes y la configuración. down -v destruye datos. Para revertir, restaure la imagen anterior y su copia correspondiente. Un listener sano no prueba autenticación: verifique solicitudes permitidas/bloqueadas y efectos en el destino. Streaming prolongado, HA e IAM real requieren validación adicional.
 
 [Compatibilidad y VS Code](gateway-compatibility.md) · [Detailed examples, backup and migration (English)](../en/self-hosting.md)
+
+## Activar el Access Broker integrado
+
+Use `gateway_auth.mode: jwt` y declare en `identity_claims` los nombres de claims para tenant, user, agent, delegation y task. Configure después `access_broker.enabled: true` y un `access_broker.tenant_id`. Registre previamente el agent y la delegation del mismo tenant en la consola. Un claim obligatorio ausente o un tenant distinto se bloquea antes del reenvío. Consulte el YAML exacto en la [referencia inglesa](../en/self-hosting.md). El file store local es para un solo host, no para HA multinodo.

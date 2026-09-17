@@ -1,14 +1,14 @@
 # Console installation and operation
 
-> Docker 0.38: [Self-hosting / integration guide](self-hosting.md) · [Gateway client compatibility](gateway-compatibility.md). This page describes the separate source-based synthetic demo.
+> Docker 0.39: [Self-hosting / integration guide](self-hosting.md) · [Gateway client compatibility](gateway-compatibility.md). This page describes the separate source-based synthetic demo.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
-Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](identity.md).
+The console can use single-tenant Microsoft Entra ID SSO with Administrator and Viewer roles. Console operator authentication is separate from agent authorization. The built-in Access Broker is available in the same open-source package. [Identity boundaries](identity.md).
 
 ## Install and start
 
-Requirements: Python 3.11+, Node.js 22.12+ (or 24), npm, and a running local Docker Engine/Desktop. Install from this repository; no SDK, private Enterprise package or model API is required. Scripts use an existing `uv` installation when available, otherwise Python venv/pip. Run without sudo and keep Docker local.
+Requirements: Python 3.11+, Node.js 22.12+ (or 24), npm, and a running local Docker Engine/Desktop. Install from this repository; no SDK, private runtime package or model API is required. Scripts use an existing `uv` installation when available, otherwise Python venv/pip. Run without sudo and keep Docker local.
 
 ```bash
 git clone https://github.com/hellocosmos/ai-firewall.git
@@ -32,7 +32,7 @@ Browser -> management API/UI :5176
                  <- response inspection <- decision + receipt <- UI
 ```
 
-The sender simulates a trusted forwarding hop after TLS decryption. It signs exact synthetic requests; it is not a TLS decryptor or identity provider. Envoy is real, and the no-op destination is a separate HTTP listener. No external business action occurs. Community verifies the forwarding source, not user/agent identity. The Access Broker page explains the separate Enterprise boundary; Community provides no fake approvals.
+The sender simulates a trusted forwarding hop and signs exact synthetic requests; it is not a TLS decryptor or identity provider. Envoy is real, and the no-op destination is a separate HTTP listener. The demo seeds the real built-in broker with synthetic identities and demonstrates request-bound approval without executing an external business action.
 
 ## Pages and a first walkthrough
 

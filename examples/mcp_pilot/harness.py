@@ -26,7 +26,7 @@ def config(state):
                   'effect': 'block' if action == 'delete' else 'allow'}
            for name, action in [('read_document', 'read'), ('write_document', 'write'),
                                 ('delete_document', 'delete')]}
-  return InspectionConfig(edition='community', trusted_sources=['pilot-adapter'],
+  return InspectionConfig(trusted_sources=['pilot-adapter'],
     max_body_bytes=65536, nonce_db=str(state/'nonces.sqlite'), audit_path=str(state/'inspection.jsonl'),
     routes=[{'authority': 'pilot.test', 'path': '/mcp', 'tools': {**control, **tools},
              'redact_fields': ['/params/arguments/text']}])

@@ -26,7 +26,7 @@ def initialize(state, generated, config, password):
     atomic_write(state/name,data)
   generated.mkdir(parents=True,exist_ok=True)
   atomic_write(generated/'envoy.yaml',envoy_config(config),mode=0o644)
-  Store(state,bootstrap_password=password).audit('installation.initialized','Self-hosted Community')
+  Store(state,bootstrap_password=password).audit('installation.initialized','Self-hosted AI Firewall')
 
 
 def secret(path):
@@ -78,7 +78,7 @@ async def serve(args, config):
 
 
 def main():
-  parser=argparse.ArgumentParser(description='TrapDefense self-hosted Community')
+  parser=argparse.ArgumentParser(description='TrapDefense self-hosted AI Firewall')
   parser.add_argument('command',choices=['init','serve','client-key','render','policy-reset'])
   parser.add_argument('--config',default='/config/deployment.yaml')
   parser.add_argument('--state',default='/state')

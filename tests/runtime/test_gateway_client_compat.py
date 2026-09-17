@@ -30,7 +30,7 @@ def synthetic_target(calls):
     elif payload['method']=='initialize':
       body={'jsonrpc':'2.0','id':payload['id'],'result':{
         'protocolVersion':'2025-11-25','capabilities':{},
-        'serverInfo':{'name':'synthetic-trapdefense-target','version':'0.38'}}}
+        'serverInfo':{'name':'synthetic-trapdefense-target','version':'0.39'}}}
     elif payload['method']=='tools/list':
       body={'jsonrpc':'2.0','id':payload['id'],'result':{'tools':[
         {'name':'notes.read','description':'Read a synthetic note','inputSchema':{'type':'object'}}]}}

@@ -1,8 +1,8 @@
-# Same-host Community inspector pool
+# Same-host inspector pool
 
 [English](../en/inspector-pool.md) · [한국어](../ko/inspector-pool.md) · [简体中文](../zh-CN/inspector-pool.md) · [日本語](../ja/inspector-pool.md) · [Español](../es/inspector-pool.md) · [Français](../fr/inspector-pool.md)
 
-`trapdefense-inspector-pool` supervises **1, 2 or 4 existing Community inspector processes** and generates their Envoy connection configuration. It does not start Docker, replace the console runtime, change host networking, or implement cross-host HA. The console's process controls do not manage this standalone pool. Enterprise authorizers are rejected because their replicated state semantics have not been validated.
+`trapdefense-inspector-pool` supervises **1, 2 or 4 existing inspector processes** and generates their Envoy connection configuration. It does not start Docker, replace the console runtime, change host networking, or implement cross-host HA. The console's process controls do not manage this standalone pool. The built-in file-backed broker is supported for same-host POSIX processes through file locking and atomic snapshots. This is not multi-host HA.
 
 ## Start
 
@@ -15,7 +15,7 @@ Create **new synthetic state** for an evaluation; `init` refuses to overwrite ex
 .venv/bin/trapdefense-demo upstream --port 18090
 ```
 
-In another terminal, start the pool. For a real installation, use its existing Community policy and trusted-hop key instead of the demo files:
+In another terminal, start the pool. For a real installation, use its existing policy and trusted-hop key instead of the demo files:
 
 ```bash
 .venv/bin/trapdefense-inspector-pool \

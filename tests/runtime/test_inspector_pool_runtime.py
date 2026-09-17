@@ -14,8 +14,8 @@ import httpx
 import pytest
 import yaml
 
-from asr_proxy.inspection.community_demo import init_demo
-from community_support import destination, signed_request, tool_body
+from asr_proxy.inspection.demo import init_demo
+from firewall_support import destination, signed_request, tool_body
 from test_dataplane_transport import docker_command, free_port
 from asr_proxy.console.network import IMAGE
 

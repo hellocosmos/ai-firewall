@@ -2,7 +2,7 @@
 
 [English](../en/security.md) · [한국어](../ko/security.md) · [简体中文](../zh-CN/security.md) · [日本語](../ja/security.md) · [Español](../es/security.md) · [Français](../fr/security.md)
 
-Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다. [Entra SSO](identity.md).
+콘솔은 관리자·조회자 역할의 단일 테넌트 Microsoft Entra ID SSO를 지원합니다. 콘솔 운영자 인증과 에이전트 인가는 별도 경계이며, 에이전트 인가는 내장 Access Broker가 담당합니다. [Entra SSO](identity.md).
 
 의심되는 취약점은 리비전, 합성 재현 절차, 영향을 포함해 **hellocosmos@gmail.com** 으로 비공개 제보하세요. 고객 데이터, 토큰, 실제 자격 증명을 공개 이슈에 넣지 마세요. 고정 응답 SLA는 제공하지 않습니다.
 
@@ -37,6 +37,6 @@ PII 처리는 **매핑 도구/작업 → 경로 → 전역 기본값**의 결정
 - 본문·시간 제한, 매핑, 필드 마스킹을 설정합니다. 버퍼링 SSE는 무제한 스트리밍이 아닙니다.
 - 로컬 SQLite 재전송 방지와 감사 저장소는 분산 HA나 불변 보존을 보장하지 않습니다.
 - 패턴·PII 검사는 오탐과 미탐이 있습니다.
-- 서명된 출처는 사용자·에이전트 신원 증명이 아닙니다. Enterprise에는 별도 신뢰 신원 체인이 필요합니다.
+- 서명된 출처는 사용자·에이전트 신원 증명이 아닙니다. Broker 모드는 별도 검증된 JWT 신원 체인과 명시적 claim mapping이 필요합니다.
 
-콘솔 초기 계정은 `admin`, 비밀번호는 `1234`이며 설정에서 변경합니다. 관리 서버는 loopback에 바인딩합니다. 네트워크 설정은 소유한 데모 Envoy 컨테이너를 관리하며 OS 인터페이스 주소·물리 경로·방화벽 규칙은 변경하지 않습니다. 인증·CSRF 검사·비밀번호 해시가 합성 데모를 운영 IAM으로 만들지는 않습니다. MIT는 Community 코드에 적용하며 비공개 구현과 고객 자산은 제외합니다.
+콘솔 초기 계정은 `admin`, 비밀번호는 `1234`이며 설정에서 변경합니다. 관리 서버는 loopback에 바인딩합니다. 네트워크 설정은 소유한 데모 Envoy 컨테이너를 관리하며 OS 인터페이스 주소·물리 경로·방화벽 규칙은 변경하지 않습니다. 인증·CSRF 검사·비밀번호 해시가 합성 데모를 운영 IAM으로 만들지는 않습니다. MIT는 전체 runtime과 Access Broker에 적용하며 고객 자산과 credential은 저장소 밖에 둡니다.

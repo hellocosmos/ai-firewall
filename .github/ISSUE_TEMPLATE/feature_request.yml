@@ -1,11 +1,11 @@
 name: Feature request
-description: Propose a focused improvement to TrapDefense Community.
+description: Propose a focused improvement to TrapDefense AI Firewall.
 title: "[Feature]: "
 body:
   - type: markdown
     attributes:
       value: |
-        Start with the user or operator problem. Community covers the public local proxy, inspector, console, policy and sanitized evidence path. Delegation, approvals and the Enterprise Access Broker are separate products.
+        Start with the user or operator problem. The public product includes the proxy, inspector, console, policy, sanitized evidence, Agent Registry, delegation and the built-in Access Broker.
   - type: textarea
     id: problem
     attributes:
@@ -21,10 +21,10 @@ body:
     validations:
       required: true
   - type: textarea
-    id: community
+    id: open_source
     attributes:
-      label: Community scope
-      description: Explain how this fits the local public AI Firewall rather than delegated Enterprise authorization.
+      label: Open-source product scope
+      description: Explain how this fits the public AI Firewall and its security boundaries.
     validations:
       required: true
   - type: textarea

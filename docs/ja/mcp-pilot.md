@@ -1,4 +1,4 @@
-# 実 MCP パイロット — 0.35 Community Preview
+# 実 MCP パイロット — 0.35 Open Source Preview
 
 [English](../en/mcp-pilot.md) · [한국어](../ko/mcp-pilot.md) · [简体中文](../zh-CN/mcp-pilot.md) · [日本語](../ja/mcp-pilot.md) · [Español](../es/mcp-pilot.md) · [Français](../fr/mcp-pilot.md)
 
@@ -13,7 +13,7 @@ docker pull envoyproxy/envoy@sha256:57e14a549d7bd43c8d3f6d03e8cfa653e037d4b38e13
 .venv/bin/python -m examples.mcp_pilot --state-dir .runtime-state/mcp-pilot-run --samples 30
 ```
 
-クライアント → ローカル認証・署名アダプター → Envoy/Community 検査器 → MCP 文書サーバー。エージェントは署名鍵を持ちません。アダプタートークンはローカルアクセス用で、ユーザーやエージェントの身元証明ではありません。同一 OS ユーザーとループバックだけでは本番の分離になりません。迂回を防ぐ経路設定が必要です。
+クライアント → ローカル認証・署名アダプター → Envoy/AI Firewall 検査器 → MCP 文書サーバー。エージェントは署名鍵を持ちません。アダプタートークンはローカルアクセス用で、ユーザーやエージェントの身元証明ではありません。同一 OS ユーザーとループバックだけでは本番の分離になりません。迂回を防ぐ経路設定が必要です。
 
 初期化、ツール一覧、読み書き、削除拒否と原本保持、要求/応答のメールアドレス秘匿、ダミー Secret 拒否、既知の悪意ある応答、未登録ツール、未署名要求、検査器停止時の下流未実行を確認します。本文は64 KiB。ステートレス Streamable HTTP JSON のみを検証し、長時間 SSE・OAuth・任意サーバー互換性は別途検証します。
 

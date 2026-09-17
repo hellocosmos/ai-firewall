@@ -2,7 +2,7 @@
 
 [English](../en/security.md) · [한국어](../ko/security.md) · [简体中文](../zh-CN/security.md) · [日本語](../ja/security.md) · [Español](../es/security.md) · [Français](../fr/security.md)
 
-Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](identity.md).
+控制台支持单租户 Microsoft Entra ID SSO 以及管理员、查看者角色。控制台操作员身份与智能体授权是独立边界；智能体授权由内置 Access Broker 执行。 [Entra SSO](identity.md).
 
 请通过 **hellocosmos@gmail.com** 私下报告疑似漏洞，附上版本、合成复现步骤和影响。不要在公开问题中包含客户数据、令牌或真实凭证。不承诺固定响应 SLA。
 
@@ -37,6 +37,6 @@ PII 处理采用确定性优先级：**映射工具/操作 → 路由 → 全局
 - 配置正文/时间限制、映射及字段脱敏。有界缓冲 SSE 不是无限流式处理。
 - 本地 SQLite 防重放与审计存储不保证分布式高可用或不可变保留。
 - 特征及 PII 检测可能出现误报和漏报。
-- 签名来源不等于用户或代理身份证明；Enterprise 需要独立可信身份链。
+- 签名来源不等于用户或智能体身份证明；Broker 模式需要独立验证的 JWT 身份链与显式 claim mapping。
 
-控制台初始账户为 `admin`，密码为 `1234`，请在设置中修改。管理接口绑定回环地址。网络设置管理本演示拥有的 Envoy 容器，不修改系统网卡地址、物理路由或防火墙规则。认证、CSRF 检查和密码哈希不代表合成演示已成为生产 IAM。MIT 适用于 Community 代码，私有实现和客户资产不包含在内。
+控制台初始账户为 `admin`，密码为 `1234`，请在设置中修改。管理接口绑定回环地址。网络设置管理本演示拥有的 Envoy 容器，不修改系统网卡地址、物理路由或防火墙规则。认证、CSRF 检查和密码哈希不代表合成演示已成为生产 IAM。MIT 适用于全部 runtime 与 Access Broker；客户资产和凭据保留在仓库之外。

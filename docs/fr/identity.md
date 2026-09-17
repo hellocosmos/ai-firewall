@@ -1,8 +1,8 @@
-# Microsoft Entra ID — Community console SSO
+# Microsoft Entra ID — TrapDefense console SSO
 
 [English](../en/identity.md) · [한국어](../ko/identity.md) · [简体中文](../zh-CN/identity.md) · [日本語](../ja/identity.md) · [Español](../es/identity.md) · [Français](../fr/identity.md)
 
-Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise.
+La console prend en charge le SSO Microsoft Entra ID à locataire unique avec les rôles Administrateur et Lecteur. L’identité de l’opérateur et l’autorisation de l’agent sont des frontières distinctes ; l’Access Broker intégré applique l’autorisation.
 
 ## Configuration
 
@@ -37,3 +37,7 @@ Le Lecteur consulte tableau de bord, événements, politique, réseau et audit ;
 Authorization code + PKCE S256, browser-bound one-time state, nonce, RS256 signature, issuer, audience, tenant and app-role validation. Tokens and client secrets are never sent to browser storage or audit logs. Synthetic mode uses an ephemeral RSA issuer with local code redemption; no Microsoft token endpoint is called. Real mode uses Microsoft authorization/token/JWKS endpoints and does not register synthetic routes.
 
 [Microsoft authorization code flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
+
+## Mapping d’identité JWT de l’agent
+
+Le mode Broker valide issuer, audience et scope du JWT émis par un IdP externe, puis ne transforme que les valeurs déclarées dans `identity_claims` en identité tenant, user, agent, delegation et task. Les claims arbitraires et le token gateway ne sont pas copiés dans les preuves ni vers la cible. Un claim obligatoire absent ou un tenant différent échoue en mode fermé. Un issuer compatible comme Entra, Okta ou Keycloak peut être utilisé, mais le client doit valider l’émission des claims et leur liaison au workload. [Auto-hébergement](self-hosting.md) · [Sécurité](security.md)

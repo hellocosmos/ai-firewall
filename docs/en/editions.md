@@ -1,31 +1,28 @@
-# Community and Enterprise
+# One open-source product
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
-## Deployment fit and availability
+TrapDefense 0.39 has one MIT-licensed codebase. Runtime inspection and Agent Access Broker capabilities ship together in this repository. No private Python distribution, provider entry point, license key, or edition switch is required.
 
-Self-hosted Community 0.38 includes a source-built Docker Compose package with client-key or external-JWT gateway authentication and independent target credentials. TrapDefense Cloud remains planned and is not available for sign-up.
-
-[Delivery and compatibility](deployment-fit.md)
-
-Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](identity.md).
-
-## Current delivery status
+## What is shipped
 
 | Boundary | Status | Evidence and limit |
 |---|---|---|
-| Community runtime and console | **Public Community Preview** | Shipped in this MIT repository; CI and synthetic Envoy-path verification pass. Production traffic and capacity remain customer-specific validation. |
-| Enterprise Access Broker | **Private pilot implementation** | Separately distributed provider and approval workflow exist; they are not in this repository or presented as general availability. Real IAM, customer policy and failure-path validation are required. |
-| Central fleet, distributed HA, immutable audit and hosted service | **Roadmap** | Not shipped or represented by the Community screens. |
+| Runtime Gateway and console | **Open Source Preview** | Public source, CI, synthetic Envoy path, HTTP/MCP policy, PII/secret controls, and local operations UI. Production routing and capacity remain deployment-specific. |
+| Built-in Agent Access Broker | **Experimental** | Public registry, delegation, strict authorization, tenant isolation, file transactions, and request-bound one-time approval. Real customer IdP/policy and multi-node validation remain required. |
+| Docker self-hosting | **Preview** | Source-built adapter, Envoy, inspector, console, gateway authentication, and separate target credentials. One fixed destination origin per installation. |
+| Managed cloud, fleet, multi-node HA, immutable external audit | **Planned** | These services are not shipped and are not represented as currently available. |
 
-Edition names describe product and licensing boundaries, not a claim that every Enterprise roadmap item is generally available.
+Gateway-only deployments use local inspection policy and trusted-source verification. Broker-enabled deployments add verified JWT identity mapping, agent registry, delegation, resource/action authorization, and approval. Both modes use the same open-source package.
 
-Community is the MIT-licensed proxy runtime and local operations console in this repository. It includes signed trusted-hop verification, client-key or external-JWT gateway authentication, independent fixed-target credentials, explicit HTTP/MCP mappings, local policy, signature checks, PII redaction, bounded response/SSE inspection, sanitized audit evidence, local login/password changes and proxy settings. It is not an OAuth authorization server or Agent IAM registry.
+## Commercial direction
 
-The separately distributed Enterprise pilot implementation adds the Access Broker: user/agent/task delegation, access decisions and one-time, expiring, request-bound human approval. Existing IAM context must come from a trusted integration; real customer IdP validation remains necessary. The Community UI identifies these unavailable capabilities.
+Future paid offerings can operate the same open-source runtime as a managed service and add fleet lifecycle, multi-node HA, durable external audit, customer connectors, policy onboarding, SLA, and support. This is a service and operations boundary, not a source-code feature gate.
 
-The private provider connects through the `trapdefense.authorizers` / `enterprise` Python entry point. `authorize(request)` enforces decisions; `evaluate(request)` provides non-mutating mirror assessment. Selecting Enterprise without its provider fails startup. Broker token records are scoped decision evidence, not general-purpose OAuth access tokens.
+## Security statement
 
-Central fleet management, distributed HA, hosted billing and immutable audit storage are not shipped features. Commercial scope can include the private provider, deployment, policy integration and support; pricing and support terms are separate. Local SQLite and JSONL storage remain mutable.
+The built-in file store is safe for same-host POSIX processes with atomic replacement and file locking. It is not a distributed database and must not be placed on NFS/SMB for multi-host HA. Local JSON and SQLite evidence is mutable. Broker decision tokens are scoped evidence and not downstream OAuth access tokens.
 
-[Docker 0.38](self-hosting.md) · [Gateway compatibility](gateway-compatibility.md)
+Synthetic tests establish protocol behavior, not production certification for Entra, Okta, Keycloak, Conditional Access, customer MCP authentication, TLS routing, or capacity.
+
+[Docker 0.39](self-hosting.md) · [Architecture](architecture.md) · [Security](security.md) · [Gateway compatibility](gateway-compatibility.md)

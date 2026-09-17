@@ -1,8 +1,8 @@
-# Community 检查器进程池
+# AI Firewall 检查器进程池
 
 [English](../en/inspector-pool.md) · [한국어](../ko/inspector-pool.md) · [简体中文](../zh-CN/inspector-pool.md) · [日本語](../ja/inspector-pool.md) · [Español](../es/inspector-pool.md) · [Français](../fr/inspector-pool.md)
 
-在同一主机上运行 1、2 或 4 个检查器，并生成 Envoy 连接配置。该命令不会启动 Docker 或替换控制台。Enterprise 和跨主机 HA 不在支持范围内。
+在同一主机上运行 1、2 或 4 个检查器，并生成 Envoy 连接配置。该命令不会启动 Docker 或替换控制台。内置 Broker 支持同主机文件锁，但跨主机 HA 不在支持范围内。
 
 所有进程共享同一个本地防重放数据库和审计日志。不要为每个进程创建独立数据库，也不要使用网络文件系统。相对路径以启动目录为基准。策略和密钥在启动时生成私有快照；变更需要重启整个池，并协调 Envoy 配置与签名端。
 

@@ -1,8 +1,8 @@
-# Microsoft Entra ID — Community console SSO
+# Microsoft Entra ID — TrapDefense console SSO
 
 [English](../en/identity.md) · [한국어](../ko/identity.md) · [简体中文](../zh-CN/identity.md) · [日本語](../ja/identity.md) · [Español](../es/identity.md) · [Français](../fr/identity.md)
 
-Community は単一テナントの Microsoft Entra ID コンソール SSO と管理者・閲覧者ロールを提供します。コンソール認証はエージェントの実行認可ではなく、委任と承認は Enterprise の機能です。
+コンソールは単一テナント Microsoft Entra ID SSO と管理者・閲覧者ロールをサポートします。コンソール運用者の認証とエージェント認可は別の境界で、認可は内蔵 Access Broker が行います。
 
 ## Configuration
 
@@ -37,3 +37,7 @@ TD_SYNTHETIC_ENTRA=1 ./scripts/run-console.sh
 Authorization code + PKCE S256, browser-bound one-time state, nonce, RS256 signature, issuer, audience, tenant and app-role validation. Tokens and client secrets are never sent to browser storage or audit logs. Synthetic mode uses an ephemeral RSA issuer with local code redemption; no Microsoft token endpoint is called. Real mode uses Microsoft authorization/token/JWKS endpoints and does not register synthetic routes.
 
 [Microsoft authorization code flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
+
+## エージェント JWT identity mapping
+
+Broker モードは外部 IdP JWT の issuer、audience、scope を検証し、`identity_claims` で明示した値だけを tenant、user、agent、delegation、task identity に変換します。任意 claim や gateway token は検査証拠や対象サービスへ渡しません。必須 claim がない場合や tenant が一致しない場合は fail closed です。Entra、Okta、Keycloak など互換 issuer を利用できますが、claim 発行と workload binding の信頼性は顧客側で検証します。[セルフホスト](self-hosting.md) · [セキュリティ](security.md)

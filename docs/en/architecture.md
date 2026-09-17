@@ -2,7 +2,7 @@
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
-Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](identity.md).
+The console can use single-tenant Microsoft Entra ID SSO for Administrator and Viewer roles. Console operator authentication remains separate from agent authorization. The built-in Access Broker consumes verified agent identity from the gateway JWT claim map. [Identity boundaries](identity.md).
 
 ```text
 AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
@@ -19,10 +19,10 @@ The console's management API authenticates a local operator, persists policy and
 1. Enforce routing outside TrapDefense so protected traffic cannot bypass the proxy.
 2. Use an authorized existing TLS decryptor. The demo does not decrypt production TLS.
 3. A trusted adapter removes client-supplied `x-td-*` and `x-asr-*` context and signs what it observed. Preserve method, authority, path/query, application headers and complete body. `inspection/identity.py` defines canonical binding and exclusions.
-4. Keep the HMAC key only on the trusted hop and inspector; never distribute it to agents. Allowlist the Community `source_id`. Isolate plaintext and ExtProc links: these examples do not authenticate a public gRPC listener.
+4. Keep the HMAC key only on the trusted hop and inspector; never distribute it to agents. Allowlist the gateway-only `source_id`. Isolate plaintext and ExtProc links: these examples do not authenticate a public gRPC listener.
 5. Envoy uses complete buffered inspection, bounded size/time and `failure_mode_allow: false`. It removes the attestation before forwarding. Signing binds the original request; durable approval, when present, binds the post-redaction action digest.
-6. Community applies explicit local route/tool/resource/action rules and verifies a forwarding source. This traffic-source check does not establish a user identity or delegated agent authority.
-7. Enterprise additionally validates identity/delegation through a separate private provider. Legacy configs default to Enterprise; a missing provider stops startup rather than silently downgrading.
+6. Gateway-only mode applies explicit local route/tool/resource/action rules and verifies a forwarding source. This traffic-source check does not establish a user identity or delegated agent authority.
+7. Broker-enabled mode requires verified JWT identity claims and evaluates the built-in agent registry, delegation, task, resource, action and one-time approval. Missing identity fields fail closed.
 
 There is no universal adapter for arbitrary TLS appliances. Integrations must prevent metadata spoofing and enforce upstream access restrictions.
 

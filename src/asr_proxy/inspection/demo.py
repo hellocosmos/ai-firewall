@@ -24,7 +24,7 @@ from .contracts import HttpMessage, InspectionConfig
 from .identity import ATTESTATION_HEADER, AttestationVerifier, sign_attestation
 from .protocol import encode_json, strict_json
 
-FORMAT = "trapdefense-community-demo-v1"
+FORMAT = "trapdefense-open-source-demo-v2"
 DEMO_IDENTITY = {"source_id": "demo-decryptor"}
 
 MAX_BODY = 1_048_576

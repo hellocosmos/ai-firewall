@@ -1,147 +1,143 @@
-# TrapDefense — AI Firewall for Agents
+# TrapDefense — Open Source AI Firewall for Agents
 
-[![Community verification](https://github.com/hellocosmos/ai-firewall/actions/workflows/test.yml/badge.svg)](https://github.com/hellocosmos/ai-firewall/actions/workflows/test.yml)
+[![Open source verification](https://github.com/hellocosmos/ai-firewall/actions/workflows/test.yml/badge.svg)](https://github.com/hellocosmos/ai-firewall/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2563EB.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-0F172A.svg)](pyproject.toml)
-[![Status: Community Preview](https://img.shields.io/badge/status-Community%20Preview-F59E0B.svg)](docs/en/editions.md)
+[![Status: Open Source Preview](https://img.shields.io/badge/status-Open%20Source%20Preview-F59E0B.svg)](docs/en/editions.md)
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-> **Community Preview:** suitable for local evaluation and integration work. Production traffic, HA, capacity and customer identity paths require separate validation.
+> **Open Source Preview 0.39:** the full runtime and operator experience are MIT licensed. The built-in Agent Access Broker is implemented and synthetically verified, but remains **Experimental** until production IdP, customer policy, HA, and capacity validation are complete.
 
-**Control the path from prompt to action.**
+**Control the path from model intent to real action.**
 
-TrapDefense Community is a self-hosted AI Firewall with a local operations UI. Inspect supported HTTP and MCP tool calls, enforce action policy, redact sensitive data and keep decision evidence. The earlier SDK remains in [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security).
+TrapDefense is a self-hosted AI Firewall for supported HTTP and MCP traffic. It inspects requests and responses, enforces explicit action and data policy, records sanitized evidence, and can authorize an action against a registered agent, delegation, task, resource, and one-time human approval.
 
 ```text
-AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
-            Action policy · Data protection · Audit
-          ← Inspected responses ←
+AI agent / client
+  → authenticated gateway
+  → trusted request binding
+  → Envoy + request/response inspection
+  → optional built-in Agent Access Broker
+  → configured tool, MCP server, or HTTP API
 ```
 
-Logical product flow. See [deployment architecture](docs/en/architecture.md) for trusted forwarding, transport visibility and routing requirements.
+The earlier embedded SDK remains available in [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security). This repository is the proxy product and requires no private runtime package.
 
-Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](docs/en/identity.md).
+## One open-source product
 
-## Docker self-hosting · 0.38
+There are no Community and Enterprise code editions. This repository contains:
 
-[Docker self-hosting: integration contract, installation and verification](docs/en/self-hosting.md)
+- Runtime Gateway for explicitly mapped HTTP and stateless MCP JSON POST calls;
+- request and response PII/secret inspection with inline and mirror policy semantics;
+- trusted-hop signatures, exact request digest binding, nonce/replay protection, and sanitized audit evidence;
+- external OAuth JWT validation and an explicit JWT-claim-to-agent-identity map;
+- Agent Registry, task delegation, resource/action authorization, and request-bound one-time approval;
+- local operations console, six UI languages, Docker Compose self-hosting, and same-host inspector supervision.
+
+Future paid work can provide a managed cloud service, fleet operations, multi-node HA, immutable external audit storage, customer integrations, and support. The open-source runtime does not hide current enforcement features behind a license gate. See [One open-source product](docs/en/editions.md).
+
+## Docker self-hosting · 0.39
 
 ```bash
-cd deploy/selfhost
+git clone https://github.com/hellocosmos/ai-firewall.git
+cd ai-firewall/deploy/selfhost
 docker compose build app
 docker compose run --rm app init
 docker compose --profile smoke up -d
 ```
 
-After cloning this repository, run the commands above. Open `http://localhost:18080` with `admin` and your chosen password. This starts the synthetic fixture; follow the guide to connect a real service. Clients need a configurable URL and either a connection-key header or an OAuth Bearer JWT. 0.38 validates gateway JWTs as an OAuth Resource Server and injects a separate target credential; it does not issue tokens, broker login or support long-lived SSE.
+Open `http://localhost:18080`, sign in as `admin` with the password chosen during initialization, and inspect the synthetic fixture. No default password is created by the Docker profile.
 
-The 0.38 compatibility lab exercises Entra-, Okta- and Keycloak-shaped OAuth claims through the official MCP SDK using discovery, PKCE, RFC 8707 resource binding and MCP `2025-11-25`. A pinned, unmodified Keycloak container issues a real local token, and VS Code 1.135 completes real local MCP initialization and tool discovery. These results are reproducible integration evidence, not certification of a customer tenant or production policy. [Evidence matrix and exact limits](docs/en/gateway-compatibility.md).
+A client must support a configurable HTTP/MCP endpoint and either `X-TD-Client-Key` or a Bearer JWT. Target credentials are separate. One installation uses one fixed destination origin and explicit route/tool mappings. Stateful MCP, unbounded SSE, WebSocket, arbitrary CONNECT, binary uploads, stdio, direct database access, and closed SaaS-internal calls are outside this profile.
 
+[Self-hosting and exact integration contract](docs/en/self-hosting.md) · [Gateway compatibility evidence](docs/en/gateway-compatibility.md) · [Deployment fit](docs/en/deployment-fit.md)
 
-## Deployment fit and availability
+## Optional Agent Access Broker (Experimental)
 
-Protect the HTTP API and remote MCP calls you can route through a supported inspection path. Keep existing service authentication in your MCP servers and connectors; do not replace your IAM.
+Gateway-only mode verifies the forwarding source and applies local inspection policy. It does not claim agent identity.
 
-Self-hosted Community 0.38 includes a source-built Docker Compose package for the adapter, Envoy, inspector, console and separated gateway/target authentication. TrapDefense Cloud remains planned and is not available for sign-up.
+Broker mode requires an externally issued JWT and an explicit claim map. TrapDefense verifies the JWT and copies only the configured claims into normalized identity fields. Missing identity fails before forwarding.
 
-[Delivery and compatibility](docs/en/deployment-fit.md) · [Gateway client compatibility](docs/en/gateway-compatibility.md)
+```yaml
+gateway_auth:
+  mode: jwt
+  issuer: https://login.example.com/tenant/v2.0
+  audience: https://firewall.example.com/mcp
+  jwks_uri: https://login.example.com/tenant/discovery/v2.0/keys
+  resource: https://firewall.example.com/mcp
+  authorization_servers: [https://login.example.com/tenant/v2.0]
+  required_scopes: [mcp.invoke]
+  identity_claims:
+    tenant_id: tid
+    user_id: sub
+    agent_id: agent_id
+    delegation_id: delegation_id
+    task_id: task_id
+    agent_instance_id: agent_instance_id
+    approval_id: approval_id
 
-## Why TrapDefense
+access_broker:
+  enabled: true
+  tenant_id: tenant-a
+```
 
-TrapDefense governs the point where model output becomes a real action. It combines a proxy-based enforcement boundary with local data protection and explicit identity semantics.
+The built-in broker then checks tenant, agent registry, tool/resource scope, delegation, user, task, action, request digest, and optional approval. High-risk actions produce `approval_required`. An approved request can be consumed once and cannot be replayed for a different request, agent instance, tenant, user, task, or action.
 
-| Boundary | What TrapDefense makes explicit |
-|---|---|
-| **Independent enforcement point** | Supported HTTP and MCP calls traverse Envoy and the inspector before reaching a configured destination. Applications do not need to embed the earlier SDK. Deployment routing must prevent bypass. |
-| **Bidirectional data control** | Complete, bounded requests and responses (the Docker profile uses JSON; bounded SSE is a separate engine capability)can be allowed, blocked or redacted using action, PII and secret policies. |
-| **Explicit identity boundary** | Community Entra ID SSO authenticates the console operator. The separate Enterprise pilot evaluates authority across user, agent, delegation, task, resource and action. |
-| **Honest failure semantics** | Inline inspection fails closed. Mirror records hypothetical `would_*` outcomes and never changes the original traffic or approval state. |
-| **Operational evidence** | The local console exposes decisions, policy coverage, destination receipts and sanitized evidence without copying protected content into audit records. |
+TrapDefense is an OAuth resource server in this path. It does not issue IdP tokens or replace target-service authorization. The broker token is decision evidence, not a downstream OAuth credential.
 
-## See it in action
+## Local source demo
 
-<table>
-  <tr>
-    <td width="58%"><img src="docs/assets/community-dashboard.png" alt="TrapDefense Community dashboard with synthetic allow, block and redact decisions"></td>
-    <td width="42%"><img src="docs/assets/entra-sign-in.png" alt="TrapDefense Community sign-in with synthetic Entra and local administrator options"></td>
-  </tr>
-  <tr>
-    <td><strong>Runtime decisions</strong><br>Sanitized synthetic evidence for allow, block and redact outcomes.</td>
-    <td><strong>Console identity</strong><br>Local sign-in and a protocol-realistic synthetic Entra flow.</td>
-  </tr>
-</table>
-
-Screens show the local synthetic demo. They are not evidence of a production Entra tenant or customer traffic deployment.
-
-## Developer demo (source installation)
-
-Requires Python 3.11+, Node.js 22.12+ (or 24), npm and local Docker Engine/Desktop. Source installation; no PyPI release is implied.
+Requires Python 3.11+, Node.js 22.12+ (or 24), npm, and Docker Engine/Desktop.
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall
 ./scripts/install-console.sh
 ./scripts/run-console.sh
 ```
 
-Open [http://127.0.0.1:5176](http://127.0.0.1:5176). Sign in with `admin` / `1234`, then change the password in Settings. English is the default. Use the language selector before or after login; the browser remembers your choice.
+Open [http://127.0.0.1:5176](http://127.0.0.1:5176), sign in with `admin` / `1234`, then change the password in Settings. The source demo seeds synthetic agents and delegations into the real file-backed Access Broker. The deployment scenario demonstrates `approval_required → approve → one matching execution → replay blocked` through the same authorization code shipped for self-hosting.
 
-Success means **Connections / System** reports the proxy, inspector and destination ready, and **Read business notes** produces HTTP 200 with a destination receipt. The initial password is only for the loopback demo; change it immediately. This flow does not configure an Internet-facing service, production routing or a real business destination.
+The demo uses synthetic identities and tools. It does not prove a production Entra, Okta, or Keycloak tenant, Conditional Access, customer MCP authentication, enforced customer routing, HA, or production capacity.
 
-## What you can operate
+## Security boundaries
 
-Dashboard and request evidence; local allow/block policy; global, route and tool PII policy with Mirror `would_*` assessment; synthetic HTTP scenarios; audit; password change; interface inventory, listener/upstream settings and verified apply/rollback of the owned Envoy container.
+| Boundary | Enforced behavior |
+|---|---|
+| Routing | Only traffic sent through the configured gateway is inspected. Prevent bypass outside TrapDefense. |
+| Gateway authentication | Client key or verified JWT admits a caller to a fixed set of routes. |
+| Trusted hop | HMAC attestation binds the adapter, application headers, request body, and final request digest. It is not agent identity. |
+| Content policy | Supported requests and responses can be allowed, blocked, or redacted. Unknown/incomplete inline inspection fails closed. |
+| Agent authorization | Optional broker checks registered identity and delegated action scope. Mirror evaluation never creates approvals, tokens, or audit mutation. |
+| Target authorization | The destination still enforces its own credential and permissions. Gateway JWTs are not forwarded as target credentials. |
+| Evidence | Local JSON/SQLite files omit original protected content where designed, but remain mutable local storage. |
 
-The synthetic requests traverse a real Envoy → gRPC inspector → HTTP destination path. The console records downstream receipts and response redaction; it does not substitute a direct engine call. The default listener is `127.0.0.1:18082`; the inspector uses `18101–18104` and the synthetic destination `18090`.
+Read [Architecture](docs/en/architecture.md), [Security](docs/en/security.md), and [Identity](docs/en/identity.md) before connecting a real service.
 
-## Scope and editions
+## Verified evidence
 
-Community includes local policy, explicit HTTP/MCP mappings, trusted-hop signatures, bounded response/SSE inspection and sanitized local evidence. The Enterprise Access Broker is a separately distributed private pilot; Community console SSO does not confer agent identity, delegated access or approvals.
+The repository tests cover the broker's tenant isolation, deny-by-default scopes, strict request digest, approval expiry and replay protection, transactional local file store, concurrent approval consumption, JWT issuer/audience/scope/authorized-party checks, explicit identity mapping, gateway/target credential separation, HTTP/MCP mapping, PII and secret controls, and console operations.
 
-NIC inventory and topology explanation are included. The loopback demo does not configure OS addresses, two-NIC routing, transparent bridges or physical egress. Inline inspection failures block. Console Mirror observes its synchronous path; the separate mirror collector cannot block original traffic.
-
-## Local performance baseline
-
-Stop the console, then run a repeatable sequential baseline through the same Envoy → gRPC inspector → synthetic HTTP path:
-
-```bash
-.venv/bin/trapdefense-benchmark --scenario read --iterations 30
-```
-
-The JSON report includes p50/p95 round-trip latency, outcome counts and host characteristics. It is a local regression baseline, not a production throughput or capacity claim. See [Benchmarking](docs/en/benchmark.md).
-
-## Documentation and verification
-
-[Console guide](docs/en/console.md) · [Architecture](docs/en/architecture.md) · [Community / Enterprise](docs/en/editions.md) · [Benchmarking](docs/en/benchmark.md) · [SDK → Proxy](docs/en/migration.md) · [Security](docs/en/security.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
-
-English application source and six complete UI dictionaries are maintained together. Offline PII inspection covers explicit English, Korean, Simplified Chinese, Japanese, Spanish and French patterns and validators. It does not provide general name, location or address NER. Localized guides have a language switch at the top.
-
-Deterministic secret inspection blocks recognized provider tokens, signed JWTs, Azure Storage SAS links and high-entropy credentials in sensitive fields across supported bodies, responses and SSE. Request credential headers remain bound to the attested mapped destination and are excluded from audit evidence. See [Security](docs/en/security.md) for exact coverage and limitations.
+The compatibility lab exercises Entra-, Okta-, and Keycloak-shaped OAuth claims, an unmodified Keycloak container, the official MCP SDK, and VS Code MCP initialization/tool discovery. These are reproducible synthetic/local protocol results, not certification of a customer tenant.
 
 ```bash
-.venv/bin/python -m pytest -q
+pip install -e ".[dev]"
+pytest -q
 npm run check --prefix console
 npm run build --prefix console
-# Stop the running console before this Docker test.
+```
+
+For the optional real local Envoy path, stop any running console and run:
+
+```bash
 TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 ```
 
-These are synthetic local checks, not certification of customer TLS/IdP integration, production enforced routing, HA or performance. Detection has false positives/negatives; local audit is not immutable.
+## Documentation
+
+[Console](docs/en/console.md) · [Architecture](docs/en/architecture.md) · [Open-source model](docs/en/editions.md) · [Self-hosting](docs/en/self-hosting.md) · [Gateway compatibility](docs/en/gateway-compatibility.md) · [Benchmarking](docs/en/benchmark.md) · [Migration](docs/en/migration.md) · [Security](docs/en/security.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
+
+English is the source language. The console and core guides are maintained in English, Korean, Simplified Chinese, Japanese, Spanish, and French.
 
 ## License
 
-MIT for Community. Private Enterprise code and customer assets are not included.
-
-
-## Same-host operations (0.34)
-
-Operate 1, 2 or 4 inspector processes from the console, view recovery state, and install an opt-in Linux user service. Same-host recovery is not cross-server HA.
-
-[Operations](docs/en/operations.md) · [Inspector pool](docs/en/inspector-pool.md)
-
-## Real MCP pilot (0.35 Community Preview)
-
-Run actual MCP initialization, discovery and document tools through the firewall; optionally add a local LLM agent. Synthetic data, explicit detection limits and measured direct/proxy latency.
-
-[MCP pilot](docs/en/mcp-pilot.md)
+MIT. All runtime enforcement and Access Broker code in this repository is open source.

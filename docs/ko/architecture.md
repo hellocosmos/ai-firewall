@@ -2,7 +2,7 @@
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
-Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다. [Entra SSO](identity.md).
+콘솔은 관리자·조회자 역할의 단일 테넌트 Microsoft Entra ID SSO를 지원합니다. 콘솔 운영자 인증과 에이전트 인가는 별도 경계이며, 에이전트 인가는 내장 Access Broker가 담당합니다. [Entra SSO](identity.md).
 
 ```text
 AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
@@ -19,10 +19,10 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 1. 보호 트래픽이 우회하지 못하도록 TrapDefense 외부에서 경로를 강제합니다.
 2. 승인된 기존 TLS 복호화 장비를 사용합니다. 데모는 운영 TLS를 복호화하지 않습니다.
 3. 신뢰된 어댑터가 클라이언트의 `x-td-*`, `x-asr-*` 문맥을 제거하고 실제 관찰한 요청에 서명합니다. method·authority·path/query·애플리케이션 헤더·전체 본문을 보존합니다. 결합 규칙과 제외 항목은 `inspection/identity.py`에 정의합니다.
-4. HMAC 키는 신뢰된 홉과 검사기에만 보관하고 에이전트에 배포하지 않습니다. Community `source_id`를 허용 목록에 등록합니다. 평문·ExtProc 구간을 격리하세요. 예제는 공개 gRPC 리스너를 인증하지 않습니다.
+4. HMAC 키는 신뢰된 홉과 검사기에만 보관하고 에이전트에 배포하지 않습니다. gateway-only `source_id`를 허용 목록에 등록합니다. 평문·ExtProc 구간을 격리하세요. 예제는 공개 gRPC 리스너를 인증하지 않습니다.
 5. Envoy는 본문 전체 버퍼링, 크기·시간 상한, `failure_mode_allow: false`를 사용하며 전달 전 서명 헤더를 제거합니다. 서명은 원본 요청에, 영속 승인은 제공되는 경우 마스킹 후 동작 digest에 결합됩니다.
-6. Community는 경로·도구·리소스·행위의 명시적 로컬 규칙과 전달 출처를 검증합니다. 사용자 인증이나 에이전트 위임 권한을 보증하지 않습니다.
-7. Enterprise는 별도 비공개 제공자로 신원·위임을 추가 검증합니다. 기존 설정은 Enterprise가 기본이며 제공자가 없으면 조용히 하향하지 않고 시작에 실패합니다.
+6. Gateway-only 모드는 경로·도구·리소스·행위의 명시적 로컬 규칙과 전달 출처를 검증합니다. 사용자 인증이나 에이전트 위임 권한을 보증하지 않습니다.
+7. Broker 모드는 검증된 JWT identity claim과 내장 registry, delegation, task, resource, action, 일회성 approval을 평가합니다. 필수 identity가 없으면 fail closed 합니다.
 
 모든 TLS 장비에 자동 적용되는 범용 어댑터는 없습니다. 통합 시 메타데이터 위조와 목적지 직접 접근을 차단해야 합니다.
 

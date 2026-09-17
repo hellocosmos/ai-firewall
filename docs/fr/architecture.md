@@ -2,7 +2,7 @@
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
-Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](identity.md).
+La console prend en charge le SSO Microsoft Entra ID à locataire unique avec les rôles Administrateur et Lecteur. L’identité de l’opérateur et l’autorisation de l’agent sont des frontières distinctes ; l’Access Broker intégré applique l’autorisation. [Entra SSO](identity.md).
 
 ```text
 AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
@@ -19,10 +19,10 @@ L’API authentifie l’opérateur local, conserve les politiques et sert l’UI
 1. Imposez le routage hors de TrapDefense pour empêcher le contournement du proxy.
 2. Utilisez un déchiffreur TLS existant et autorisé. La démo ne déchiffre pas le TLS de production.
 3. L’adaptateur de confiance retire `x-td-*` et `x-asr-*` fournis par le client et signe ce qu’il a observé. Préservez méthode, autorité, chemin/requête, en-têtes applicatifs et corps complet. `inspection/identity.py` définit la liaison canonique et ses exclusions.
-4. Gardez la clé HMAC sur le relais et l’inspecteur uniquement, jamais chez les agents. Autorisez explicitement le `source_id` Community. Isolez les liens en clair et ExtProc : les exemples n’authentifient pas une écoute gRPC publique.
+4. Gardez la clé HMAC sur le relais et l’inspecteur uniquement, jamais chez les agents. Autorisez explicitement le `source_id` gateway-only. Isolez les liens en clair et ExtProc : les exemples n’authentifient pas une écoute gRPC publique.
 5. Envoy utilise un tampon complet, des limites de taille/temps et `failure_mode_allow: false`. Il retire l’attestation avant transfert. La signature lie l’original ; l’approbation persistante éventuelle lie l’empreinte de l’action après masquage.
-6. Community applique des règles locales explicites de route/outil/ressource/action et vérifie la source, sans établir l’identité utilisateur ni l’autorité déléguée de l’agent.
-7. Enterprise valide aussi identité/délégation avec un fournisseur privé distinct. Les anciennes configurations gardent Enterprise par défaut ; l’absence du fournisseur empêche le démarrage, sans dégradation silencieuse.
+6. Le mode gateway-only applique des règles locales explicites de route/outil/ressource/action et vérifie la source, sans établir l’identité utilisateur ni l’autorité déléguée de l’agent.
+7. Le mode Broker exige des claims JWT vérifiés et évalue registry, delegation, task, resource, action et approval à usage unique ; une identité incomplète échoue en mode fermé.
 
 Il n’existe pas d’adaptateur universel pour tout équipement TLS. L’intégration doit empêcher l’usurpation des métadonnées et restreindre l’accès direct à l’amont.
 

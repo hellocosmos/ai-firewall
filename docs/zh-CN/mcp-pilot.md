@@ -1,4 +1,4 @@
-# 真实 MCP 试点 — 0.35 Community Preview
+# 真实 MCP 试点 — 0.35 Open Source Preview
 
 [English](../en/mcp-pilot.md) · [한국어](../ko/mcp-pilot.md) · [简体中文](../zh-CN/mcp-pilot.md) · [日本語](../ja/mcp-pilot.md) · [Español](../es/mcp-pilot.md) · [Français](../fr/mcp-pilot.md)
 
@@ -13,7 +13,7 @@ docker pull envoyproxy/envoy@sha256:57e14a549d7bd43c8d3f6d03e8cfa653e037d4b38e13
 .venv/bin/python -m examples.mcp_pilot --state-dir .runtime-state/mcp-pilot-run --samples 30
 ```
 
-客户端 → 本地认证签名适配器 → Envoy/Community 检查器 → MCP 文档服务器。代理不持有签名密钥。适配器令牌仅用于本地访问，不证明用户或代理身份。同一 OS 用户与回环监听不等于生产隔离；生产路由必须防止绕过。
+客户端 → 本地认证签名适配器 → Envoy/AI Firewall 检查器 → MCP 文档服务器。代理不持有签名密钥。适配器令牌仅用于本地访问，不证明用户或代理身份。同一 OS 用户与回环监听不等于生产隔离；生产路由必须防止绕过。
 
 检查初始化、工具发现、读取/修改、删除拒绝与文档保留、请求/响应邮箱脱敏和虚构 Secret 拒绝、已知恶意响应、未映射工具、未签名请求以及检查器故障时无下游执行。正文限制 64 KiB。仅验证无状态 Streamable HTTP JSON；长期 SSE、OAuth 和任意 MCP 服务器兼容性需另行验证。
 

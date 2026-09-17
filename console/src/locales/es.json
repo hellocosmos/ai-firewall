@@ -464,5 +464,6 @@
   "Inspection only": "Solo inspección",
   "AI Firewall inspector": "Inspector AI Firewall",
   "Built-in Access Broker": "Access Broker integrado",
-  "Open-source broker · local file storage · request-bound one-time approval": "Broker de código abierto · almacenamiento local · aprobación única vinculada a la solicitud"
+  "Open-source broker · local file storage · request-bound one-time approval": "Broker de código abierto · almacenamiento local · aprobación única vinculada a la solicitud",
+  "Only fixed-resource route mappings can be registered from this console.": "Esta consola solo permite registrar asignaciones de ruta con recursos fijos."
 }

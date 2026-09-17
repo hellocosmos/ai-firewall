@@ -1,4 +1,4 @@
-"""Reproducible synthetic baseline for the installed Community proxy path."""
+"""Reproducible synthetic baseline for the installed AI Firewall path."""
 from __future__ import annotations
 
 import argparse
@@ -87,7 +87,7 @@ async def run(args) -> dict:
       if runtime.grpc_server is not None or runtime.destination is not None:
         await runtime.stop()
   try:
-    release = version("trapdefense-community")
+    release = version("trapdefense-ai-firewall")
   except PackageNotFoundError:
     release = "source-checkout"
   return {

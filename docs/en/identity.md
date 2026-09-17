@@ -1,12 +1,17 @@
-# Microsoft Entra ID — Community console SSO
+# Identity boundaries: console operators and agents
 
 [English](../en/identity.md) · [한국어](../ko/identity.md) · [简体中文](../zh-CN/identity.md) · [日本語](../ja/identity.md) · [Español](../es/identity.md) · [Français](../fr/identity.md)
 
-Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features.
+TrapDefense has two separate identity paths:
 
-## Configuration
+1. **Console operator identity** controls who can view or change policy, agents, delegations, and approvals. The console supports local administration and single-tenant Microsoft Entra ID SSO with Administrator and Viewer roles.
+2. **Agent request identity** controls whether a routed action may execute. A self-hosted gateway verifies an external JWT and maps an explicit allowlist of claims into the built-in Access Broker.
 
-Create a single-tenant Web app registration. Register the exact callback below. Define user app roles `TrapDefense.Admin` and `TrapDefense.Viewer`, enable assignment requirements in Enterprise applications, and assign test users. Store the configuration outside the repository with mode 0600. The secret stays on the server; no Graph permission is required.
+An operator login never becomes an agent identity. A trusted-hop signature proves adapter/request binding, not a user or agent.
+
+## Console Entra configuration
+
+Create a single-tenant Web app registration and register the exact callback. Define user app roles `TrapDefense.Admin` and `TrapDefense.Viewer`, require assignment in the Entra Enterprise application, and assign test users. Keep the server-side configuration outside the repository with mode 0600. No Microsoft Graph permission is required.
 
 ```json
 {
@@ -22,18 +27,14 @@ chmod 600 /absolute/path/entra.json
 TD_ENTRA_CONFIG=/absolute/path/entra.json ./scripts/run-console.sh
 ```
 
-## Synthetic demo
+Viewer access is read-only server-side. Entra users manage passwords in Entra. Sessions never outlive the validated ID-token expiry. Synthetic Entra uses an ephemeral local issuer and is not evidence of real consent, MFA, Conditional Access, Microsoft signing keys, or role propagation.
 
-```bash
-TD_SYNTHETIC_ENTRA=1 ./scripts/run-console.sh
-```
+## Agent JWT claim mapping
 
-`http://127.0.0.1:5176` → **Sign in with Synthetic Entra** → **Admin / Viewer**.
+The Docker gateway accepts RS256 tokens for the configured issuer, audience, resource, scopes, and optional authorized party. When `access_broker.enabled` is true, `gateway_auth.identity_claims` is mandatory. Required mapped values are tenant, user, agent, delegation, and task. Optional values are agent instance and approval ID.
 
-Viewer can read dashboard, events, policy, network and audit; all writes except logout are denied server-side. Entra users manage passwords in Entra. Sessions last at most one hour and never beyond ID-token expiry. Role changes take effect at next sign-in; existing sessions are not continuously revalidated. Logout ends the local session, not the Microsoft session. Real Entra defaults to local login disabled; `TD_CONSOLE_LOCAL_LOGIN=1` explicitly enables the local recovery account. Change its default password before enabling it. The console remains loopback-only. Synthetic success is not real tenant, consent, MFA or Conditional Access evidence.
+Only mapped values enter the trusted attestation. Arbitrary JWT claims and the gateway token itself are not copied into inspection evidence or forwarded to the target. The configured broker tenant must match the mapped tenant. Missing, empty, oversized, or non-string identity claims fail closed.
 
-## Protocol
+The external IdP may be Entra, Okta, Keycloak, or another compatible issuer. TrapDefense does not prescribe how that issuer creates agent/delegation claims; the customer must bind them to a trustworthy workload and lifecycle. Target-service credentials and permissions remain independent.
 
-Authorization code + PKCE S256, browser-bound one-time state, nonce, RS256 signature, issuer, audience, tenant and app-role validation. Tokens and client secrets are never sent to browser storage or audit logs. Synthetic mode uses an ephemeral RSA issuer with local code redemption; no Microsoft token endpoint is called. Real mode uses Microsoft authorization/token/JWKS endpoints and does not register synthetic routes.
-
-[Microsoft authorization code flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
+[Self-hosting configuration](self-hosting.md) · [Security](security.md) · [Synthetic compatibility evidence](gateway-compatibility.md)

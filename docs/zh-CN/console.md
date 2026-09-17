@@ -1,14 +1,14 @@
 # 控制台安装与操作
 
-> Docker 0.38: [自托管](self-hosting.md) · [网关兼容性](gateway-compatibility.md)。本页说明独立的源码合成演示。
+> Docker 0.39: [自托管](self-hosting.md) · [网关兼容性](gateway-compatibility.md)。本页说明独立的源码合成演示。
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
-Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](identity.md).
+控制台支持单租户 Microsoft Entra ID SSO 以及管理员、查看者角色。控制台操作员身份与智能体授权是独立边界；智能体授权由内置 Access Broker 执行。 [Entra SSO](identity.md).
 
 ## 安装与启动
 
-需要 Python 3.11+、Node.js 22.12+ 或 24、npm，以及运行中的本地 Docker Engine/Desktop。仅需此仓库，无需 SDK、私有 Enterprise 包或模型 API。脚本优先使用已安装的 `uv`，否则使用 Python venv/pip。不要使用 sudo，并保持 Docker 在本地运行。
+需要 Python 3.11+、Node.js 22.12+ 或 24、npm，以及运行中的本地 Docker Engine/Desktop。仅需此仓库，无需 SDK、私有运行时包或模型 API。脚本优先使用已安装的 `uv`，否则使用 Python venv/pip。不要使用 sudo，并保持 Docker 在本地运行。
 
 ```bash
 git clone https://github.com/hellocosmos/ai-firewall.git
@@ -32,7 +32,7 @@ Browser -> management API/UI :5176
                  <- response inspection <- decision + receipt <- UI
 ```
 
-发送器模拟 TLS 解密后的可信转发节点，对准确的合成请求签名，并不执行 TLS 解密或身份认证。Envoy 为真实代理，目标是独立 HTTP 监听器，不执行外部业务操作。Community 验证转发来源，而非用户或智能体身份。Access Broker 页面说明独立 Enterprise 的范围；Community 不提供模拟审批。
+发送器模拟可信转发节点并对准确的合成请求签名；它不是 TLS 解密器或 IdP。Envoy 与独立 HTTP 目标均为真实组件。演示使用内置 Access Broker 的真实代码、合成身份和请求绑定审批，但不执行外部业务操作。
 
 ## 页面与首次使用
 

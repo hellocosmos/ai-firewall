@@ -1,14 +1,14 @@
 # 콘솔 설치와 운영
 
-> Docker 0.38: [셀프호스팅](self-hosting.md) · [게이트웨이 호환성](gateway-compatibility.md). 이 페이지는 별도 소스 기반 합성 데모를 설명합니다.
+> Docker 0.39: [셀프호스팅](self-hosting.md) · [게이트웨이 호환성](gateway-compatibility.md). 이 페이지는 별도 소스 기반 합성 데모를 설명합니다.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
-Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회자 역할을 제공합니다. 콘솔 인증은 에이전트 실행 권한이 아니며 위임·승인은 Enterprise 기능입니다. [Entra SSO](identity.md).
+콘솔은 관리자·조회자 역할의 단일 테넌트 Microsoft Entra ID SSO를 지원합니다. 콘솔 운영자 인증과 에이전트 인가는 별도 경계이며, 에이전트 인가는 내장 Access Broker가 담당합니다. [Entra SSO](identity.md).
 
 ## 설치와 실행
 
-필수 환경은 Python 3.11+, Node.js 22.12+ 또는 24, npm, 실행 중인 로컬 Docker Engine/Desktop입니다. 이 저장소만으로 설치하며 SDK·비공개 Enterprise 패키지·모델 API는 필요하지 않습니다. 스크립트는 설치된 `uv`가 있으면 사용하고, 없으면 Python venv/pip를 사용합니다. sudo 없이 실행하고 Docker는 로컬에서 사용하세요.
+필수 환경은 Python 3.11+, Node.js 22.12+ 또는 24, npm, 실행 중인 로컬 Docker Engine/Desktop입니다. 이 저장소만으로 설치하며 SDK·비공개 런타임 패키지·모델 API는 필요하지 않습니다. 스크립트는 설치된 `uv`가 있으면 사용하고, 없으면 Python venv/pip를 사용합니다. sudo 없이 실행하고 Docker는 로컬에서 사용하세요.
 
 ```bash
 git clone https://github.com/hellocosmos/ai-firewall.git
@@ -32,7 +32,7 @@ Browser -> management API/UI :5176
                  <- response inspection <- decision + receipt <- UI
 ```
 
-발신기는 TLS 복호화 뒤의 신뢰된 전달 지점을 모사하여 정확한 합성 요청에 서명합니다. TLS 복호화기나 IdP는 아닙니다. 실제 Envoy와 별도 HTTP 목적지를 사용하지만 외부 업무 동작은 수행하지 않습니다. Community는 전달 출처를 검증하며 사용자·에이전트 신원을 보증하지 않습니다. Access Broker 화면은 별도 Enterprise 범위를 안내하며 Community에 가짜 승인 기능을 넣지 않았습니다.
+발신기는 신뢰된 전달 지점을 모사해 정확한 합성 요청에 서명하며 TLS 복호화기나 IdP는 아닙니다. 실제 Envoy와 별도 HTTP 목적지를 사용합니다. 데모는 내장 Access Broker에 합성 신원을 등록하고 요청 결합 승인을 실제 코드로 수행하되 외부 업무 동작은 실행하지 않습니다.
 
 ## 화면과 첫 사용 순서
 

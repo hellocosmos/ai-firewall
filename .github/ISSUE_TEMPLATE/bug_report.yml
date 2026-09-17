@@ -1,11 +1,11 @@
 name: Bug report
-description: Report a reproducible problem in TrapDefense Community.
+description: Report a reproducible problem in TrapDefense AI Firewall.
 title: "[Bug]: "
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping improve TrapDefense Community. Use synthetic inputs and remove secrets, credentials, tokens and customer content. Report suspected vulnerabilities through the Security policy instead.
+        Thanks for helping improve TrapDefense. Use synthetic inputs and remove secrets, credentials, tokens and customer content. Report suspected vulnerabilities through the Security policy instead.
   - type: input
     id: revision
     attributes:
@@ -20,7 +20,7 @@ body:
       label: Affected surface
       options:
         - Proxy or inspector
-        - Community console
+        - Operations console
         - Entra console SSO
         - Installation or scripts
         - Documentation
@@ -73,5 +73,5 @@ body:
           required: true
         - label: I removed secrets, credentials, tokens and customer content.
           required: true
-        - label: This report concerns the public Community repository rather than a private Enterprise deployment.
+        - label: This report concerns the public repository and contains no private customer material.
           required: true

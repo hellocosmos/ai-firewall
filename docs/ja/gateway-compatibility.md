@@ -1,10 +1,10 @@
-# ゲートウェイクライアント互換性 — 0.38
+# ゲートウェイクライアント互換性 — 0.39
 
 [English](../en/gateway-compatibility.md) · [한국어](../ko/gateway-compatibility.md) · [简体中文](../zh-CN/gateway-compatibility.md) · [日本語](../ja/gateway-compatibility.md) · [Español](../es/gateway-compatibility.md) · [Français](../fr/gateway-compatibility.md)
 
 クライアントはリモート HTTP/MCP URL を TrapDefense に変更し、接続キーのヘッダーまたは OAuth Bearer JWT を送信できる必要があります。クライアント→TrapDefense と TrapDefense→宛先の認証は分離されます。
 
-| 経路 | 0.38 の証拠 |
+| 経路 | 0.39 の証拠 |
 |---|---|
 | 一般 JSON HTTP | HTTPX による合成統合を検証済み |
 | 公式 Python MCP SDK 1.30.0 | MCP `2025-11-25` の初期化、通知、ツール一覧を合成統合で検証済み |
@@ -15,7 +15,7 @@
 | Stateful MCP、長時間 SSE、WebSocket、stdio | 未対応。session header と upstream SSE は fail closed |
 | マルチノード HA | 未対応。ローカル SQLite、replay、audit state を持つ単一 gateway 構成 |
 
-`gateway_auth` は `client_key` または `jwt` を使用します。JWT モードの TrapDefense は OAuth Resource Server で、RFC 9728 metadata と `WWW-Authenticate` を提供します。`scope`/`scp` は空白区切り文字列または文字列配列を受け付け、任意の `authorized_parties` は `azp`、`appid`、`cid` を制限します。0.38 は Entra の `roles` app role を scope として扱いません。
+`gateway_auth` は `client_key` または `jwt` を使用します。JWT モードの TrapDefense は OAuth Resource Server で、RFC 9728 metadata と `WWW-Authenticate` を提供します。`scope`/`scp` は空白区切り文字列または文字列配列を受け付け、任意の `authorized_parties` は `azp`、`appid`、`cid` を制限します。0.39 は Entra の `roles` app role を scope として扱いません。
 
 `target_auth` は `none`、`passthrough_bearer`、`static_bearer`、`static_api_key` をサポートします。Gateway JWT は宛先に転送されません。ログイン、token 発行、refresh、OBO は外部 IdP または別の credential provider が担当します。
 

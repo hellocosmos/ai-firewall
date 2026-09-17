@@ -464,5 +464,6 @@
   "Inspection only": "Inspection only",
   "AI Firewall inspector": "AI Firewall inspector",
   "Built-in Access Broker": "Built-in Access Broker",
-  "Open-source broker · local file storage · request-bound one-time approval": "Open-source broker · local file storage · request-bound one-time approval"
+  "Open-source broker · local file storage · request-bound one-time approval": "Open-source broker · local file storage · request-bound one-time approval",
+  "Only fixed-resource route mappings can be registered from this console.": "Only fixed-resource route mappings can be registered from this console."
 }

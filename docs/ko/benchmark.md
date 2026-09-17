@@ -22,6 +22,6 @@
 
 [콘솔 안내](console.md), [아키텍처](architecture.md), [에디션](editions.md), [보안 범위](security.md)를 참고하세요.
 
-## Community 검사기 다중 프로세스
+## AI Firewall 검사기 다중 프로세스
 
-[Community 검사기 다중 프로세스](inspector-pool.md)
+[AI Firewall 검사기 다중 프로세스](inspector-pool.md)

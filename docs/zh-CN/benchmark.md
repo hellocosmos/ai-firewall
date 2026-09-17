@@ -22,6 +22,6 @@
 
 参见[控制台](console.md)、[架构](architecture.md)、[版本](editions.md)和[安全范围](security.md)。
 
-## Community 检查器进程池
+## AI Firewall 检查器进程池
 
-[Community 检查器进程池](inspector-pool.md)
+[AI Firewall 检查器进程池](inspector-pool.md)
