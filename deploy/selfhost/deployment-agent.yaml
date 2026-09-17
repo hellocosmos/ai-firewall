@@ -1,0 +1,51 @@
+# Synthetic AISG agent-key profile. Use a private target secret for real services.
+upstream: http://fixture:8080
+allow_plaintext_upstream: true
+console_origin: http://localhost:18080
+gateway_auth:
+  mode: agent_key
+access_broker:
+  enabled: true
+  tenant_id: local
+target_auth:
+  mode: static_bearer
+  secret_file: /state/synthetic-target.token
+max_body_bytes: 1048576
+routes:
+- authority: fixture:8080
+  path: /api/notes
+  method: POST
+  protocol: http
+  tool: notes.read
+  rule:
+    action: read
+    resource: notes
+    effect: allow
+  redact_fields:
+  - /message
+- authority: fixture:8080
+  path: /mcp
+  protocol: mcp
+  tools:
+    initialize:
+      action: initialize
+      resource: mcp
+      effect: allow
+    notifications/initialized:
+      action: notify
+      resource: mcp
+      effect: allow
+    tools/list:
+      action: discover
+      resource: mcp
+      effect: allow
+    notes.read:
+      action: read
+      resource: notes
+      effect: allow
+    notes.delete:
+      action: delete
+      resource: notes
+      effect: block
+  redact_fields:
+  - /params/arguments/message

@@ -1,8 +1,12 @@
-# TrapDefense — 에이전트를 위한 오픈소스 AI Firewall
+# TrapDefense — Open-source AI Security Gateway
+
+**지원되는 HTTP API와 원격 MCP 서버를 명시적인 보안 경로로 연결합니다. 에이전트별 통제가 필요하면 신원을 추가합니다.**
+
+[연결 → 신원 → 통제 → 확인 →](docs/ko/aisg.md)
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-> **Open Source Preview 0.39:** 전체 런타임과 운영 UI는 MIT 라이선스다. 내장 Agent Access Broker는 구현과 합성 검증을 마쳤지만, 실제 IdP·고객 정책·HA·용량 검증 전까지 **Experimental**로 표시한다.
+> **Open Source Preview 0.40:** 전체 런타임과 운영 UI는 MIT 라이선스다. 내장 Agent Access Broker는 구현과 합성 검증을 마쳤지만, 실제 IdP·고객 정책·HA·용량 검증 전까지 **Experimental**로 표시한다.
 
 TrapDefense는 지원되는 HTTP 및 MCP 트래픽을 위한 셀프호스팅 AI Firewall이다. 요청과 응답을 검사하고, action/PII/secret 정책을 집행하며, 정제된 증거를 저장한다. 선택적으로 등록된 agent, delegation, task, resource, action, 일회성 human approval을 함께 평가한다.
 
@@ -20,8 +24,8 @@ Community/Enterprise 코드 에디션을 구분하지 않는다. Runtime Gateway
 ## Docker 셀프호스팅
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall/deploy/selfhost
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway/deploy/selfhost
 docker compose build app
 docker compose run --rm app init
 docker compose --profile smoke up -d

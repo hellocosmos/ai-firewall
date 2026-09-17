@@ -218,3 +218,13 @@ def test_target_credential_conflicts_fail_before_forward(target,gateway_mode,hea
   provider=TargetCredentialProvider(target,gateway_mode=gateway_mode,
     secret='target-token' if target.secret_file else None)
   with pytest.raises(CredentialError):provider.apply(headers,inbound)
+
+
+def test_autonomous_jwt_maps_only_agent_context(signing_key):
+  auth=GatewayAuthenticator(auth_config(identity_mode='agent',identity_claims={}),client_key='',jwk_client=KeyClient(signing_key))
+  result=auth.authenticate({'authorization':'Bearer '+encoded(signing_key,tid='tenant-a',agent_id='agent-a',
+    delegation_id='ignored',task_id='ignored',authorization_mode='delegated')})
+  assert result.identity=={'tenant_id':'tenant-a','agent_id':'agent-a','authorization_mode':'agent'}
+  for changes in ({'agent_id':None},{'tid':None},{'agent_id':123}):
+    claims={'tid':'tenant-a','agent_id':'agent-a',**changes}
+    with pytest.raises(AuthError):auth.authenticate({'authorization':'Bearer '+encoded(signing_key,**claims)})

@@ -1,5 +1,7 @@
 # Microsoft Entra ID — TrapDefense console SSO
 
+> **0.40 · AISG:** [Connecter, identifier, contrôler, vérifier](aisg.md). La passerelle utilise une clé de déploiement ou un JWT vérifié. agent_key identifie un agent enregistré sans IAM externe. JWT identity_mode: agent utilise les attributs vérifiés du tenant et de l’agent ; delegated exige aussi utilisateur, tâche et délégation. Les agents existants nécessitent une délégation par défaut.
+
 [English](../en/identity.md) · [한국어](../ko/identity.md) · [简体中文](../zh-CN/identity.md) · [日本語](../ja/identity.md) · [Español](../es/identity.md) · [Français](../fr/identity.md)
 
 La console prend en charge le SSO Microsoft Entra ID à locataire unique avec les rôles Administrateur et Lecteur. L’identité de l’opérateur et l’autorisation de l’agent sont des frontières distinctes ; l’Access Broker intégré applique l’autorisation.
@@ -39,5 +41,7 @@ Authorization code + PKCE S256, browser-bound one-time state, nonce, RS256 signa
 [Microsoft authorization code flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
 
 ## Mapping d’identité JWT de l’agent
+
+La suite décrit le **mode JWT delegated**. Consultez le [guide AISG](aisg.md) pour agent_key local et le mode agent autonome.
 
 Le mode Broker valide issuer, audience et scope du JWT émis par un IdP externe, puis ne transforme que les valeurs déclarées dans `identity_claims` en identité tenant, user, agent, delegation et task. Les claims arbitraires et le token gateway ne sont pas copiés dans les preuves ni vers la cible. Un claim obligatoire absent ou un tenant différent échoue en mode fermé. Un issuer compatible comme Entra, Okta ou Keycloak peut être utilisé, mais le client doit valider l’émission des claims et leur liaison au workload. [Auto-hébergement](self-hosting.md) · [Sécurité](security.md)

@@ -1,0 +1,8 @@
+# Synthetic fixture only; real deployments must mount their own private target secret.
+services:
+  app:
+    entrypoint: [sh, /config/prepare-agent-demo.sh]
+    command: [serve]
+    volumes:
+      - ./deployment-agent.yaml:/config/deployment.yaml:ro
+      - ./prepare-agent-demo.sh:/config/prepare-agent-demo.sh:ro

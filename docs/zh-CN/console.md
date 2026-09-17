@@ -1,5 +1,7 @@
 # 控制台安装与操作
 
+> **0.40 · AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
+
 > Docker 0.39: [自托管](self-hosting.md) · [网关兼容性](gateway-compatibility.md)。本页说明独立的源码合成演示。
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
@@ -11,8 +13,8 @@
 需要 Python 3.11+、Node.js 22.12+ 或 24、npm，以及运行中的本地 Docker Engine/Desktop。仅需此仓库，无需 SDK、私有运行时包或模型 API。脚本优先使用已安装的 `uv`，否则使用 Python venv/pip。不要使用 sudo，并保持 Docker 在本地运行。
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway
 ./scripts/install-console.sh
 ./scripts/run-console.sh
 ```

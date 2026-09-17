@@ -1,5 +1,7 @@
 # Microsoft Entra ID — TrapDefense console SSO
 
+> **0.40 · AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
+
 [English](../en/identity.md) · [한국어](../ko/identity.md) · [简体中文](../zh-CN/identity.md) · [日本語](../ja/identity.md) · [Español](../es/identity.md) · [Français](../fr/identity.md)
 
 控制台支持单租户 Microsoft Entra ID SSO 以及管理员、查看者角色。控制台操作员身份与智能体授权是独立边界；智能体授权由内置 Access Broker 执行。
@@ -39,5 +41,7 @@ Authorization code + PKCE S256, browser-bound one-time state, nonce, RS256 signa
 [Microsoft authorization code flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
 
 ## 智能体 JWT identity mapping
+
+以下说明 **delegated JWT 模式**。本地 agent_key 和自主 agent 模式请参见 [AISG 指南](aisg.md)。
 
 Broker 模式先验证外部 IdP JWT 的 issuer、audience 与 scope，再仅将 `identity_claims` 中显式配置的值映射为 tenant、user、agent、delegation 与 task 身份。任意 claims 与 gateway token 不会进入检查证据或目标服务。缺少必需 claim 或 tenant 不匹配时会 fail closed。可使用 Entra、Okta、Keycloak 等兼容 issuer，但客户必须验证 claim 签发与 workload 绑定的可信度。[自托管](self-hosting.md) · [安全](security.md)

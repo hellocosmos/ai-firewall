@@ -1,5 +1,7 @@
 # Autoalojamiento con Docker — 0.39 Open Source Preview
 
+> **0.40 · AISG:** [Conectar, identificar, controlar, verificar](aisg.md). El gateway autentica con una clave de despliegue o JWT verificado. agent_key identifica agentes registrados sin IAM externo. JWT identity_mode: agent usa los atributos verificados de tenant y agente; delegated también exige usuario, tarea y delegación. Los agentes existentes requieren delegación por defecto.
+
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
 0.39 ofrece adaptador, Envoy, inspector, consola y autenticación separada para gateway y destino. La imagen se compila localmente desde el código fuente. TrapDefense Cloud sigue previsto.
@@ -21,8 +23,8 @@ La contraseña administra la consola. La clave o JWT autentica el acceso a TrapD
 Requiere Git y Docker Compose v2. init solicita una contraseña de administrador de al menos 12 caracteres, sin valor predeterminado. El ejemplo apunta a un destino sintético, no a un servicio real.
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall/deploy/selfhost
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway/deploy/selfhost
 docker compose build app
 docker compose run --rm app init
 docker compose --profile smoke up -d
@@ -42,5 +44,7 @@ El estado persiste en volúmenes. Detenga y respalde ambos volúmenes y la confi
 [Compatibilidad y VS Code](gateway-compatibility.md) · [Detailed examples, backup and migration (English)](../en/self-hosting.md)
 
 ## Activar el Access Broker integrado
+
+Lo siguiente describe el **modo JWT delegated**. Consulte la [guía AISG](aisg.md) para agent_key local y el modo agent autónomo.
 
 Use `gateway_auth.mode: jwt` y declare en `identity_claims` los nombres de claims para tenant, user, agent, delegation y task. Configure después `access_broker.enabled: true` y un `access_broker.tenant_id`. Registre previamente el agent y la delegation del mismo tenant en la consola. Un claim obligatorio ausente o un tenant distinto se bloquea antes del reenvío. Consulte el YAML exacto en la [referencia inglesa](../en/self-hosting.md). El file store local es para un solo host, no para HA multinodo.

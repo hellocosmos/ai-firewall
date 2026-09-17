@@ -1,10 +1,12 @@
 # Docker self-hosting (0.39 Open Source Preview)
 
+> **0.40 · AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
+
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
 ## Start here: does your client fit?
 
-This package supports **one fixed destination origin per installation** and an explicit list of HTTP routes/MCP actions. The client must let you change its API/MCP URL and use either `X-TD-Client-Key` or an OAuth Bearer JWT. Target credentials remain separate. Use a server-side client or a separately configured same-origin application; this package does not enable permissive browser CORS. If the required settings are unavailable, this package is not a drop-in integration for that client. See the [gateway compatibility matrix](gateway-compatibility.md).
+This package supports **one fixed destination origin per installation** and an explicit list of HTTP routes/MCP actions. The client must let you change its API/MCP URL and use either `X-TD-Client-Key`, a local agent Bearer credential, or an OAuth Bearer JWT. Target credentials remain separate. Use a server-side client or a separately configured same-origin application; this package does not enable permissive browser CORS. If the required settings are unavailable, this package is not a drop-in integration for that client. See the [gateway compatibility matrix](gateway-compatibility.md).
 
 ```text
 Client -- gateway key or JWT --> bundled adapter
@@ -37,8 +39,8 @@ In JWT mode, TrapDefense is an OAuth resource server, not an authorization serve
 Prerequisites: Git and Docker Engine/Desktop with Compose v2. Python and Node run inside the build. This builds a local image; no hosted image registry or managed Cloud availability is implied. Allocate enough memory for dependency installation and inspection; measure your workload before sizing production.
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall/deploy/selfhost
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway/deploy/selfhost
 docker compose build app
 docker compose run --rm app init
 # Choose and confirm a unique 12+ character administrator password.
@@ -88,7 +90,7 @@ Expected: blocked by the configured action policy. The optional fixture is a sma
 1. Stop the smoke stack with `docker compose --profile smoke down` (without `-v`).
 2. Edit `deployment.yaml`: replace `upstream`, each route's `authority`, exact paths, methods, tool/action/resource mappings and allowed redaction fields. Use a DNS HTTPS origin, for example `https://api.example.com`; no URL credentials, base path, query or fragment. Certificate-chain and hostname checks are enabled. For a private CA, mount the appropriate CA bundle into Envoy at `/etc/ssl/certs/ca-certificates.crt`; never disable verification.
 3. Plain HTTP requires `allow_plaintext_upstream: true`; use it only on an explicitly trusted segment. One installation cannot dynamically select destinations based on client URLs. Deploy separate instances for different origins.
-4. Configure `gateway_auth` as `client_key` or `jwt`. Configure `target_auth` as `none`, `passthrough_bearer`, `static_bearer` or `static_api_key`. JWT cannot be combined with passthrough. For static modes, mount the secret file read-only into the app, readable by UID 10001 and mode 0600. Do not commit secret files. Restart the app after rotation. Conflicting caller credentials are rejected.
+4. Configure `gateway_auth` as `client_key`, `agent_key` or `jwt`. Configure `target_auth` as `none`, `passthrough_bearer`, `static_bearer` or `static_api_key`. JWT and agent_key cannot be combined with passthrough. For static modes, mount the secret file read-only into the app, readable by UID 10001 and mode 0600. Do not commit secret files. Restart the app after rotation. Conflicting caller credentials are rejected.
 5. If route/tool keys changed after initialization, explicitly migrate saved policies using the procedure below. Existing saved policies are never silently replaced by new YAML defaults.
 6. Run `docker compose run --rm app render` and `docker compose up -d --force-recreate` (without the smoke profile). Change the client's URL to your gateway and add its connection key. Send an allowed and blocked request; examine destination-side effects and console evidence.
 
@@ -139,7 +141,7 @@ target_auth:
 
 Production identity and metadata URLs require HTTPS. `allow_insecure_loopback: true` exists only for explicit local synthetic tests. The resource-derived metadata URL for the example is `https://firewall.example.com/.well-known/oauth-protected-resource/mcp`. `authorized_parties` is optional; when configured, the token must carry a matching `azp`, `appid` or `cid` client identifier. Scope validation accepts the OAuth `scope`/`scp` claim as a space-delimited string or string array. Entra application roles in `roles` are not treated as scopes in 0.39.
 
-`identity_claims` is an explicit allowlist. The broker-enabled gateway copies only those verified claims into the signed inspector context. Required values are tenant, user, agent, delegation and task. The configured `access_broker.tenant_id` is the console management boundary and must match request identities. Register the agent and create a matching delegation in the console before sending traffic. High-risk requests can create an approval; the caller must obtain a new JWT carrying the returned `approval_id` (or otherwise place that value in the configured approval claim) and repeat the exact request once. Do not let an untrusted caller mint or rewrite these claims.
+`identity_claims` is an explicit allowlist. The broker-enabled gateway copies only those verified claims into the signed inspector context. In the default delegated JWT mode, required values are tenant, user, agent, delegation and task. The configured `access_broker.tenant_id` is the console management boundary and must match request identities. Register the agent and create a matching delegation in the console before sending traffic. High-risk requests can create an approval; the caller must obtain a new JWT carrying the returned `approval_id` (or otherwise place that value in the configured approval claim) and repeat the exact request once. Do not let an untrusted caller mint or rewrite these claims.
 
 ## Integration acceptance checklist
 
@@ -179,4 +181,12 @@ docker compose run --rm app render
 docker compose up -d --force-recreate
 ```
 
-Multi-node HA, automatic credential rotation, managed Cloud operations and universal MCP compatibility are outside this package. Per-agent identity is available through explicit verified JWT claim mapping and still requires customer validation.
+Multi-node HA, automatic credential rotation, managed Cloud operations and universal MCP compatibility are outside this package. Per-agent identity is available through local agent credentials or explicit verified JWT claim mapping. External issuer integration still requires customer validation.
+
+## AISG autonomous JWT configuration
+
+Set `gateway_auth.identity_mode: agent` with `identity_claims` mapping only trusted tenant/agent values (for example tenant_id to `tid`, agent_id to `azp` for an explicitly registered workload). Register that exact value in the Agent Registry, enable autonomous access, and assign action/resource/tool scopes. No user, task or delegation is synthesized. The default remains `delegated`. Shared client IDs identify the application, not distinct agent instances.
+
+The local `agent_key` profile uses an opaque Bearer credential, not OAuth discovery or an OAuth issuer. Clients must support static Bearer configuration. For OAuth clients use the external JWT profile. Destination authentication and target permissions remain independent.
+
+Local keys are hashed in `/state/agent-credentials.sqlite`. The console issues, rotates, revokes and lists metadata under `/demo-api/agents/{agent_id}/credentials`; mutations require an administrator session and CSRF protection. Never expose this console API as a client authentication API. Rotation revokes the selected key immediately. An agent may hold multiple keys; revoke each or disable the agent to block all.

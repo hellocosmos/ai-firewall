@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.40 — AI Security Gateway
+
+- Explicit AISG positioning and six-language connection guides.
+- Local expiring agent credentials with hashed storage, atomic rotation, revocation and live registry checks.
+- Opt-in autonomous agent authorization with action/tool/resource allowlists; existing delegated mode remains the default.
+- Mode-bound one-time approvals and side-effect-free mirror evaluation.
+- Console credential lifecycle and agent enable/disable controls.
+- Synthetic Docker agent-key profile; bounded JSON HTTP/MCP transport limits remain unchanged.
+
+
 All notable changes to TrapDefense AI Firewall are documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Source releases currently run from `0.31` through `0.39`.
@@ -207,13 +217,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Sou
 - Local audit storage is mutable, and content detection can produce false positives or false negatives.
 - Enterprise Access Broker, approvals and delegated authorization are distributed separately.
 
-[0.39]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.39
-[0.38]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.38
-[0.37]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.37
-[0.36]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.36
-[0.35]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.35
-[0.34]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.34
-[0.33]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.33
-[0.32]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.32
-[0.31]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.31
-[0.3.0]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.3.0
+[0.39]: https://github.com/hellocosmos/ai-security-gateway/releases/tag/v0.39
+[0.38]: https://github.com/hellocosmos/ai-security-gateway/releases/tag/v0.38
+[0.37]: https://github.com/hellocosmos/ai-security-gateway/releases/tag/v0.37
+[0.36]: https://github.com/hellocosmos/ai-security-gateway/releases/tag/v0.36
+[0.35]: https://github.com/hellocosmos/ai-security-gateway/releases/tag/v0.35
+[0.34]: https://github.com/hellocosmos/ai-security-gateway/releases/tag/v0.34
+[0.33]: https://github.com/hellocosmos/ai-security-gateway/releases/tag/v0.33
+[0.32]: https://github.com/hellocosmos/ai-security-gateway/releases/tag/v0.32
+[0.31]: https://github.com/hellocosmos/ai-security-gateway/releases/tag/v0.31
+[0.3.0]: https://github.com/hellocosmos/ai-security-gateway/releases/tag/v0.3.0

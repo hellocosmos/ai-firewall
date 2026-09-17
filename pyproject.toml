@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "trapdefense-ai-firewall"
-version = "0.39"
+version = "0.40"
 description = "TrapDefense AI Firewall: AI action control, data protection and HTTP/MCP inspection"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -31,7 +31,7 @@ trapdefense-demo = "asr_proxy.inspection.demo:main"
 
 [project.urls]
 Homepage = "https://trapdefense.com"
-Repository = "https://github.com/hellocosmos/ai-firewall"
+Repository = "https://github.com/hellocosmos/ai-security-gateway"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/asr_proxy"]

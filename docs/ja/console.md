@@ -1,5 +1,7 @@
 # コンソールのインストールと運用
 
+> **0.40 · AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
+
 > Docker 0.39: [セルフホスティング](self-hosting.md) · [ゲートウェイ互換性](gateway-compatibility.md)。このページは別のソース版合成デモを説明します。
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
@@ -11,8 +13,8 @@
 Python 3.11+、Node.js 22.12+ または 24、npm、稼働中のローカル Docker Engine/Desktop が必要です。このリポジトリだけで導入でき、SDK・非公開ランタイムパッケージ・モデル API は不要です。スクリプトは既存の `uv` を優先し、なければ Python venv/pip を使います。sudo を使わず、Docker はローカルで実行してください。
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway
 ./scripts/install-console.sh
 ./scripts/run-console.sh
 ```

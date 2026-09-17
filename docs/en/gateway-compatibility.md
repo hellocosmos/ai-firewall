@@ -1,5 +1,7 @@
 # Gateway client compatibility — 0.39
 
+> **0.40 · AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
+
 [English](../en/gateway-compatibility.md) · [한국어](../ko/gateway-compatibility.md) · [简体中文](../zh-CN/gateway-compatibility.md) · [日本語](../ja/gateway-compatibility.md) · [Español](../es/gateway-compatibility.md) · [Français](../fr/gateway-compatibility.md)
 
 TrapDefense exposes a normal remote HTTP/MCP endpoint. A client must let you replace its destination URL and send either a configured header or an OAuth Bearer token. Authentication from the client to TrapDefense stays separate from authentication from TrapDefense to the target.

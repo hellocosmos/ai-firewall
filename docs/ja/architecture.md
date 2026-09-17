@@ -1,5 +1,7 @@
 # アーキテクチャと信頼境界
 
+> **0.40 · AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
+
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
 コンソールは単一テナント Microsoft Entra ID SSO と管理者・閲覧者ロールをサポートします。コンソール運用者の認証とエージェント認可は別の境界で、認可は内蔵 Access Broker が行います。 [Entra SSO](identity.md).

@@ -1,5 +1,7 @@
 # Architecture and trust boundary
 
+> **0.40 · AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
+
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
 The console can use single-tenant Microsoft Entra ID SSO for Administrator and Viewer roles. Console operator authentication remains separate from agent authorization. The built-in Access Broker consumes verified agent identity from the gateway JWT claim map. [Identity boundaries](identity.md).
@@ -22,7 +24,7 @@ The console's management API authenticates a local operator, persists policy and
 4. Keep the HMAC key only on the trusted hop and inspector; never distribute it to agents. Allowlist the gateway-only `source_id`. Isolate plaintext and ExtProc links: these examples do not authenticate a public gRPC listener.
 5. Envoy uses complete buffered inspection, bounded size/time and `failure_mode_allow: false`. It removes the attestation before forwarding. Signing binds the original request; durable approval, when present, binds the post-redaction action digest.
 6. Gateway-only mode applies explicit local route/tool/resource/action rules and verifies a forwarding source. This traffic-source check does not establish a user identity or delegated agent authority.
-7. Broker-enabled mode requires verified JWT identity claims and evaluates the built-in agent registry, delegation, task, resource, action and one-time approval. Missing identity fields fail closed.
+7. Broker-enabled mode accepts a local agent credential or verified JWT identity claims. It evaluates agent scope, resource, action and one-time approval; delegated mode also requires user, delegation and task. Missing identity fields fail closed.
 
 There is no universal adapter for arbitrary TLS appliances. Integrations must prevent metadata spoofing and enforce upstream access restrictions.
 

@@ -1,5 +1,7 @@
 # 아키텍처와 신뢰 경계
 
+> **0.40 · AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
+
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
 콘솔은 관리자·조회자 역할의 단일 테넌트 Microsoft Entra ID SSO를 지원합니다. 콘솔 운영자 인증과 에이전트 인가는 별도 경계이며, 에이전트 인가는 내장 Access Broker가 담당합니다. [Entra SSO](identity.md).

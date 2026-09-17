@@ -1,11 +1,13 @@
 # Identity boundaries: console operators and agents
 
+> **0.40 · AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
+
 [English](../en/identity.md) · [한국어](../ko/identity.md) · [简体中文](../zh-CN/identity.md) · [日本語](../ja/identity.md) · [Español](../es/identity.md) · [Français](../fr/identity.md)
 
 TrapDefense has two separate identity paths:
 
 1. **Console operator identity** controls who can view or change policy, agents, delegations, and approvals. The console supports local administration and single-tenant Microsoft Entra ID SSO with Administrator and Viewer roles.
-2. **Agent request identity** controls whether a routed action may execute. A self-hosted gateway verifies an external JWT and maps an explicit allowlist of claims into the built-in Access Broker.
+2. **Agent request identity** controls whether a routed action may execute. The gateway verifies a local agent credential or explicitly mapped external JWT claims before invoking the built-in Access Broker.
 
 An operator login never becomes an agent identity. A trusted-hop signature proves adapter/request binding, not a user or agent.
 
@@ -31,7 +33,7 @@ Viewer access is read-only server-side. Entra users manage passwords in Entra. S
 
 ## Agent JWT claim mapping
 
-The Docker gateway accepts RS256 tokens for the configured issuer, audience, resource, scopes, and optional authorized party. When `access_broker.enabled` is true, `gateway_auth.identity_claims` is mandatory. Required mapped values are tenant, user, agent, delegation, and task. Optional values are agent instance and approval ID.
+The Docker gateway accepts RS256 tokens for the configured issuer, audience, resource, scopes, and optional authorized party. For JWT-backed broker mode, `gateway_auth.identity_claims` is mandatory. In `identity_mode: agent`, tenant and agent are required. The default `delegated` mode also requires user, delegation, and task. Local `agent_key` mode uses the registry and credential store instead of JWT claims. Optional values are agent instance and approval ID.
 
 Only mapped values enter the trusted attestation. Arbitrary JWT claims and the gateway token itself are not copied into inspection evidence or forwarded to the target. The configured broker tenant must match the mapped tenant. Missing, empty, oversized, or non-string identity claims fail closed.
 

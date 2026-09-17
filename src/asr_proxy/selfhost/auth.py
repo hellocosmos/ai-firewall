@@ -4,7 +4,7 @@ import hmac
 
 import jwt
 
-from .config import ClientKeyGatewayAuth, JwtGatewayAuth
+from .config import ClientKeyGatewayAuth, JwtGatewayAuth, AgentKeyGatewayAuth
 
 
 class AuthError(ValueError):
@@ -22,8 +22,9 @@ class GatewayAuthResult:
 
 
 class GatewayAuthenticator:
-  def __init__(self,config,*,client_key: str,jwk_client=None):
+  def __init__(self,config,*,client_key: str,jwk_client=None,agent_credentials=None):
     self.config,self.client_key=config,client_key
+    self.agent_credentials=agent_credentials
     self.keys=jwk_client
     if isinstance(config,JwtGatewayAuth) and self.keys is None:
       # Bound unknown-kid refreshes to protect the IdP while accepting normal key rotation quickly.
@@ -35,6 +36,18 @@ class GatewayAuthenticator:
       if not hmac.compare_digest(supplied.encode(),self.client_key.encode()):
         raise AuthError('invalid_client_key',401)
       return GatewayAuthResult('client-key')
+    if isinstance(self.config,AgentKeyGatewayAuth):
+      value=headers.get('authorization','')
+      if not value.startswith('Bearer ') or self.agent_credentials is None:
+        raise AuthError('invalid_agent_key',401)
+      identity=self.agent_credentials.authenticate(value[7:])
+      if identity is None:raise AuthError('invalid_agent_key',401)
+      approval=headers.get('x-td-approval-id')
+      if approval:
+        import re
+        if not re.fullmatch(r'apv_[a-f0-9]{12}',approval):raise AuthError('invalid_approval_id',400)
+        identity['approval_id']=approval
+      return GatewayAuthResult(identity['agent_id'],identity=identity)
     value=headers.get('authorization','')
     parts=value.split(' ')
     if len(parts)!=2 or parts[0]!='Bearer' or not parts[1]:
@@ -61,8 +74,10 @@ class GatewayAuthenticator:
     identity = {}
     mapping = self.config.identity_claims
     if mapping is not None:
-      required = ('tenant_id','user_id','agent_id','delegation_id','task_id')
+      required = ('tenant_id','agent_id') if self.config.identity_mode=='agent' else ('tenant_id','user_id','agent_id','delegation_id','task_id')
       for field_name, claim_name in mapping.model_dump().items():
+        if self.config.identity_mode=='agent' and field_name in ('user_id','task_id','delegation_id'):
+          continue
         if claim_name is None:
           continue
         value = claims.get(claim_name)
@@ -71,6 +86,7 @@ class GatewayAuthenticator:
         if not isinstance(value,str) or not value or len(value)>256:
           raise AuthError('invalid_agent_identity',401)
         identity[field_name]=value
+      if self.config.identity_mode=='agent':identity['authorization_mode']='agent'
     return GatewayAuthResult(subject,scopes,identity)
 
   def metadata(self):

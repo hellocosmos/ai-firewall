@@ -1,5 +1,7 @@
 # 部署条件与提供状态
 
+> **0.40 · AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
+
 [English](../en/deployment-fit.md) · [한국어](../ko/deployment-fit.md) · [简体中文](../zh-CN/deployment-fit.md) · [日本語](../ja/deployment-fit.md) · [Español](../es/deployment-fit.md) · [Français](../fr/deployment-fit.md)
 
 保护可通过受支持检查路径的 HTTP API 和远程 MCP 调用。保留 MCP 服务器和连接器中的现有服务认证，不替代 IAM。

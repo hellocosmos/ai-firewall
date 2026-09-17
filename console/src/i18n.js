@@ -30,5 +30,5 @@ export function t(key, values = []) {
   const text = dictionaries[locale][canonical] ?? en[canonical] ?? key;
   return String(text ?? '').replace(/\{(\d+)\}/g, (match, index) => String(values[index] ?? match));
 }
-export const documentationUrl = (selfhost = false) => `https://github.com/hellocosmos/ai-firewall/blob/main/docs/${locale}/${selfhost ? "self-hosting" : "console"}.md`;
+export const documentationUrl = (selfhost = false) => `https://github.com/hellocosmos/ai-security-gateway/blob/main/docs/${locale}/${selfhost ? "self-hosting" : "console"}.md`;
 document.documentElement.lang = locale;

@@ -1,5 +1,7 @@
 # Microsoft Entra ID — TrapDefense console SSO
 
+> **0.40 · AISG:** [Conectar, identificar, controlar, verificar](aisg.md). El gateway autentica con una clave de despliegue o JWT verificado. agent_key identifica agentes registrados sin IAM externo. JWT identity_mode: agent usa los atributos verificados de tenant y agente; delegated también exige usuario, tarea y delegación. Los agentes existentes requieren delegación por defecto.
+
 [English](../en/identity.md) · [한국어](../ko/identity.md) · [简体中文](../zh-CN/identity.md) · [日本語](../ja/identity.md) · [Español](../es/identity.md) · [Français](../fr/identity.md)
 
 La consola admite SSO Microsoft Entra ID de un solo tenant con roles Administrador y Lector. La identidad del operador y la autorización del agente son límites distintos; el Access Broker integrado aplica la autorización.
@@ -39,5 +41,7 @@ Authorization code + PKCE S256, browser-bound one-time state, nonce, RS256 signa
 [Microsoft authorization code flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
 
 ## Mapeo de identidad JWT del agente
+
+Lo siguiente describe el **modo JWT delegated**. Consulte la [guía AISG](aisg.md) para agent_key local y el modo agent autónomo.
 
 El modo Broker valida issuer, audience y scope del JWT emitido por un IdP externo y solo transforma los valores declarados en `identity_claims` en identidad tenant, user, agent, delegation y task. Los claims arbitrarios y el token gateway no pasan a la evidencia ni al servicio destino. Un claim obligatorio ausente o un tenant distinto falla de forma cerrada. Puede usarse un issuer compatible como Entra, Okta o Keycloak, pero el cliente debe validar la emisión de claims y su vínculo con el workload. [Autoalojamiento](self-hosting.md) · [Seguridad](security.md)

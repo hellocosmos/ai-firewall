@@ -1,5 +1,7 @@
 # Un único producto de código abierto
 
+> **0.40 · AISG:** [Conectar, identificar, controlar, verificar](aisg.md). El gateway autentica con una clave de despliegue o JWT verificado. agent_key identifica agentes registrados sin IAM externo. JWT identity_mode: agent usa los atributos verificados de tenant y agente; delegated también exige usuario, tarea y delegación. Los agentes existentes requieren delegación por defecto.
+
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
 TrapDefense 0.39 usa una sola base de código con licencia MIT. Runtime Gateway y Agent Access Broker se publican juntos en este repositorio; no se necesitan una distribución Python privada, provider entry point, license key ni edition switch.

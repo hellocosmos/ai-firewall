@@ -1,3 +1,4 @@
+import AgentCredentials from './AgentCredentials';
 import { t } from "./i18n";
 import React, { useEffect, useState } from 'react';
 import { Plus, ArrowUpRight, Check, X, Play } from 'lucide-react';
@@ -31,14 +32,17 @@ const fieldLabels = {
   risk_tier: "Risk level",
   enabled: "Enabled",
   purpose: "Delegation purpose",
-  allowed_actions: "Allowed actions"
+  allowed_actions: "Allowed actions",
+  allow_autonomous: "Autonomous access",
+  authorization_mode: "Authorization mode"
 };
 export default function Broker({
   broker,
   mutate,
   busy,
   run,
-  synthetic
+  synthetic,
+  localCredentials
 }) {
   const [tab, setTab] = useState('approvals'),
     [search, setSearch] = useState(''),
@@ -49,6 +53,7 @@ export default function Broker({
     agent_id: '',
     owner_id: '',
     risk_tier: 'medium',
+    allow_autonomous: false,
     allowed_tools: [broker.tools?.[0]?.name || '']
   });
   const [delegation, setDelegation] = useState({
@@ -82,7 +87,10 @@ export default function Broker({
                     type: tab
                   });
                   setComment('');
-                }}><ArrowUpRight size={15} /></button></td></tr>)}</tbody></table></div>}</Panel>{selected && <Drawer title={selected.type === 'approvals' ? t("Review approval request") : selected.type === 'agents' ? t("Agent details") : t("Delegation details")} onClose={() => setSelected(null)}><div className="td-detail-hero"><Badge value={selected.status || selected.risk_tier || 'active'} /><h3>{selected.agent_id}</h3><p>{t(reasons[selected.reason] || selected.reason) || selected.purpose || selected.owner_id}</p></div><dl className="td-dl">{Object.entries(selected).filter(([key]) => !['type', 'metadata', 'reason'].includes(key)).map(([key, value]) => <React.Fragment key={key}><dt>{t(fieldLabels[key] || key)}</dt><dd>{Array.isArray(value) ? value.join(', ') : key.endsWith('_at') ? date(value) : typeof value === 'boolean' ? value ? t("Yes") : t("No") : String(value ?? '—')}</dd></React.Fragment>)}</dl>{selected.type === 'approvals' && <><div className="td-callout"><span>{t("Approval is bound to the request digest. It only authorizes a synthetic replay; no external business tool runs.")}</span></div>{state(selected) === 'pending' ? <form onSubmit={e => e.preventDefault()}><label>{t("Review reason")}<textarea value={comment} onChange={e => setComment(e.target.value)} maxLength={300} placeholder={t("Enter the reason for approval or denial")} /></label><div className="td-form-actions"><button className="td-btn danger" disabled={busy || comment.trim().length < 3} onClick={async () => {
+                }}><ArrowUpRight size={15} /></button></td></tr>)}</tbody></table></div>}</Panel>{tab === 'agents' && localCredentials && <AgentCredentials agents={broker.agents} mutate={mutate} busy={busy} synthetic={synthetic}/ >}{selected && <Drawer title={selected.type === 'approvals' ? t("Review approval request") : selected.type === 'agents' ? t("Agent details") : t("Delegation details")} onClose={() => setSelected(null)}><div className="td-detail-hero"><Badge value={selected.status || selected.risk_tier || 'active'} /><h3>{selected.agent_id}</h3><p>{t(reasons[selected.reason] || selected.reason) || selected.purpose || selected.owner_id}</p></div><dl className="td-dl">{Object.entries(selected).filter(([key]) => !['type', 'metadata', 'reason'].includes(key)).map(([key, value]) => <React.Fragment key={key}><dt>{t(fieldLabels[key] || key)}</dt><dd>{Array.isArray(value) ? value.join(', ') : key.endsWith('_at') ? date(value) : typeof value === 'boolean' ? value ? t("Yes") : t("No") : String(value ?? '—')}</dd></React.Fragment>)}</dl>{selected.type === 'agents' && <button className="td-btn" disabled={busy} onClick={async()=>{
+  const result=await mutate(()=>request(`/agents/${encodeURIComponent(selected.agent_id)}/status`,{enabled:!selected.enabled}),t('Agent status updated.'));
+  if(result)setSelected({...result,type:'agents'});
+}}>{selected.enabled?t('Disable agent'):t('Enable agent')}</button>}{selected.type === 'approvals' && <><div className="td-callout"><span>{t(synthetic ? "Approval is bound to the request digest. It only authorizes a synthetic replay; no external business tool runs." : "Approval is bound to this request. After approval, retry the exact request with the approval ID; it can execute only once.")}</span></div>{state(selected) === 'pending' ? <form onSubmit={e => e.preventDefault()}><label>{t("Review reason")}<textarea value={comment} onChange={e => setComment(e.target.value)} maxLength={300} placeholder={t("Enter the reason for approval or denial")} /></label><div className="td-form-actions"><button className="td-btn danger" disabled={busy || comment.trim().length < 3} onClick={async () => {
               const result = await mutate(() => request(`/approvals/${selected.approval_id}/deny`, {
                 comment: comment.trim()
               }), t("The approval request was denied."));
@@ -98,7 +106,7 @@ export default function Broker({
                 ...result,
                 type: 'approvals'
               });
-            }}><Check size={15} />{t("Approve")}</button></div></form> : state(selected) === 'approved' ? <button className="td-btn primary" disabled={busy} onClick={async () => {
+            }}><Check size={15} />{t("Approve")}</button></div></form> : state(selected) === 'approved' && synthetic ? <button className="td-btn primary" disabled={busy} onClick={async () => {
           const result = await run('deploy', selected.approval_id);
           if (result) setSelected(null);
         }}><Play size={15} />{t("Replay approved synthetic request")}</button> : <p className="td-note">{state(selected) === 'expired' ? t("This request has expired. Run the deployment approval scenario again.") : t("This request has been processed. A new execution needs a new decision.")}</p>}</>}</Drawer>}{form && <Drawer title={form === 'agent' ? t("Register agent") : t("Create task delegation")} onClose={() => setForm(null)}><form onSubmit={async e => {
@@ -111,7 +119,7 @@ export default function Broker({
             })} placeholder="security-assistant" /></label><label>{t("Owner")}<input required minLength={2} maxLength={80} value={agent.owner_id} onChange={e => setAgent({
               ...agent,
               owner_id: e.target.value
-            })} placeholder="security-team" /></label><label>{t("Risk level")}<select value={agent.risk_tier} onChange={e => setAgent({
+            })} placeholder="security-team" /></label><label>{t("Autonomous access")}<select value={String(agent.allow_autonomous)} onChange={e=>setAgent({...agent,allow_autonomous:e.target.value==='true'})}><option value="false">{t("Delegation required")}</option><option value="true">{t("Allow registered agent actions")}</option></select></label><label>{t("Risk level")}<select value={agent.risk_tier} onChange={e => setAgent({
               ...agent,
               risk_tier: e.target.value
             })}><option value="low">{t("Low")}</option><option value="medium">{t("Medium")}</option><option value="high">{t("High")}</option></select></label><label>{t("Allowed tools")}<select value={agent.allowed_tools[0]} onChange={e => setAgent({

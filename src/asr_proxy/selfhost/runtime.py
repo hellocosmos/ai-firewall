@@ -54,7 +54,7 @@ class SelfhostRuntime(Runtime):
 
   def build_engine(self,policy):
     config=self.config(policy)
-    fields=IDENTITY_FIELDS if config.access_broker_enabled else ('source_id',)
+    fields=('tenant_id','agent_id') if config.access_broker_enabled else ('source_id',)
     verifier=AttestationVerifier(self.key,config.nonce_db,required_fields=fields)
     self.broker=load_authorizer(config)
     return InspectionEngine(config,self.scanner,verifier,self.broker)

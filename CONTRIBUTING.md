@@ -14,8 +14,8 @@ Thank you for helping improve the public AI Firewall. TrapDefense 0.39 is one MI
 Requires Python 3.11+, Node.js 22.12+ (or 24), npm and Docker Engine/Desktop.
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway
 ./scripts/install-console.sh
 ```
 

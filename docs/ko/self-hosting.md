@@ -1,5 +1,7 @@
 # Docker 셀프호스팅 — 0.39 Open Source Preview
 
+> **0.40 · AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
+
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
 0.39은 어댑터·Envoy·검사기·운영 UI와 분리된 게이트웨이/대상 인증을 함께 제공하는 Docker Compose Preview입니다. 이미지는 소스에서 로컬 빌드합니다. TrapDefense Cloud는 계획 단계이며 가입할 수 없습니다.
@@ -21,8 +23,8 @@
 Git과 Docker Compose v2가 필요합니다. `init`에서 12자 이상 관리자 비밀번호를 지정합니다. 기본 비밀번호는 없습니다. 예제 설정은 합성 목적지를 사용하므로 실제 서비스 연동으로 오해하지 마세요.
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall/deploy/selfhost
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway/deploy/selfhost
 docker compose build app
 docker compose run --rm app init
 docker compose --profile smoke up -d
@@ -42,5 +44,7 @@ UI는 정책·비밀번호를 관리합니다. 매핑 변경은 백업 후 `poli
 [상세 설정·VS Code·검증 표](gateway-compatibility.md) · [Detailed examples, backup and migration (English)](../en/self-hosting.md)
 
 ## 내장 Access Broker 활성화
+
+다음은 **delegated JWT 모드** 설정입니다. 로컬 agent_key와 무인 agent 모드는 [AISG 가이드](aisg.md)를 참조하세요.
 
 `gateway_auth.mode: jwt`를 사용하고 `identity_claims`에 tenant, user, agent, delegation, task claim 이름을 명시하세요. 이어서 `access_broker.enabled: true`와 하나의 `access_broker.tenant_id`를 설정합니다. 콘솔에서 해당 tenant의 agent와 delegation을 먼저 등록해야 합니다. 필수 claim 누락과 tenant 불일치는 전달 전에 차단됩니다. 정확한 YAML 예시는 [영문 기준 문서](../en/self-hosting.md)를 따르세요. 로컬 file store는 동일 호스트용이며 multi-node HA가 아닙니다.

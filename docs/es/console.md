@@ -1,5 +1,7 @@
 # Instalación y operación de la consola
 
+> **0.40 · AISG:** [Conectar, identificar, controlar, verificar](aisg.md). El gateway autentica con una clave de despliegue o JWT verificado. agent_key identifica agentes registrados sin IAM externo. JWT identity_mode: agent usa los atributos verificados de tenant y agente; delegated también exige usuario, tarea y delegación. Los agentes existentes requieren delegación por defecto.
+
 > Docker 0.39: [Autoalojamiento](self-hosting.md) · [Compatibilidad del gateway](gateway-compatibility.md). Esta página describe la demostración sintética separada desde fuentes.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
@@ -11,8 +13,8 @@ La consola admite SSO Microsoft Entra ID de un solo tenant con roles Administrad
 Requisitos: Python 3.11+, Node.js 22.12+ o 24, npm y Docker Engine/Desktop local en ejecución. Solo hace falta este repositorio: no requiere SDK, paquete runtime privado ni API de modelos. Los scripts usan `uv` si está instalado; en caso contrario, Python venv/pip. Ejecute sin sudo y mantenga Docker local.
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway
 ./scripts/install-console.sh
 ./scripts/run-console.sh
 ```

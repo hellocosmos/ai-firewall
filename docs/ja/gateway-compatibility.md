@@ -1,5 +1,7 @@
 # ゲートウェイクライアント互換性 — 0.39
 
+> **0.40 · AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
+
 [English](../en/gateway-compatibility.md) · [한국어](../ko/gateway-compatibility.md) · [简体中文](../zh-CN/gateway-compatibility.md) · [日本語](../ja/gateway-compatibility.md) · [Español](../es/gateway-compatibility.md) · [Français](../fr/gateway-compatibility.md)
 
 クライアントはリモート HTTP/MCP URL を TrapDefense に変更し、接続キーのヘッダーまたは OAuth Bearer JWT を送信できる必要があります。クライアント→TrapDefense と TrapDefense→宛先の認証は分離されます。

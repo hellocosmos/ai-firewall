@@ -1,5 +1,7 @@
 # 1 つのオープンソース製品
 
+> **0.40 · AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
+
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
 TrapDefense 0.39 は単一の MIT ライセンスコードベースです。Runtime Gateway と Agent Access Broker を同じ公開リポジトリで提供し、非公開 Python 配布物、provider entry point、license key、edition switch は不要です。

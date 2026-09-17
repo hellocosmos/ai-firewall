@@ -103,7 +103,7 @@ class AccessBroker:
   def decide(self, request: AccessRequest) -> AccessDecision:
     # Requests carrying a strict binding must not bypass one-time approval
     # consumption through the legacy API.
-    if "request_digest" in request.metadata:
+    if request.authorization_mode == "agent" or "request_digest" in request.metadata:
       return self.authorize(request)
     if request.approval_id:
       with self.store.read_transaction():
@@ -210,8 +210,8 @@ class AccessBroker:
       token = None
       if evaluation.action == "approval_required" and approval is None:
         delegation = evaluation.delegation
-        assert delegation is not None
         approval = ApprovalRecord(
+          authorization_mode=request.authorization_mode,
           approval_id=_id("apv"),
           tenant_id=request.tenant_id,
           user_id=request.user_id,
@@ -225,7 +225,7 @@ class AccessBroker:
           request_digest=request.metadata["request_digest"],
           expires_at=min(
             now + timedelta(seconds=self.approval_ttl_seconds),
-            delegation.expires_at,
+            delegation.expires_at if delegation else now + timedelta(seconds=self.approval_ttl_seconds),
           ),
           reason="high_risk_action_requires_approval",
           created_at=now,
@@ -233,7 +233,6 @@ class AccessBroker:
         self.store.upsert_approval(approval)
         self._audit("access.approval_created", {"approval": approval.model_dump(mode="json")})
       elif evaluation.action == "allow":
-        assert evaluation.delegation is not None
         if approval is not None:
           approval = approval.model_copy(update={"consumed_at": now})
           self.store.upsert_approval(approval)
@@ -271,22 +270,33 @@ class AccessBroker:
       return _Evaluation(
         "block", "resource_not_allowed_for_agent", "Resource is not allowed for agent.",
       )
-    delegation = self.store.get_delegation(request.delegation_id)
-    if delegation is None:
-      return _Evaluation("block", "delegation_not_found", "Delegation was not found.")
-    if delegation.tenant_id != request.tenant_id:
-      return _Evaluation(
-        "block", "delegation_tenant_mismatch", "Delegation belongs to another tenant.",
-      )
-    if delegation.status != "active" or not _is_future(delegation.expires_at, now):
-      return _Evaluation("block", "delegation_not_active", "Delegation is expired or inactive.")
-    mismatch = self._delegation_mismatch(request, delegation)
-    if mismatch is not None:
-      return _Evaluation("block", *mismatch)
-    if not _matches(request.resource_id, delegation.allowed_resources):
-      return _Evaluation("block", "resource_not_delegated", "Resource was not delegated.")
-    if not _matches(request.requested_action, delegation.allowed_actions):
-      return _Evaluation("block", "action_not_delegated", "Action was not delegated.")
+    delegation = None
+    if request.authorization_mode == "agent":
+      if request.user_id or request.delegation_id or request.task_id:
+        return _Evaluation("block", "mixed_authorization_context", "Agent-only requests cannot claim user delegation.")
+      if not agent.allow_autonomous:
+        return _Evaluation("block", "autonomous_not_allowed", "Autonomous access is not enabled for this agent.")
+      if not _matches(request.requested_action, agent.allowed_actions):
+        return _Evaluation("block", "action_not_allowed_for_agent", "Action is not allowed for this agent.")
+    else:
+      if not request.user_id or not request.task_id or not request.delegation_id:
+        return _Evaluation("block", "delegation_context_required", "User, task and delegation are required.")
+      delegation = self.store.get_delegation(request.delegation_id)
+      if delegation is None:
+        return _Evaluation("block", "delegation_not_found", "Delegation was not found.")
+      if delegation.tenant_id != request.tenant_id:
+        return _Evaluation(
+          "block", "delegation_tenant_mismatch", "Delegation belongs to another tenant.",
+        )
+      if delegation.status != "active" or not _is_future(delegation.expires_at, now):
+        return _Evaluation("block", "delegation_not_active", "Delegation is expired or inactive.")
+      mismatch = self._delegation_mismatch(request, delegation)
+      if mismatch is not None:
+        return _Evaluation("block", *mismatch)
+      if not _matches(request.resource_id, delegation.allowed_resources):
+        return _Evaluation("block", "resource_not_delegated", "Resource was not delegated.")
+      if not _matches(request.requested_action, delegation.allowed_actions):
+        return _Evaluation("block", "action_not_delegated", "Action was not delegated.")
     if request.approval_id:
       approval = self.store.get_approval(request.approval_id)
       if approval is None:
@@ -316,7 +326,8 @@ class AccessBroker:
         "The high-risk action requires human approval.", delegation,
       )
     return _Evaluation(
-      "allow", "delegation_allowed", "The bound action is delegated.", delegation,
+      "allow", "agent_allowed" if request.authorization_mode == "agent" else "delegation_allowed",
+      "The bound action is authorized.", delegation,
     )
 
   def _strict_decision(
@@ -337,6 +348,7 @@ class AccessBroker:
         "agent_instance_id": request.agent_instance_id,
         "request_digest": digest,
         "evaluation_only": evaluation_only,
+        "authorization_mode": request.authorization_mode,
         "enforcementApplied": False,
       },
     )
@@ -424,14 +436,14 @@ class AccessBroker:
     self._audit("access.approval_created", {"approval": saved.model_dump(mode="json")})
     return saved
 
-  def _issue_token(self, request: AccessRequest, delegation: DelegationRecord) -> BrokerToken:
+  def _issue_token(self, request: AccessRequest, delegation: DelegationRecord | None) -> BrokerToken:
     expires_at = min(
       utc_now() + timedelta(seconds=self.token_ttl_seconds),
-      delegation.expires_at,
+      delegation.expires_at if delegation else utc_now() + timedelta(seconds=self.token_ttl_seconds),
     )
     return BrokerToken(
       token_id=f"td_jit_{token_urlsafe(12)}",
-      subject=f"{request.user_id}/{request.agent_id}",
+      subject=f"{request.user_id}/{request.agent_id}" if request.user_id else request.agent_id,
       scopes=[f"{request.resource_id}:{request.requested_action}"],
       expires_at=expires_at,
       tenant_id=request.tenant_id,

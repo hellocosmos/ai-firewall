@@ -1,8 +1,12 @@
-# TrapDefense — AI Firewall de código abierto para agentes
+# TrapDefense — Open-source AI Security Gateway
+
+**Conecte API HTTP y servidores MCP remotos compatibles a través de un límite de seguridad explícito. Añada identidad para controlar cada agente.**
+
+[Conectar, identificar, controlar, verificar →](docs/es/aisg.md)
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-> **Open Source Preview 0.39:** todo el runtime y la consola operativa se publican con licencia MIT. El Agent Access Broker integrado está implementado y validado con datos sintéticos, pero permanece **Experimental** hasta validar IdP reales, políticas de clientes, HA y capacidad.
+> **Open Source Preview 0.40:** todo el runtime y la consola operativa se publican con licencia MIT. El Agent Access Broker integrado está implementado y validado con datos sintéticos, pero permanece **Experimental** hasta validar IdP reales, políticas de clientes, HA y capacidad.
 
 TrapDefense es un AI Firewall autoalojado para tráfico HTTP y MCP compatible. Inspecciona solicitudes y respuestas, aplica políticas de action, PII y secrets, conserva evidencia saneada y puede autorizar una acción según agent, delegation, task, resource y una aprobación humana de un solo uso.
 
@@ -20,8 +24,8 @@ Los futuros servicios de pago pueden cubrir cloud administrado, operación de fl
 ## Docker autoalojado
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall/deploy/selfhost
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway/deploy/selfhost
 docker compose build app
 docker compose run --rm app init
 docker compose --profile smoke up -d

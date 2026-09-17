@@ -1,5 +1,7 @@
 # Installation et utilisation de la console
 
+> **0.40 · AISG:** [Connecter, identifier, contrôler, vérifier](aisg.md). La passerelle utilise une clé de déploiement ou un JWT vérifié. agent_key identifie un agent enregistré sans IAM externe. JWT identity_mode: agent utilise les attributs vérifiés du tenant et de l’agent ; delegated exige aussi utilisateur, tâche et délégation. Les agents existants nécessitent une délégation par défaut.
+
 > Docker 0.39 : [Auto-hébergement](self-hosting.md) · [Compatibilité de la passerelle](gateway-compatibility.md). Cette page décrit la démonstration synthétique distincte depuis les sources.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
@@ -11,8 +13,8 @@ La console prend en charge le SSO Microsoft Entra ID à locataire unique avec le
 Prérequis : Python 3.11+, Node.js 22.12+ ou 24, npm et Docker Engine/Desktop local en cours d’exécution. Ce dépôt suffit : aucun SDK, package runtime privé ni API de modèle n’est requis. Les scripts utilisent `uv` s’il est présent, sinon Python venv/pip. Exécutez sans sudo et gardez Docker local.
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway
 ./scripts/install-console.sh
 ./scripts/run-console.sh
 ```

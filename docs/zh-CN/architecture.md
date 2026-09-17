@@ -1,5 +1,7 @@
 # 架构与信任边界
 
+> **0.40 · AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
+
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
 控制台支持单租户 Microsoft Entra ID SSO 以及管理员、查看者角色。控制台操作员身份与智能体授权是独立边界；智能体授权由内置 Access Broker 执行。 [Entra SSO](identity.md).

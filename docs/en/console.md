@@ -1,5 +1,7 @@
 # Console installation and operation
 
+> **0.40 · AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
+
 > Docker 0.39: [Self-hosting / integration guide](self-hosting.md) · [Gateway client compatibility](gateway-compatibility.md). This page describes the separate source-based synthetic demo.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
@@ -11,8 +13,8 @@ The console can use single-tenant Microsoft Entra ID SSO with Administrator and 
 Requirements: Python 3.11+, Node.js 22.12+ (or 24), npm, and a running local Docker Engine/Desktop. Install from this repository; no SDK, private runtime package or model API is required. Scripts use an existing `uv` installation when available, otherwise Python venv/pip. Run without sudo and keep Docker local.
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway
 ./scripts/install-console.sh
 ./scripts/run-console.sh
 ```

@@ -1,5 +1,7 @@
 # 게이트웨이 클라이언트 호환성 — 0.39
 
+> **0.40 · AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
+
 [English](../en/gateway-compatibility.md) · [한국어](../ko/gateway-compatibility.md) · [简体中文](../zh-CN/gateway-compatibility.md) · [日本語](../ja/gateway-compatibility.md) · [Español](../es/gateway-compatibility.md) · [Français](../fr/gateway-compatibility.md)
 
 클라이언트는 원격 HTTP/MCP URL을 TrapDefense로 바꾸고 연결 키 헤더 또는 OAuth Bearer JWT를 사용할 수 있어야 합니다. 클라이언트→TrapDefense 인증과 TrapDefense→대상 인증은 분리됩니다.

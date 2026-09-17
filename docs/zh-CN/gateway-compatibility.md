@@ -1,5 +1,7 @@
 # 网关客户端兼容性 — 0.39
 
+> **0.40 · AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
+
 [English](../en/gateway-compatibility.md) · [한국어](../ko/gateway-compatibility.md) · [简体中文](../zh-CN/gateway-compatibility.md) · [日本語](../ja/gateway-compatibility.md) · [Español](../es/gateway-compatibility.md) · [Français](../fr/gateway-compatibility.md)
 
 客户端必须能把远程 HTTP/MCP URL 改为 TrapDefense，并发送连接密钥请求头或 OAuth Bearer JWT。客户端到 TrapDefense 的认证与 TrapDefense 到目标的认证彼此独立。

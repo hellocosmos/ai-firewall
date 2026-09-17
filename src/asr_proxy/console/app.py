@@ -36,6 +36,16 @@ class AgentCreate(BaseModel):
   owner_id:str=Field(min_length=2,max_length=80)
   risk_tier:Literal['low','medium','high']='medium'
   allowed_tools:list[str]=Field(min_length=1,max_length=32)
+  allow_autonomous:bool=False
+
+class CredentialCreate(BaseModel):
+  model_config=ConfigDict(extra='forbid')
+  ttl_seconds:int=Field(default=86400,ge=60,le=2592000)
+  rotate_id:str|None=Field(default=None,pattern=r'^key_[a-f0-9]{32}$')
+
+class AgentStatus(BaseModel):
+  model_config=ConfigDict(extra='forbid')
+  enabled:bool
 
 class DelegationCreate(BaseModel):
   model_config=ConfigDict(extra='forbid')
@@ -156,7 +166,7 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
     network=runtime.network_status() if getattr(runtime,'integrated',False) or deployment else None
     broker_enabled=getattr(runtime,'broker',None) is not None
     return {'events':runtime.store.events(),'broker':runtime.broker_snapshot(),
-      'product':'open_source','capabilities':{'broker':broker_enabled,'broker_maturity':'experimental'},'policy':runtime.policy(),
+      'product':'open_source','capabilities':{'broker':broker_enabled,'broker_maturity':'experimental','local_agent_credentials':broker_enabled and (not deployment or deployment.gateway_auth.mode=='agent_key')},'policy':runtime.policy(),
       'scenarios':[{'id':key,'label':value['label']} for key,value in CASES.items()] if not deployment else [],
       'system':{'inspector':('ready' if network and network['inspector_ready'] else 'unavailable'),
         'broker':'experimental' if broker_enabled else 'disabled','database':'ready',
@@ -191,6 +201,34 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
   @router.post('/agents')
   def register_agent(payload:AgentCreate,request:Request):
     return runtime.register_agent(payload.model_dump(),actor(request.state.principal))
+
+  def credentials():
+    if runtime.broker is None:raise HTTPException(409,'Access Broker is disabled.')
+    if deployment and deployment.gateway_auth.mode!='agent_key':
+      raise HTTPException(409,'Configure gateway_auth.mode: agent_key to use local agent credentials.')
+    from asr_proxy.selfhost.agent_credentials import AgentCredentials
+    return AgentCredentials(runtime.store.directory/'agent-credentials.sqlite',runtime.broker,runtime.broker_tenant)
+
+  @router.get('/agents/{agent_id}/credentials')
+  def list_credentials(agent_id:str):return credentials().list(agent_id)
+
+  @router.post('/agents/{agent_id}/credentials')
+  def issue_credential(agent_id:str,payload:CredentialCreate):
+    return credentials().issue(agent_id,payload.ttl_seconds,rotate_id=payload.rotate_id)
+
+  @router.post('/agents/{agent_id}/credentials/{credential_id}/revoke')
+  def revoke_credential(agent_id:str,credential_id:str):
+    credentials().revoke(agent_id,credential_id)
+    return {'ok':True}
+
+  @router.post('/agents/{agent_id}/status')
+  def agent_status(agent_id:str,payload:AgentStatus,request:Request):
+    if runtime.broker is None:raise HTTPException(409,'Access Broker is disabled.')
+    with runtime.broker.store.transaction():
+      agent=runtime.broker.store.get_agent(agent_id)
+      if agent is None or agent.tenant_id!=runtime.broker_tenant:raise HTTPException(404,'Agent was not found.')
+      return runtime.broker.register_agent(agent.model_copy(update={'enabled':payload.enabled}),
+        actor=actor(request.state.principal)).model_dump(mode='json')
 
   @router.post('/delegations')
   def create_delegation(payload:DelegationCreate,request:Request):

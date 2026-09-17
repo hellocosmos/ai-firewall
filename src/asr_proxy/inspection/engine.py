@@ -175,7 +175,8 @@ class InspectionEngine:
       verdict.source_verified = True
       verdict.identity_verified = True
       request = AuthorizationRequest(
-        **{key: identity[key] for key in IDENTITY_FIELDS},
+        **{key: identity.get(key, "") for key in IDENTITY_FIELDS},
+        authorization_mode=identity.get("authorization_mode", "delegated"),
         tool_name=original_semantics[0], requested_action=original_semantics[1],
         resource_id=original_semantics[2], approval_id=identity.get("approval_id"),
         agent_instance_id=identity.get("agent_instance_id"),

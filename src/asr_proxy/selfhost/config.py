@@ -26,6 +26,11 @@ class ClientKeyGatewayAuth(BaseModel):
   mode: Literal['client_key'] = 'client_key'
 
 
+class AgentKeyGatewayAuth(BaseModel):
+  model_config = ConfigDict(extra="forbid")
+  mode: Literal["agent_key"] = "agent_key"
+
+
 class AgentIdentityClaims(BaseModel):
   """Explicit allowlist that maps verified JWT claims to broker identity fields."""
   model_config = ConfigDict(extra='forbid')
@@ -48,6 +53,7 @@ class AgentIdentityClaims(BaseModel):
 class JwtGatewayAuth(BaseModel):
   model_config = ConfigDict(extra='forbid')
   mode: Literal['jwt'] = 'jwt'
+  identity_mode: Literal['delegated','agent'] = 'delegated'
   issuer: str
   audience: str = Field(min_length=1,max_length=512)
   jwks_uri: str
@@ -90,7 +96,7 @@ class JwtGatewayAuth(BaseModel):
     return f'{parsed.scheme}://{parsed.netloc}{self.metadata_path}'
 
 
-GatewayAuth = Annotated[ClientKeyGatewayAuth | JwtGatewayAuth, Field(discriminator='mode')]
+GatewayAuth = Annotated[ClientKeyGatewayAuth | JwtGatewayAuth | AgentKeyGatewayAuth, Field(discriminator='mode')]
 
 
 class AccessBrokerDeployment(BaseModel):
@@ -189,11 +195,13 @@ class Deployment(BaseModel):
     if (origin.scheme not in ('http', 'https') or not origin.hostname or origin.username or origin.password
         or origin.path or origin.query or origin.fragment):
       raise ValueError('console_origin must be an exact HTTP(S) origin')
-    if self.gateway_auth.mode=='jwt' and self.target_auth.mode=='passthrough_bearer':
-      raise ValueError('JWT gateway authentication cannot use target Bearer passthrough')
-    if self.access_broker.enabled and (
-        self.gateway_auth.mode!='jwt' or self.gateway_auth.identity_claims is None):
-      raise ValueError('Access Broker requires JWT gateway authentication and identity_claims')
+    if self.gateway_auth.mode in ('jwt','agent_key') and self.target_auth.mode=='passthrough_bearer':
+      raise ValueError('JWT or agent-key gateway authentication cannot use target Bearer passthrough')
+    if self.gateway_auth.mode=='agent_key' and not self.access_broker.enabled:
+      raise ValueError('Agent keys require the Access Broker')
+    if self.access_broker.enabled and not (self.gateway_auth.mode=='agent_key' or (
+        self.gateway_auth.mode=='jwt' and self.gateway_auth.identity_claims is not None)):
+      raise ValueError('Access Broker requires agent_key or JWT gateway authentication with identity_claims')
     seen = set()
     for route in self.routes:
       if route.authority != target.netloc:

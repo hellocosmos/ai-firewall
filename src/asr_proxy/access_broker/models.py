@@ -24,6 +24,8 @@ class AgentRecord(BaseModel):
   sponsor_id: str | None = None
   runtime: str = Field(default="unknown", min_length=1)
   model: str | None = None
+  allow_autonomous: bool = False
+  allowed_actions: list[str] = Field(default_factory=list)
   allowed_tools: list[str] = Field(default_factory=list)
   allowed_resources: list[str] = Field(default_factory=list)
   risk_tier: RiskTier = "medium"
@@ -65,12 +67,13 @@ class DelegationRecord(BaseModel):
 
 
 class AccessRequest(BaseModel):
+  authorization_mode: Literal["delegated", "agent"] = "delegated"
   tenant_id: str | None = None
-  user_id: str = Field(..., min_length=1)
+  user_id: str = ""
   agent_id: str = Field(..., min_length=1)
   agent_instance_id: str | None = None
-  delegation_id: str = Field(..., min_length=1)
-  task_id: str = Field(..., min_length=1)
+  delegation_id: str = ""
+  task_id: str = ""
   tool_name: str = Field(..., min_length=1)
   resource_id: str = Field(..., min_length=1)
   requested_action: str = Field(..., min_length=1)
@@ -90,6 +93,7 @@ class BrokerToken(BaseModel):
 
 
 class ApprovalRecord(BaseModel):
+  authorization_mode: Literal["delegated", "agent"] = "delegated"
   approval_id: str
   status: ApprovalStatus = "pending"
   tenant_id: str | None = None
@@ -113,7 +117,8 @@ class ApprovalRecord(BaseModel):
 
   def matches(self, request: AccessRequest) -> bool:
     return (
-      self.tenant_id == request.tenant_id
+      self.authorization_mode == request.authorization_mode
+      and self.tenant_id == request.tenant_id
       and self.user_id == request.user_id
       and self.agent_id == request.agent_id
       and self.delegation_id == request.delegation_id

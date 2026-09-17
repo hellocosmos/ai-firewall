@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/hellocosmos/ai-firewall/security/policy
+    url: https://github.com/hellocosmos/ai-security-gateway/security/policy
     about: Read the private reporting instructions before sharing vulnerability details.
   - name: Documentation
-    url: https://github.com/hellocosmos/ai-firewall#documentation-and-verification
+    url: https://github.com/hellocosmos/ai-security-gateway#documentation-and-verification
     about: Review the architecture, console, identity and security guides.

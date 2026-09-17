@@ -1,5 +1,7 @@
 # 콘솔 설치와 운영
 
+> **0.40 · AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
+
 > Docker 0.39: [셀프호스팅](self-hosting.md) · [게이트웨이 호환성](gateway-compatibility.md). 이 페이지는 별도 소스 기반 합성 데모를 설명합니다.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
@@ -11,8 +13,8 @@
 필수 환경은 Python 3.11+, Node.js 22.12+ 또는 24, npm, 실행 중인 로컬 Docker Engine/Desktop입니다. 이 저장소만으로 설치하며 SDK·비공개 런타임 패키지·모델 API는 필요하지 않습니다. 스크립트는 설치된 `uv`가 있으면 사용하고, 없으면 Python venv/pip를 사용합니다. sudo 없이 실행하고 Docker는 로컬에서 사용하세요.
 
 ```bash
-git clone https://github.com/hellocosmos/ai-firewall.git
-cd ai-firewall
+git clone https://github.com/hellocosmos/ai-security-gateway.git
+cd ai-security-gateway
 ./scripts/install-console.sh
 ./scripts/run-console.sh
 ```

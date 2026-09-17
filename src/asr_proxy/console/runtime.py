@@ -126,7 +126,7 @@ class Runtime:
         raise ValueError('Agent ID is already registered.')
     resources=sorted({tool_map[tool][1] for tool in tools})
     record=AgentRecord(**payload,tenant_id=self.broker_tenant,runtime='console',
-      allowed_resources=resources)
+      allowed_resources=resources,allowed_actions=sorted({tool_map[tool][0] for tool in tools}))
     return self.broker.register_agent(record,actor=actor).model_dump(mode='json')
 
   def create_delegation(self,payload,actor):

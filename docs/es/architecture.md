@@ -1,5 +1,7 @@
 # Arquitectura y límite de confianza
 
+> **0.40 · AISG:** [Conectar, identificar, controlar, verificar](aisg.md). El gateway autentica con una clave de despliegue o JWT verificado. agent_key identifica agentes registrados sin IAM externo. JWT identity_mode: agent usa los atributos verificados de tenant y agente; delegated también exige usuario, tarea y delegación. Los agentes existentes requieren delegación por defecto.
+
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
 La consola admite SSO Microsoft Entra ID de un solo tenant con roles Administrador y Lector. La identidad del operador y la autorización del agente son límites distintos; el Access Broker integrado aplica la autorización. [Entra SSO](identity.md).

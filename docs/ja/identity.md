@@ -1,5 +1,7 @@
 # Microsoft Entra ID — TrapDefense console SSO
 
+> **0.40 · AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
+
 [English](../en/identity.md) · [한국어](../ko/identity.md) · [简体中文](../zh-CN/identity.md) · [日本語](../ja/identity.md) · [Español](../es/identity.md) · [Français](../fr/identity.md)
 
 コンソールは単一テナント Microsoft Entra ID SSO と管理者・閲覧者ロールをサポートします。コンソール運用者の認証とエージェント認可は別の境界で、認可は内蔵 Access Broker が行います。
@@ -39,5 +41,7 @@ Authorization code + PKCE S256, browser-bound one-time state, nonce, RS256 signa
 [Microsoft authorization code flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
 
 ## エージェント JWT identity mapping
+
+以下は **delegated JWT モード**の設定です。ローカル agent_key と自律 agent モードは [AISG ガイド](aisg.md)を参照してください。
 
 Broker モードは外部 IdP JWT の issuer、audience、scope を検証し、`identity_claims` で明示した値だけを tenant、user、agent、delegation、task identity に変換します。任意 claim や gateway token は検査証拠や対象サービスへ渡しません。必須 claim がない場合や tenant が一致しない場合は fail closed です。Entra、Okta、Keycloak など互換 issuer を利用できますが、claim 発行と workload binding の信頼性は顧客側で検証します。[セルフホスト](self-hosting.md) · [セキュリティ](security.md)
