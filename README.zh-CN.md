@@ -22,7 +22,7 @@ Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看
 
 [Docker 自托管: integration contract, installation and verification](docs/zh-CN/self-hosting.md)
 
-0.38 Compatibility Lab 使用官方 MCP SDK 验证类 Entra、Okta、Keycloak claims、discovery、PKCE、RFC 8707 resource binding 与 MCP `2025-11-25`。它还验证固定 digest 的官方 Keycloak 容器签发的真实本地 token。这是可复现的集成证据，并非真实客户 tenant 认证。[证据与准确边界](docs/zh-CN/gateway-compatibility.md)。
+0.38 Compatibility Lab 使用官方 MCP SDK 验证类 Entra、Okta、Keycloak claims、discovery、PKCE、RFC 8707 resource binding 与 MCP `2025-11-25`。它还验证固定 digest 的官方 Keycloak 容器签发的真实本地 token，以及 VS Code 1.135 的真实本地 MCP 初始化与工具发现。这是可复现的集成证据，并非真实客户 tenant 认证。[证据与准确边界](docs/zh-CN/gateway-compatibility.md)。
 
 ## 部署条件与提供状态
 

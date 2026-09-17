@@ -39,7 +39,11 @@ def create_gateway(config, client_key, signing_key, *, target_secret=None, authe
       return JSONResponse({'error':error.code},status_code=error.status_code,headers=response_headers)
     if slots.locked(): return JSONResponse({'error':'gateway_busy'}, status_code=503)
     raw_path = request.scope.get('raw_path', b'/').decode('ascii')
-    if (request.method, raw_path) not in {(r.method,r.path) for r in config.routes}:
+    mapped_routes={(r.method,r.path) for r in config.routes}
+    if (request.method,raw_path) not in mapped_routes:
+      if request.method in ('GET','DELETE') and any(
+          route.path==raw_path and route.protocol=='mcp' for route in config.routes):
+        return JSONResponse({'error':'method_not_supported'},status_code=405,headers={'Allow':'POST'})
       return JSONResponse({'error':'unmapped_route'}, status_code=403)
     if any(name in headers for name in ('upgrade','cookie','mcp-session-id','proxy-authorization')):
       return JSONResponse({'error':'unsupported_session_or_upgrade'}, status_code=400)

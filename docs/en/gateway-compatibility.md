@@ -17,7 +17,7 @@ Client -- gateway credential --> TrapDefense -- target credential --> MCP / API
 | Entra-shaped OAuth | **Protocol-shaped synthetic verification** | The lab exercises `scp`, `tid`, `oid` and `azp` with discovery, DCR, authorization code, PKCE and RFC 8707 `resource`. This is not a real Entra tenant or proof of Microsoft-specific registration and policy behavior. |
 | Okta-shaped OAuth | **Protocol-shaped synthetic verification** | The lab exercises an array-valued `scp` and `cid` through the same complete client flow. This is not a real Okta authorization server. |
 | Keycloak-shaped OAuth | **Synthetic plus real local verification** | The claim profile is tested through the full lab. Separately, an unmodified digest-pinned Keycloak 26.7.3 container issues a real client-credentials token that TrapDefense verifies through its discovery and JWKS endpoints. |
-| VS Code 1.135 remote MCP | **Configuration detected; connection pending** | The installed product detects the generated workspace server definition, but this run did not capture `initialize`/`tools/list` receipts. Real-client execution is not yet claimed. |
+| VS Code 1.135 remote MCP | **Real local client verified** | The installed product reports the server `Running`, discovers one tool and produces matching `initialize`, `notifications/initialized` and `tools/list` receipts. The client requested MCP `2025-11-25` during initialization. |
 | Stateful MCP, long-lived SSE, WebSocket, stdio | **Unsupported** | Inbound and upstream `MCP-Session-Id` and upstream `text/event-stream` fail closed. This profile remains bounded stateless JSON over HTTP. |
 | Multi-node HA | **Unsupported** | The package is one gateway instance with local SQLite, replay and audit state. Container restart recovery is not cross-server HA. |
 
@@ -59,7 +59,9 @@ PYTHONPATH=src .venv/bin/python tests/compat/vscode_fixture.py \
   --receipts .runtime-state/vscode-compat/receipts.jsonl
 ```
 
-Open `.runtime-state/vscode-compat/workspace` in the VS Code build under test, run **MCP: List Servers**, and start `trapdefense-compat`. A passing result contains server-side receipts for all three methods above, with `2025-11-25` on post-initialization requests. No GitHub or model-provider login is needed for server discovery.
+Open `.runtime-state/vscode-compat/workspace` in the VS Code build under test, run **MCP: List Servers**, and start `trapdefense-compat`. A passing result shows `Running`, discovers `notes_read`, and contains server-side receipts for all three methods above. No GitHub or model-provider login is needed for server discovery.
+
+VS Code 1.135 requested MCP `2025-11-25` in `initialize` but did not include `MCP-Protocol-Version` on the observed post-initialization requests. TrapDefense accepts the missing header, so this is verified interoperability rather than a claim that the client is fully transport-conformant. VS Code also rejects dots in tool names; use names matching `[a-z0-9_-]` for this client. When VS Code opens the optional GET stream, this stateless profile returns the standard `405 Method Not Allowed` with `Allow: POST` instead of triggering an OAuth fallback.
 
 ## JWT resource-server mode
 

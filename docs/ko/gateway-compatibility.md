@@ -11,7 +11,7 @@
 | Entra 유사 OAuth | `scp`·`tid`·`oid`·`azp`, discovery·DCR·PKCE·resource binding을 합성 검증. 실제 Entra 테넌트는 미검증 |
 | Okta 유사 OAuth | 배열형 `scp`와 `cid`를 같은 전체 흐름으로 합성 검증. 실제 Okta 서버는 미검증 |
 | Keycloak 유사/실제 로컬 | 합성 전체 흐름과 별도로, digest 고정 공식 Keycloak 26.7.3 컨테이너가 발급한 실제 로컬 토큰 및 discovery/JWKS 검증 완료 |
-| VS Code 1.135 원격 MCP | 워크스페이스 서버 설정 인식 확인. 이번 실행에서는 서버 시작과 receipt 확보를 완료하지 못했으므로 실제 연결은 아직 주장하지 않음 |
+| VS Code 1.135 원격 MCP | 실제 설치 제품에서 `Running`, 도구 1개 발견, `initialize`·`notifications/initialized`·`tools/list` receipt와 MCP `2025-11-25` 요청 확인 |
 | 세션 MCP·장기 SSE·WebSocket·stdio | 미지원. 세션 헤더와 upstream SSE는 fail-closed |
 | 다중 노드 HA | 미지원. 현재 로컬 SQLite·replay·audit 상태를 가진 단일 gateway 구성 |
 

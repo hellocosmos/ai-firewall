@@ -22,7 +22,7 @@ Community는 단일 테넌트 Microsoft Entra ID 콘솔 SSO와 관리자·조회
 
 [Docker 셀프호스팅: integration contract, installation and verification](docs/ko/self-hosting.md)
 
-0.38 Compatibility Lab은 공식 MCP SDK로 Entra·Okta·Keycloak 유사 claim, discovery, PKCE, RFC 8707 resource binding과 MCP `2025-11-25`를 검증합니다. 또한 digest를 고정한 공식 Keycloak 컨테이너가 발급한 실제 로컬 토큰을 검증합니다. 이는 재현 가능한 통합 증거이며 실제 고객 테넌트 인증은 아닙니다. [증거와 정확한 한계](docs/ko/gateway-compatibility.md).
+0.38 Compatibility Lab은 공식 MCP SDK로 Entra·Okta·Keycloak 유사 claim, discovery, PKCE, RFC 8707 resource binding과 MCP `2025-11-25`를 검증합니다. 또한 digest를 고정한 공식 Keycloak 컨테이너의 실제 로컬 토큰과 VS Code 1.135의 실제 로컬 MCP 초기화·도구 조회를 검증합니다. 이는 재현 가능한 통합 증거이며 실제 고객 테넌트 인증은 아닙니다. [증거와 정확한 한계](docs/ko/gateway-compatibility.md).
 
 ## 배포 적합성과 제공 상태
 

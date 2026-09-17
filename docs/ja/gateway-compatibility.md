@@ -11,7 +11,7 @@
 | Entra 形式 OAuth | `scp`、`tid`、`oid`、`azp` と discovery、DCR、PKCE、resource binding を合成検証。実 Entra tenant は未検証 |
 | Okta 形式 OAuth | 配列 `scp` と `cid` を完全な合成フローで検証。実 Okta server は未検証 |
 | Keycloak 形式 / 実ローカル | 合成フローに加え、digest 固定の公式 Keycloak 26.7.3 が発行した実ローカルトークンと discovery/JWKS を検証済み |
-| VS Code 1.135 リモート MCP | workspace server 設定の認識を確認。今回の実行では起動と receipt 取得が未完了のため、実接続は未検証 |
+| VS Code 1.135 リモート MCP | 実インストール製品で `Running`、1 ツール検出、3 件の MCP receipt、`2025-11-25` 初期化要求を確認 |
 | Stateful MCP、長時間 SSE、WebSocket、stdio | 未対応。session header と upstream SSE は fail closed |
 | マルチノード HA | 未対応。ローカル SQLite、replay、audit state を持つ単一 gateway 構成 |
 

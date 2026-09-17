@@ -11,7 +11,7 @@
 | 类 Entra OAuth | 合成验证 `scp`、`tid`、`oid`、`azp` 以及 discovery、DCR、PKCE 和 resource binding；未验证真实 Entra tenant |
 | 类 Okta OAuth | 通过完整合成流程验证数组型 `scp` 和 `cid`；未验证真实 Okta server |
 | 类 Keycloak / 真实本地 Keycloak | 除完整合成流程外，还验证了固定 digest 的官方 Keycloak 26.7.3 容器签发的真实本地 token、discovery 和 JWKS |
-| VS Code 1.135 远程 MCP | 已确认 workspace server 配置被识别；本次运行未取得启动和 receipt 证据，因此尚不宣称真实连接成功 |
+| VS Code 1.135 远程 MCP | 已在实际安装产品中确认 `Running`、发现 1 个工具、三项 MCP receipt 以及 `2025-11-25` 初始化请求 |
 | 有状态 MCP、长连接 SSE、WebSocket、stdio | 不支持；session header 与 upstream SSE 会 fail closed |
 | 多节点 HA | 不支持；当前为单 gateway，使用本地 SQLite、replay 与 audit state |
 

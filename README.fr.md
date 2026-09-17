@@ -22,7 +22,7 @@ Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec 
 
 [Auto-hébergement Docker: integration contract, installation and verification](docs/fr/self-hosting.md)
 
-Le Compatibility Lab 0.38 vérifie les claims aux formats Entra, Okta et Keycloak, discovery, PKCE, RFC 8707 resource binding et MCP `2025-11-25` avec le SDK MCP officiel. Il valide aussi un token local réel émis par un conteneur Keycloak officiel fixé par digest. Il s’agit d’une preuve d’intégration reproductible, pas d’une certification de tenant réel. [Preuves et limites exactes](docs/fr/gateway-compatibility.md).
+Le Compatibility Lab 0.38 vérifie les claims aux formats Entra, Okta et Keycloak, discovery, PKCE, RFC 8707 resource binding et MCP `2025-11-25` avec le SDK MCP officiel. Il valide aussi un token local réel de Keycloak fixé par digest ainsi que l’initialisation et la découverte MCP locales réelles de VS Code 1.135. Il s’agit d’une preuve d’intégration reproductible, pas d’une certification de tenant réel. [Preuves et limites exactes](docs/fr/gateway-compatibility.md).
 
 ## Compatibilité et disponibilité
 

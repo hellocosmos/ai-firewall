@@ -13,7 +13,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Com
 - Exercise Entra-, Okta- and Keycloak-shaped OAuth claim dialects through the pinned official MCP SDK, including authorization-server discovery, dynamic client registration, authorization code with PKCE, RFC 8707 resource binding and MCP `2025-11-25` initialization/tool discovery.
 - Accept OAuth scope claims as either a space-delimited string or a string array, and optionally restrict caller applications through common `azp`, `appid` or `cid` claims.
 - Validate a real token from an unmodified, digest-pinned Keycloak 26.7.3 container using its discovery and JWKS endpoints; consume the gateway token without forwarding it to the target.
-- Add a loopback-only VS Code fixture and workspace for real-client acceptance. Configuration discovery was observed in VS Code 1.135; client connection remains unverified until server-side MCP receipts are captured.
+- Verify the installed VS Code 1.135 client reports the server running, discovers one tool and completes `initialize`, `notifications/initialized` and `tools/list` with a `2025-11-25` initialization request.
+- Return `405 Method Not Allowed` with `Allow: POST` when a Streamable HTTP client probes GET or DELETE on a stateless MCP route, avoiding a false OAuth fallback while preserving the unsupported session boundary.
 
 ### Boundaries
 

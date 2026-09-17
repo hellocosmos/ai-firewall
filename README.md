@@ -36,7 +36,7 @@ docker compose --profile smoke up -d
 
 After cloning this repository, run the commands above. Open `http://localhost:18080` with `admin` and your chosen password. This starts the synthetic fixture; follow the guide to connect a real service. Clients need a configurable URL and either a connection-key header or an OAuth Bearer JWT. 0.38 validates gateway JWTs as an OAuth Resource Server and injects a separate target credential; it does not issue tokens, broker login or support long-lived SSE.
 
-The 0.38 compatibility lab exercises Entra-, Okta- and Keycloak-shaped OAuth claims through the official MCP SDK using discovery, PKCE, RFC 8707 resource binding and MCP `2025-11-25`. A pinned, unmodified Keycloak container also issues a real local token. These results are reproducible integration evidence, not certification of a customer tenant or production policy. [Evidence matrix and exact limits](docs/en/gateway-compatibility.md).
+The 0.38 compatibility lab exercises Entra-, Okta- and Keycloak-shaped OAuth claims through the official MCP SDK using discovery, PKCE, RFC 8707 resource binding and MCP `2025-11-25`. A pinned, unmodified Keycloak container issues a real local token, and VS Code 1.135 completes real local MCP initialization and tool discovery. These results are reproducible integration evidence, not certification of a customer tenant or production policy. [Evidence matrix and exact limits](docs/en/gateway-compatibility.md).
 
 
 ## Deployment fit and availability

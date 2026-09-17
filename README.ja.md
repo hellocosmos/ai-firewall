@@ -22,7 +22,7 @@ Community は単一テナントの Microsoft Entra ID コンソール SSO と管
 
 [Docker セルフホスティング: integration contract, installation and verification](docs/ja/self-hosting.md)
 
-0.38 Compatibility Lab は公式 MCP SDK で Entra・Okta・Keycloak 形式の claims、discovery、PKCE、RFC 8707 resource binding、MCP `2025-11-25` を検証します。さらに digest 固定の公式 Keycloak コンテナが発行した実ローカルトークンを検証します。これは再現可能な統合証拠であり、実顧客 tenant の認証ではありません。[証拠と正確な制限](docs/ja/gateway-compatibility.md)。
+0.38 Compatibility Lab は公式 MCP SDK で Entra・Okta・Keycloak 形式の claims、discovery、PKCE、RFC 8707 resource binding、MCP `2025-11-25` を検証します。さらに digest 固定の公式 Keycloak コンテナが発行した実ローカルトークンと、VS Code 1.135 の実ローカル MCP 初期化・ツール検出を検証します。これは再現可能な統合証拠であり、実顧客 tenant の認証ではありません。[証拠と正確な制限](docs/ja/gateway-compatibility.md)。
 
 ## 導入条件と提供状況
 

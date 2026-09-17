@@ -23,8 +23,10 @@ def test_stateful_mcp_methods_and_inbound_session_fail_before_forward():
   calls=[]
   client=gateway(httpx.MockTransport(lambda request:calls.append(request)))
   headers={'x-td-client-key':CLIENT_KEY}
-  assert client.get('/mcp',headers=headers).status_code==403
-  assert client.delete('/mcp',headers=headers).status_code==403
+  for method in (client.get,client.delete):
+    response=method('/mcp',headers=headers)
+    assert response.status_code==405 and response.headers['allow']=='POST'
+    assert response.json()=={'error':'method_not_supported'}
   response=client.post('/mcp',headers={**headers,'mcp-session-id':'synthetic-session'},json={
     'jsonrpc':'2.0','id':1,'method':'tools/list'})
   assert response.status_code==400

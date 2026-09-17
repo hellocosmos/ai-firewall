@@ -31,22 +31,27 @@ def prepare_workspace(workspace: Path,port: int):
 def app(receipt_path: Path):
   data=load(ROOT/'deploy/selfhost/deployment.yaml').model_dump(exclude_none=True)
   data['target_auth']={'mode':'none'}
+  for route in data['routes']:
+    if route['protocol']=='mcp':
+      route['tools']['notes_read']=route['tools'].pop('notes.read')
   config=Deployment.model_validate(data)
 
   def target(request):
     payload=json.loads(request.content)
     with receipt_path.open('a') as handle:
       handle.write(json.dumps({'method':payload.get('method'),'protocol':
-        request.headers.get('mcp-protocol-version')},sort_keys=True)+'\n')
+        request.headers.get('mcp-protocol-version'),'requested_protocol':
+        payload.get('params',{}).get('protocolVersion')},sort_keys=True)+'\n')
     method=payload.get('method')
     if method=='initialize':
       body={'jsonrpc':'2.0','id':payload['id'],'result':{'protocolVersion':'2025-11-25',
-        'capabilities':{},'serverInfo':{'name':'trapdefense-vscode-lab','version':'0.38'}}}
+        'capabilities':{'tools':{}},
+        'serverInfo':{'name':'trapdefense-vscode-lab','version':'0.38'}}}
     elif method=='notifications/initialized':
       return httpx.Response(202,headers={'content-type':'application/json'},stream=httpx.ByteStream(b''))
     elif method=='tools/list':
       body={'jsonrpc':'2.0','id':payload['id'],'result':{'tools':[
-        {'name':'notes.read','description':'Read a synthetic compatibility note',
+        {'name':'notes_read','description':'Read a synthetic compatibility note',
          'inputSchema':{'type':'object','properties':{}}}]}}
     elif method=='tools/call':
       body={'jsonrpc':'2.0','id':payload['id'],'result':{'content':[

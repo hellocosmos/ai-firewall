@@ -11,7 +11,7 @@ El cliente debe poder cambiar la URL HTTP/MCP remota a TrapDefense y enviar una 
 | OAuth con forma de Entra | `scp`, `tid`, `oid`, `azp`, discovery, DCR, PKCE y resource binding verificados sintéticamente; no es un tenant Entra real |
 | OAuth con forma de Okta | `scp` como array y `cid` verificados en el flujo sintético completo; no es un servidor Okta real |
 | Keycloak sintético / local real | Además del flujo sintético, un Keycloak 26.7.3 oficial fijado por digest emitió un token local real validado con su discovery y JWKS |
-| MCP remoto de VS Code 1.135 | Se confirmó que reconoce la configuración del workspace; esta ejecución no capturó el inicio ni los receipts, por lo que la conexión real sigue sin verificarse |
+| MCP remoto de VS Code 1.135 | El producto instalado mostró `Running`, descubrió una herramienta y produjo los tres receipts MCP con una solicitud de inicialización `2025-11-25` |
 | MCP con estado, SSE prolongado, WebSocket, stdio | No admitidos; session headers y upstream SSE fallan de forma cerrada |
 | HA multinodo | No admitida; una instancia con SQLite, replay y audit state locales |
 
