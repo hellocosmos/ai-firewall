@@ -19,6 +19,9 @@ from asr_proxy.inspection.contracts import InspectionConfig
 from asr_proxy.inspection.engine import InspectionEngine
 from asr_proxy.inspection.identity import AttestationVerifier
 from asr_proxy.inspection.pii import PresidioScanner
+from asr_proxy.inspection.authorization import load_authorizer
+from asr_proxy.inspection.identity import IDENTITY_FIELDS
+from asr_proxy.access_broker import AgentRecord,ApprovalDecisionRequest,DelegationCreateRequest
 from .network import NetworkManager
 from .dataplane import ConsoleProcessor
 from .destination import create_destination
@@ -26,6 +29,8 @@ from .destination import create_destination
 
 class Runtime:
   integrated=True
+  broker_tenant='synthetic-tenant'
+  broker_user='synthetic-user'
   def __init__(self,directory,seed=False):
     self.store=Store(directory)
     self.lock=RLock()
@@ -47,8 +52,9 @@ class Runtime:
       result={'action':action,'resource':resource,'effect':policy['rules'][name]}
       if policy['pii_rules'][name]!='inherit':result['pii_action']=policy['pii_rules'][name]
       return result
-    config=InspectionConfig(edition='community',trusted_sources=['demo-decryptor'],pii_action=policy['pii_action'],
+    config=InspectionConfig(access_broker_enabled=True,trusted_sources=['demo-decryptor'],pii_action=policy['pii_action'],
       nonce_db=str(self.store.directory/'nonces.sqlite'),audit_path=str(self.store.directory/'inspection.jsonl'),
+      broker_store=str(self.store.directory/'broker.json'),
       routes=[{'authority':'tools.demo.test','path':'/mcp','tools':{
         name:tool_rule(name,action,resource) for name,(action,resource) in TOOLS.items()},
         'redact_fields':['/params/arguments/message']}])
@@ -60,8 +66,81 @@ class Runtime:
 
   def build_engine(self,policy):
     config=self.config(policy)
-    verifier=AttestationVerifier(self.key,config.nonce_db,required_fields=('source_id',))
-    return InspectionEngine(config,self.scanner,verifier,None)
+    fields=IDENTITY_FIELDS if config.access_broker_enabled else ('source_id',)
+    verifier=AttestationVerifier(self.key,config.nonce_db,required_fields=fields)
+    self.broker=load_authorizer(config)
+    if self.broker is not None and not self.broker.store.list_agents():self.seed_broker()
+    return InspectionEngine(config,self.scanner,verifier,self.broker)
+
+  def seed_broker(self):
+    by_agent={}
+    for case in CASES.values():
+      action,resource=TOOLS[case['tool']]
+      entry=by_agent.setdefault(case['agent'],{'tools':set(),'resources':set(),'actions':set()})
+      entry['tools'].add(case['tool']);entry['resources'].add(resource);entry['actions'].add(action)
+    for agent_id,scope in by_agent.items():
+      self.broker.register_agent(AgentRecord(agent_id=agent_id,tenant_id=self.broker_tenant,
+        owner_id='synthetic-operator',runtime='synthetic-console',
+        allowed_tools=sorted(scope['tools']),allowed_resources=sorted(scope['resources']),
+        risk_tier='high' if agent_id=='deployment-agent' else 'medium'))
+      self.broker.create_delegation(DelegationCreateRequest(
+        delegation_id=f'demo-{agent_id}',tenant_id=self.broker_tenant,user_id=self.broker_user,
+        agent_id=agent_id,task_id=f'task-{agent_id}',purpose='Synthetic console scenario',
+        allowed_resources=sorted(scope['resources']),allowed_actions=sorted(scope['actions']),
+        ttl_seconds=86400))
+
+  def broker_snapshot(self):
+    if self.broker is None:return {'agents':[],'delegations':[],'approvals':[]}
+    with self.broker.store.read_transaction():
+      tenant=self.broker_tenant
+      return {
+        'agents':[item.model_dump(mode='json') for item in self.broker.store.list_agents()
+          if item.tenant_id==tenant],
+        'delegations':[item.model_dump(mode='json') for item in self.broker.store.list_delegations()
+          if item.tenant_id==tenant],
+        'approvals':[item.model_dump(mode='json') for item in self.broker.store.list_approvals()
+          if item.tenant_id==tenant],
+      }
+
+  def register_agent(self,payload,actor):
+    if self.broker is None:raise ValueError('Access Broker is disabled.')
+    tools=payload['allowed_tools']
+    if any(tool not in TOOLS for tool in tools):raise ValueError('Unknown tool mapping.')
+    with self.broker.store.read_transaction():
+      if self.broker.store.get_agent(payload['agent_id']) is not None:
+        raise ValueError('Agent ID is already registered.')
+    resources=sorted({TOOLS[tool][1] for tool in tools})
+    record=AgentRecord(**payload,tenant_id=self.broker_tenant,runtime='console',
+      allowed_resources=resources)
+    return self.broker.register_agent(record,actor=actor).model_dump(mode='json')
+
+  def create_delegation(self,payload,actor):
+    if self.broker is None:raise ValueError('Access Broker is disabled.')
+    with self.broker.store.read_transaction():
+      agent=self.broker.store.get_agent(payload['agent_id'])
+    if agent is None or agent.tenant_id!=self.broker_tenant:raise ValueError('Agent was not found.')
+    actions=sorted({TOOLS[tool][0] for tool in agent.allowed_tools if tool in TOOLS})
+    request=DelegationCreateRequest(delegation_id='dlg-'+uuid4().hex[:12],
+      tenant_id=self.broker_tenant,allowed_resources=agent.allowed_resources,
+      allowed_actions=actions,**payload)
+    return self.broker.create_delegation(request,actor=actor).model_dump(mode='json')
+
+  def review_approval(self,approval_id,payload,actor,approved):
+    if self.broker is None:raise ValueError('Access Broker is disabled.')
+    with self.broker.store.read_transaction():approval=self.broker.store.get_approval(approval_id)
+    if approval is None or approval.tenant_id!=self.broker_tenant:raise ValueError('Approval was not found.')
+    request=ApprovalDecisionRequest(approver_id=actor['principal_id'],comment=payload.get('comment'))
+    result=self.broker.approve(approval_id,request) if approved else self.broker.deny(approval_id,request)
+    return result.model_dump(mode='json')
+
+  def renew_demo_delegation(self,actor):
+    if self.broker is None:raise ValueError('Access Broker is disabled.')
+    agent_id='deployment-agent'
+    return self.broker.create_delegation(DelegationCreateRequest(
+      delegation_id=f'demo-{agent_id}',tenant_id=self.broker_tenant,user_id=self.broker_user,
+      agent_id=agent_id,task_id=f'task-{agent_id}',purpose='Synthetic deployment approval',
+      allowed_resources=['environment:staging'],allowed_actions=['deploy'],ttl_seconds=86400),
+      actor=actor).model_dump(mode='json')
 
   def configure(self,policy):
     self.engine=self.build_engine(policy)
@@ -157,7 +236,7 @@ class Runtime:
     except (httpx.HTTPError,ValueError):result['destination_ready']=False
     return result
 
-  def signed_request(self,client,name):
+  def signed_request(self,client,name,approval_id=None):
     case=CASES[name]
     arguments={'message':case['message']}
     if name=='response':arguments['demo_response_pii']=True
@@ -167,7 +246,11 @@ class Runtime:
       headers={'host':'tools.demo.test','content-type':'application/json'},content=body)
     message=HttpMessage('POST','tools.demo.test','/mcp',dict(request.headers),body)
     run_id=uuid4().hex
-    identity={'source_id':'demo-decryptor','agent_id':case['agent'],'scenario':name,'run_id':run_id}
+    identity={'source_id':'demo-decryptor','tenant_id':self.broker_tenant,'user_id':self.broker_user,
+      'agent_id':case['agent'],'delegation_id':f'demo-{case["agent"]}',
+      'task_id':f'task-{case["agent"]}','agent_instance_id':'synthetic-console',
+      'scenario':name,'run_id':run_id}
+    if approval_id:identity['approval_id']=approval_id
     request.headers['x-td-attestation']=sign_attestation(message,identity,self.key,nonce=uuid4().hex)
     return request,run_id
 
@@ -175,7 +258,7 @@ class Runtime:
     with self.network.lock:
       started=time.perf_counter()
       with httpx.Client(timeout=35,trust_env=False,follow_redirects=False) as client:
-        request,run_id=self.signed_request(client,name)
+        request,run_id=self.signed_request(client,name,kwargs.get('approval_id'))
         try:response=client.send(request)
         except httpx.HTTPError:
           self.store.audit('proxy.transport_failed',f'{name} · proxy unavailable; no direct fallback')

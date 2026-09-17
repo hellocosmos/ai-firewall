@@ -3,7 +3,7 @@ import { t } from './i18n';
 import { Panel } from './components';
 
 export default function DeploymentSettings({deployment, network}) {
-  return <Panel title={t('Self-hosted Community')} sub={t('Configured destination only')}>
+  return <Panel title={t('Self-hosted AI Firewall')} sub={t('Configured destination only')}>
     <div className="td-form-body">
       <div className="td-callout"><div><strong>{t('Client → TrapDefense → MCP / API')}</strong><p>{t('Only routed traffic is inspected. Target-service permissions still apply.')}</p></div></div>
       <dl className="td-dl">

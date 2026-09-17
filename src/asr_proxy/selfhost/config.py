@@ -26,6 +26,25 @@ class ClientKeyGatewayAuth(BaseModel):
   mode: Literal['client_key'] = 'client_key'
 
 
+class AgentIdentityClaims(BaseModel):
+  """Explicit allowlist that maps verified JWT claims to broker identity fields."""
+  model_config = ConfigDict(extra='forbid')
+  tenant_id: str = 'tid'
+  user_id: str = 'sub'
+  agent_id: str = 'agent_id'
+  delegation_id: str = 'delegation_id'
+  task_id: str = 'task_id'
+  agent_instance_id: str | None = 'agent_instance_id'
+  approval_id: str | None = 'approval_id'
+
+  @model_validator(mode='after')
+  def validate_claim_names(self):
+    values = [value for value in self.model_dump().values() if value is not None]
+    if any(not re.fullmatch(r'[A-Za-z0-9_.:/-]{1,128}', value) for value in values):
+      raise ValueError('Identity claim names must be explicit JWT claim keys')
+    return self
+
+
 class JwtGatewayAuth(BaseModel):
   model_config = ConfigDict(extra='forbid')
   mode: Literal['jwt'] = 'jwt'
@@ -37,6 +56,7 @@ class JwtGatewayAuth(BaseModel):
   required_scopes: list[str] = Field(min_length=1,max_length=32)
   authorized_parties: list[str] = Field(default_factory=list,max_length=32)
   allow_insecure_loopback: bool = False
+  identity_claims: AgentIdentityClaims | None = None
 
   @model_validator(mode='after')
   def validate_contract(self):
@@ -71,6 +91,18 @@ class JwtGatewayAuth(BaseModel):
 
 
 GatewayAuth = Annotated[ClientKeyGatewayAuth | JwtGatewayAuth, Field(discriminator='mode')]
+
+
+class AccessBrokerDeployment(BaseModel):
+  model_config = ConfigDict(extra='forbid')
+  enabled: bool = False
+  tenant_id: str | None = Field(default=None,min_length=1,max_length=256)
+
+  @model_validator(mode='after')
+  def validate_tenant(self):
+    if self.enabled != bool(self.tenant_id):
+      raise ValueError('Enabled Access Broker requires one tenant_id')
+    return self
 
 
 class TargetAuth(BaseModel):
@@ -113,6 +145,7 @@ class Deployment(BaseModel):
   allow_plaintext_upstream: bool = False
   console_origin: str = 'http://localhost:18080'
   gateway_auth: GatewayAuth = Field(default_factory=ClientKeyGatewayAuth,discriminator='mode')
+  access_broker: AccessBrokerDeployment = Field(default_factory=AccessBrokerDeployment)
   target_auth: TargetAuth = Field(default_factory=TargetAuth)
   destination_auth: Literal['passthrough', 'static_bearer'] | None = Field(default=None,exclude=True)
   bearer_file: str | None = Field(default=None,exclude=True)
@@ -158,6 +191,9 @@ class Deployment(BaseModel):
       raise ValueError('console_origin must be an exact HTTP(S) origin')
     if self.gateway_auth.mode=='jwt' and self.target_auth.mode=='passthrough_bearer':
       raise ValueError('JWT gateway authentication cannot use target Bearer passthrough')
+    if self.access_broker.enabled and (
+        self.gateway_auth.mode!='jwt' or self.gateway_auth.identity_claims is None):
+      raise ValueError('Access Broker requires JWT gateway authentication and identity_claims')
     seen = set()
     for route in self.routes:
       if route.authority != target.netloc:
@@ -186,6 +222,8 @@ class Deployment(BaseModel):
   def public(self):
     return {'upstream': self.upstream, 'console_origin': self.console_origin,
       'gateway_auth':{'mode':self.gateway_auth.mode},'target_auth':self.target_auth.public(),
+      'access_broker':{'enabled':self.access_broker.enabled,'tenant_id':self.access_broker.tenant_id,
+        'maturity':'experimental'},
       'destination_auth':self.target_auth.mode,'source': 'selfhost-adapter',
       'max_body_bytes': self.max_body_bytes,
       'routes': [{'method': r.method, 'path': r.path, 'protocol': r.protocol,

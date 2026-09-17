@@ -64,7 +64,7 @@ def test_valid_jwt_and_resource_metadata(signing_key):
   result=auth.authenticate({'authorization':'Bearer '+encoded(signing_key)})
   assert result.subject=='synthetic-agent'
   assert result.scopes==frozenset({'mcp.invoke','notes.read'})
-  assert result.claims=={}
+  assert result.identity=={}
   assert auth.metadata()=={
     'resource':RESOURCE,'authorization_servers':[ISSUER],
     'bearer_methods_supported':['header'],'scopes_supported':['mcp.invoke']}
@@ -77,6 +77,26 @@ def test_okta_array_scope_and_authorized_party_claims(signing_key):
   result=auth.authenticate({'authorization':'Bearer '+encoded(signing_key,
     scope=None,scp=['mcp.invoke','notes.read'],cid='expected-client')})
   assert result.scopes==frozenset({'mcp.invoke','notes.read'})
+
+
+def test_explicit_identity_claim_map_returns_only_normalized_values(signing_key):
+  auth=GatewayAuthenticator(auth_config(identity_claims={}),client_key=CLIENT_KEY,
+    jwk_client=KeyClient(signing_key))
+  token=encoded(signing_key,tid='tenant-a',agent_id='agent-a',delegation_id='delegation-a',
+    task_id='task-a',agent_instance_id='instance-a',untrusted='must-not-propagate')
+  result=auth.authenticate({'authorization':'Bearer '+token})
+  assert result.identity=={
+    'tenant_id':'tenant-a','user_id':'synthetic-agent','agent_id':'agent-a',
+    'delegation_id':'delegation-a','task_id':'task-a','agent_instance_id':'instance-a'}
+  assert 'untrusted' not in result.identity
+
+
+def test_missing_required_mapped_identity_fails_closed(signing_key):
+  auth=GatewayAuthenticator(auth_config(identity_claims={}),client_key=CLIENT_KEY,
+    jwk_client=KeyClient(signing_key))
+  with pytest.raises(AuthError) as error:
+    auth.authenticate({'authorization':'Bearer '+encoded(signing_key,tid='tenant-a')})
+  assert error.value.code=='invalid_agent_identity'
 
 
 @pytest.mark.parametrize(('claim','value'),[

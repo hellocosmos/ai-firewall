@@ -5,6 +5,9 @@ from asr_proxy.console.runtime import Runtime
 from asr_proxy.console.store import Store
 from asr_proxy.console.scenarios import Policy
 from asr_proxy.inspection.contracts import InspectionConfig
+from asr_proxy.inspection.authorization import load_authorizer
+from asr_proxy.inspection.engine import InspectionEngine
+from asr_proxy.inspection.identity import IDENTITY_FIELDS, AttestationVerifier
 from asr_proxy.inspection.pii import PresidioScanner
 
 
@@ -13,6 +16,7 @@ class SelfhostRuntime(Runtime):
 
   def __init__(self, directory, deployment, *, seed=False):
     self.deployment = deployment
+    self.broker_tenant = deployment.access_broker.tenant_id or ''
     self.store = Store(directory, require_existing=True)
     self.lock = RLock()
     key_path=self.store.directory/'attestation.key'
@@ -40,10 +44,20 @@ class SelfhostRuntime(Runtime):
         rule.pii_action = None if policy['pii_rules'][key]=='inherit' else policy['pii_rules'][key]
     credential_headers=([self.deployment.target_auth.header]
       if self.deployment.target_auth.mode=='static_api_key' else [])
-    return InspectionConfig(edition='community',trusted_sources=['selfhost-adapter'],routes=routes,
+    return InspectionConfig(access_broker_enabled=self.deployment.access_broker.enabled,
+      trusted_sources=['selfhost-adapter'],routes=routes,
       credential_headers=credential_headers,
       max_body_bytes=self.deployment.max_body_bytes,pii_action=policy['pii_action'],
-      nonce_db=str(self.store.directory/'nonces.sqlite'),audit_path=str(self.store.directory/'inspection.jsonl'))
+      nonce_db=str(self.store.directory/'nonces.sqlite'),
+      broker_store=str(self.store.directory/'broker.json'),
+      audit_path=str(self.store.directory/'inspection.jsonl'))
+
+  def build_engine(self,policy):
+    config=self.config(policy)
+    fields=IDENTITY_FIELDS if config.access_broker_enabled else ('source_id',)
+    verifier=AttestationVerifier(self.key,config.nonce_db,required_fields=fields)
+    self.broker=load_authorizer(config)
+    return InspectionEngine(config,self.scanner,verifier,self.broker)
 
   def configure(self, policy):
     self.engine = self.build_engine(policy)

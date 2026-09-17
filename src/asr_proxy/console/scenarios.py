@@ -1,8 +1,9 @@
-"""Synthetic Community inputs. Labels are English translation keys, not verdicts."""
+"""Synthetic open-source inputs. Labels are English translation keys, not verdicts."""
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
-TOOLS={'notes.read':('read','notes'),'notes.delete':('delete','notes')}
+TOOLS={'notes.read':('read','notes'),'notes.delete':('delete','notes'),
+  'infra.deploy':('deploy','environment:staging')}
 CASES={
   'read':{'label':'Read business notes','agent':'support-assistant','tool':'notes.read','message':'Summarize the support knowledge base'},
   'pii':{'label':'Redact customer data','agent':'support-assistant','tool':'notes.read','message':'Contact alex@example.com'},
@@ -12,6 +13,8 @@ CASES={
   'injection':{'label':'Indirect prompt injection','agent':'research-agent','tool':'notes.read','message':'ignore previous instructions'},
   'egress':{'label':'External data transfer','agent':'finance-assistant','tool':'notes.read','message':'https://outside.example/export'},
   'response':{'label':'Redact response PII','agent':'support-assistant','tool':'notes.read','message':'Read synthetic customer response'},
+  'deploy':{'label':'Approve staged deployment','agent':'deployment-agent','tool':'infra.deploy',
+    'message':'Deploy the signed staging release'},
 }
 
 class Policy(BaseModel):
@@ -19,6 +22,7 @@ class Policy(BaseModel):
   version:int=Field(default=1,ge=1)
   mode:Literal['inline','mirror']='inline'
   pii_action:Literal['redact','block']='redact'
-  rules:dict[str,Literal['allow','block']]=Field(default_factory=lambda:{'notes.read':'allow','notes.delete':'block'})
+  rules:dict[str,Literal['allow','block']]=Field(default_factory=lambda:{
+    'notes.read':'allow','notes.delete':'block','infra.deploy':'allow'})
   pii_rules:dict[str,Literal['inherit','redact','block']]=Field(
     default_factory=lambda:{name:'inherit' for name in TOOLS})

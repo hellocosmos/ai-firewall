@@ -28,12 +28,32 @@ class Inspectors(BaseModel):
 
 class Run(BaseModel):
   model_config=ConfigDict(extra='forbid')
+  approval_id:str|None=Field(default=None,pattern=r'^apv_[a-f0-9]{12}$')
+
+class AgentCreate(BaseModel):
+  model_config=ConfigDict(extra='forbid')
+  agent_id:str=Field(pattern=r'^[A-Za-z0-9_-]{2,60}$')
+  owner_id:str=Field(min_length=2,max_length=80)
+  risk_tier:Literal['low','medium','high']='medium'
+  allowed_tools:list[str]=Field(min_length=1,max_length=32)
+
+class DelegationCreate(BaseModel):
+  model_config=ConfigDict(extra='forbid')
+  agent_id:str=Field(pattern=r'^[A-Za-z0-9_-]{2,60}$')
+  user_id:str=Field(min_length=1,max_length=256)
+  task_id:str=Field(pattern=r'^[A-Za-z0-9_-]{2,60}$')
+  purpose:str=Field(min_length=3,max_length=160)
+  ttl_seconds:int=Field(default=3600,ge=60,le=86400)
+
+class ApprovalReview(BaseModel):
+  model_config=ConfigDict(extra='forbid')
+  comment:str=Field(min_length=3,max_length=300)
 
 
 
 def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,identity=None,local_login=True,console_origin=None):
   runtime=runtime_factory(directory,seed=seed)
-  app=FastAPI(title='TrapDefense Community Console',docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifespan)
+  app=FastAPI(title='TrapDefense AI Firewall Console',docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifespan)
   app.state.runtime=runtime
   deployment=getattr(runtime,'deployment',None)
   origins=({console_origin} if console_origin else ORIGINS) | ({identity.origin} if identity else set())
@@ -110,6 +130,10 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
 
   router=APIRouter(prefix='/demo-api',dependencies=[Depends(authenticated)])
 
+  def actor(principal):
+    return {'principal_id':principal['username'],'tenant_id':runtime.broker_tenant,
+      'authentication':principal['authentication']}
+
   @router.get('/session')
   def session(request:Request):return {**request.state.principal,'password_changed':runtime.store.changed() if request.state.principal['authentication']=='local' else True}
 
@@ -130,9 +154,15 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
   @router.get('/overview')
   def overview():
     network=runtime.network_status() if getattr(runtime,'integrated',False) or deployment else None
-    return {'events':runtime.store.events(),'broker':{'agents':[],'delegations':[],'approvals':[]},'edition':'community','capabilities':{'broker':False},'policy':runtime.policy(),
+    broker_enabled=getattr(runtime,'broker',None) is not None
+    return {'events':runtime.store.events(),'broker':runtime.broker_snapshot(),
+      'product':'open_source','capabilities':{'broker':broker_enabled,'broker_maturity':'experimental'},'policy':runtime.policy(),
       'scenarios':[{'id':key,'label':value['label']} for key,value in CASES.items()] if not deployment else [],
-      'system':{'inspector':('ready' if network and network['inspector_ready'] else 'unavailable'),'broker':'not_included','database':'ready','proxy':('ready' if network['proxy_ready'] else 'unavailable') if network else 'not_connected','iam':('synthetic_entra' if identity.synthetic else 'entra') if identity else 'not_configured','tls':'configured_upstream' if deployment else 'synthetic'},'synthetic':not bool(deployment),'integrated':getattr(runtime,'integrated',False),
+      'system':{'inspector':('ready' if network and network['inspector_ready'] else 'unavailable'),
+        'broker':'experimental' if broker_enabled else 'disabled','database':'ready',
+        'proxy':('ready' if network['proxy_ready'] else 'unavailable') if network else 'not_connected',
+        'iam':('synthetic_entra' if identity.synthetic else 'entra') if identity else 'not_configured',
+        'tls':'configured_upstream' if deployment else 'synthetic'},'synthetic':not bool(deployment),'integrated':getattr(runtime,'integrated',False),
       'network':network,'deployment':deployment.public() if deployment else None}
 
   @router.get('/events')
@@ -156,7 +186,28 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
   def scenario(name:str,payload:Run):
     if deployment:raise HTTPException(404,'Synthetic scenarios are not enabled in self-hosted mode')
     if name not in CASES:raise HTTPException(404,'Scenario not found')
-    return runtime.run(name)
+    return runtime.run(name,approval_id=payload.approval_id)
+
+  @router.post('/agents')
+  def register_agent(payload:AgentCreate,request:Request):
+    return runtime.register_agent(payload.model_dump(),actor(request.state.principal))
+
+  @router.post('/delegations')
+  def create_delegation(payload:DelegationCreate,request:Request):
+    return runtime.create_delegation(payload.model_dump(),actor(request.state.principal))
+
+  @router.post('/approvals/{approval_id}/approve')
+  def approve(approval_id:str,payload:ApprovalReview,request:Request):
+    return runtime.review_approval(approval_id,payload.model_dump(),actor(request.state.principal),True)
+
+  @router.post('/approvals/{approval_id}/deny')
+  def deny(approval_id:str,payload:ApprovalReview,request:Request):
+    return runtime.review_approval(approval_id,payload.model_dump(),actor(request.state.principal),False)
+
+  @router.post('/demo/renew-delegation')
+  def renew_demo(request:Request):
+    if deployment:raise HTTPException(404,'Synthetic demo operation is unavailable')
+    return runtime.renew_demo_delegation(actor(request.state.principal))
 
   if getattr(runtime,'integrated',False):
     from .network import NetworkConfig
@@ -207,7 +258,7 @@ def from_env():
 def main():
   import argparse
   import uvicorn
-  parser=argparse.ArgumentParser(description='Run the local Community proxy console (requires Docker)')
+  parser=argparse.ArgumentParser(description='Run the local TrapDefense proxy console (requires Docker)')
   parser.add_argument('--state-dir',help='Persistent local console state directory')
   parser.add_argument('--assets',help='Built console/dist directory')
   args=parser.parse_args()

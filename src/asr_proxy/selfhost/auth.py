@@ -17,8 +17,8 @@ class AuthError(ValueError):
 class GatewayAuthResult:
   subject: str
   scopes: frozenset[str] = frozenset()
-  # Deliberately empty: raw claims are not propagated into inspection or audit.
-  claims: dict = field(default_factory=dict)
+  # Only explicitly mapped values are propagated; arbitrary raw claims never leave authentication.
+  identity: dict[str, str] = field(default_factory=dict)
 
 
 class GatewayAuthenticator:
@@ -58,7 +58,20 @@ class GatewayAuthenticator:
       raise AuthError('invalid_token',401) from None
     if not set(self.config.required_scopes).issubset(scopes):
       raise AuthError('insufficient_scope',403)
-    return GatewayAuthResult(subject,scopes)
+    identity = {}
+    mapping = self.config.identity_claims
+    if mapping is not None:
+      required = ('tenant_id','user_id','agent_id','delegation_id','task_id')
+      for field_name, claim_name in mapping.model_dump().items():
+        if claim_name is None:
+          continue
+        value = claims.get(claim_name)
+        if value is None and field_name not in required:
+          continue
+        if not isinstance(value,str) or not value or len(value)>256:
+          raise AuthError('invalid_agent_identity',401)
+        identity[field_name]=value
+    return GatewayAuthResult(subject,scopes,identity)
 
   def metadata(self):
     if not isinstance(self.config,JwtGatewayAuth):return None

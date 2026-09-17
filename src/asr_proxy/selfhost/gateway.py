@@ -32,7 +32,7 @@ def create_gateway(config, client_key, signing_key, *, target_secret=None, authe
       name = key.decode('latin1').lower()
       if name in headers: return JSONResponse({'error':'duplicate_header'}, status_code=400)
       headers[name] = value.decode('latin1')
-    try:await asyncio.to_thread(authenticator.authenticate,headers)
+    try:auth_result=await asyncio.to_thread(authenticator.authenticate,headers)
     except AuthError as error:
       response_headers={}
       if challenge:=authenticator.challenge(error):response_headers['WWW-Authenticate']=challenge
@@ -71,7 +71,8 @@ def create_gateway(config, client_key, signing_key, *, target_secret=None, authe
           # Sign the actual serialized target and defaults added by the HTTP client.
           message = HttpMessage(request.method, authority, outgoing.url.raw_path.decode('ascii'), dict(outgoing.headers), body)
           outgoing.headers['x-td-attestation'] = sign_attestation(message,
-            {'source_id':'selfhost-adapter','run_id':uuid4().hex}, signing_key, nonce=uuid4().hex)
+            {'source_id':'selfhost-adapter','run_id':uuid4().hex,**auth_result.identity},
+            signing_key, nonce=uuid4().hex)
           response = await client.send(outgoing, stream=True)
           try:
             if 300 <= response.status_code < 400:

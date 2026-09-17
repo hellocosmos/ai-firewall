@@ -37,7 +37,8 @@ export default function Broker({
   broker,
   mutate,
   busy,
-  run
+  run,
+  synthetic
 }) {
   const [tab, setTab] = useState('approvals'),
     [search, setSearch] = useState(''),
@@ -52,6 +53,7 @@ export default function Broker({
   });
   const [delegation, setDelegation] = useState({
     agent_id: broker.agents[0]?.agent_id || '',
+    user_id: 'synthetic-user',
     task_id: '',
     purpose: '',
     ttl_seconds: 3600
@@ -66,7 +68,7 @@ export default function Broker({
   return <><div className="td-subtabs">{Object.entries(title).map(([key, label]) => <button className={key === tab ? 'active' : ''} key={key} onClick={() => {
         setTab(key);
         setSearch('');
-      }}>{label}<span>{broker[key].length}</span></button>)}</div><Panel title={title[tab]} sub={t("Local synthetic tenant \xB7 existing Access Broker")} action={<div className="td-inline">{tab === 'agents' && <button className="td-btn primary" onClick={() => setForm('agent')}><Plus size={14} />{t("Register agent")}</button>}{tab === 'delegations' && <><button className="td-btn" disabled={busy} onClick={() => mutate(() => request('/demo/renew-delegation', {}), t("The default deployment delegation was renewed for 24 hours."))}>{t("Renew demo delegation")}</button><button className="td-btn primary" onClick={() => setForm('delegation')}><Plus size={14} />{t("Create delegation")}</button></>}{tab === 'approvals' && <button className="td-btn" disabled={busy} onClick={() => run('deploy')}><Play size={14} />{t("Deployment approval scenario")}</button>}</div>}><div className="td-toolbar"><SearchBox value={search} onChange={setSearch} placeholder={t("Search agents, users or tasks")} /><span className="td-muted">{rows.length}{t("records")}</span></div>{!rows.length ? <Empty /> : <div className="td-table-wrap"><table><thead><tr>{(tab === 'agents' ? [t("Agent"), t("Owner"), t("Risk level"), t("Allowed tools"), t("Status"), ''] : tab === 'delegations' ? [t("Delegation / task"), t("Agent"), t("Delegator"), t("Allowed actions"), t("Expired"), ''] : [t("Status"), t("Agent / task"), t("Resource"), t("Requested at"), t("Validity"), '']).map((h, i) => <th key={i}>{h}</th>)}</tr></thead><tbody>{rows.map(row => <tr key={row.agent_id + '-' + (row.approval_id || row.delegation_id || 'agent')}>{tab === 'agents' ? <><td><strong>{row.agent_id}</strong><small className="td-block td-muted">{row.runtime}</small></td><td>{row.owner_id}</td><td><Badge value={row.risk_tier} /></td><td className="td-mono">{row.allowed_tools.join(', ')}</td><td><Badge value={row.enabled ? 'active' : 'block'}>{row.enabled ? t("Active") : t("Disabled")}</Badge></td></> : tab === 'delegations' ? <><td><strong>{row.task_id}</strong><small className="td-block td-muted">{row.purpose}</small></td><td>{row.agent_id}</td><td>{row.user_id}</td><td>{row.allowed_actions.join(', ')}</td><td>{date(row.expires_at)}{new Date(row.expires_at) < new Date() && <Badge value="block">{t("Expired")}</Badge>}</td></> : <><td><Badge value={state(row)}>{{
+      }}>{label}<span>{broker[key].length}</span></button>)}</div><Panel title={title[tab]} sub={t("Built-in Access Broker · Experimental")} action={<div className="td-inline">{tab === 'agents' && <button className="td-btn primary" onClick={() => setForm('agent')}><Plus size={14} />{t("Register agent")}</button>}{tab === 'delegations' && <>{synthetic && <button className="td-btn" disabled={busy} onClick={() => mutate(() => request('/demo/renew-delegation', {}), t("The default deployment delegation was renewed for 24 hours."))}>{t("Renew demo delegation")}</button>}<button className="td-btn primary" onClick={() => setForm('delegation')}><Plus size={14} />{t("Create delegation")}</button></>}{tab === 'approvals' && synthetic && <button className="td-btn" disabled={busy} onClick={() => run('deploy')}><Play size={14} />{t("Deployment approval scenario")}</button>}</div>}><div className="td-toolbar"><SearchBox value={search} onChange={setSearch} placeholder={t("Search agents, users or tasks")} /><span className="td-muted">{rows.length}{t("records")}</span></div>{!rows.length ? <Empty /> : <div className="td-table-wrap"><table><thead><tr>{(tab === 'agents' ? [t("Agent"), t("Owner"), t("Risk level"), t("Allowed tools"), t("Status"), ''] : tab === 'delegations' ? [t("Delegation / task"), t("Agent"), t("Delegator"), t("Allowed actions"), t("Expired"), ''] : [t("Status"), t("Agent / task"), t("Resource"), t("Requested at"), t("Validity"), '']).map((h, i) => <th key={i}>{h}</th>)}</tr></thead><tbody>{rows.map(row => <tr key={row.agent_id + '-' + (row.approval_id || row.delegation_id || 'agent')}>{tab === 'agents' ? <><td><strong>{row.agent_id}</strong><small className="td-block td-muted">{row.runtime}</small></td><td>{row.owner_id}</td><td><Badge value={row.risk_tier} /></td><td className="td-mono">{row.allowed_tools.join(', ')}</td><td><Badge value={row.enabled ? 'active' : 'block'}>{row.enabled ? t("Active") : t("Disabled")}</Badge></td></> : tab === 'delegations' ? <><td><strong>{row.task_id}</strong><small className="td-block td-muted">{row.purpose}</small></td><td>{row.agent_id}</td><td>{row.user_id}</td><td>{row.allowed_actions.join(', ')}</td><td>{date(row.expires_at)}{new Date(row.expires_at) < new Date() && <Badge value="block">{t("Expired")}</Badge>}</td></> : <><td><Badge value={state(row)}>{{
                       consumed: t("Consumed"),
                       expired: t("Expired")
                     }[state(row)]}</Badge></td><td><strong>{row.agent_id}</strong><small className="td-block td-mono">{row.tool_name}</small></td><td>{row.resource_id}</td><td>{date(row.created_at)}</td><td>{date(row.expires_at)}</td></>}<td><button className="td-icon" aria-label={t("{0} details", [row.approval_id || row.delegation_id || row.agent_id])} onClick={() => {
@@ -113,7 +115,10 @@ export default function Broker({
             })}><option>notes.read</option><option>notes.delete</option><option>infra.deploy</option></select></label></> : <><label>{t("Agent")}<select required value={delegation.agent_id} onChange={e => setDelegation({
               ...delegation,
               agent_id: e.target.value
-            })}>{broker.agents.map(a => <option key={a.agent_id}>{a.agent_id}</option>)}</select></label><label>{t("Task ID")}<input required pattern="[a-zA-Z0-9_-]{2,60}" value={delegation.task_id} onChange={e => setDelegation({
+            })}>{broker.agents.map(a => <option key={a.agent_id}>{a.agent_id}</option>)}</select></label><label>{t("Delegator ID")}<input required minLength={1} maxLength={256} value={delegation.user_id} onChange={e => setDelegation({
+              ...delegation,
+              user_id: e.target.value
+            })} placeholder="user-or-workload-subject" /></label><label>{t("Task ID")}<input required pattern="[a-zA-Z0-9_-]{2,60}" value={delegation.task_id} onChange={e => setDelegation({
               ...delegation,
               task_id: e.target.value
             })} placeholder="ticket-review" /></label><label>{t("Delegation purpose")}<textarea required minLength={3} maxLength={160} value={delegation.purpose} onChange={e => setDelegation({

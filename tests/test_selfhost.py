@@ -13,6 +13,7 @@ from asr_proxy.selfhost.config import Deployment, load, envoy_config
 from asr_proxy.selfhost.auth import GatewayAuthenticator
 from asr_proxy.selfhost.gateway import create_gateway
 from asr_proxy.selfhost.main import initialize
+from asr_proxy.selfhost.runtime import SelfhostRuntime
 from asr_proxy.console.store import Store
 from asr_proxy.inspection.contracts import HttpMessage
 from asr_proxy.inspection.identity import AttestationVerifier
@@ -67,6 +68,21 @@ def test_jwt_gateway_requires_separate_target_credential(config):
   data['target_auth']={'mode':'passthrough_bearer'}
   with pytest.raises(ValueError,match='passthrough'):
     Deployment.model_validate(data)
+
+
+def test_access_broker_requires_explicit_jwt_identity_mapping(config):
+  data=deployment_data(config)
+  data['access_broker']={'enabled':True,'tenant_id':'tenant-a'}
+  with pytest.raises(ValueError,match='identity_claims'):
+    Deployment.model_validate(data)
+  data.update(gateway_auth=jwt_auth(),target_auth={'mode':'none'})
+  with pytest.raises(ValueError,match='identity_claims'):
+    Deployment.model_validate(data)
+  data['gateway_auth']['identity_claims']={}
+  parsed=Deployment.model_validate(data)
+  assert parsed.access_broker.enabled is True
+  assert parsed.public()['access_broker']=={
+    'enabled':True,'tenant_id':'tenant-a','maturity':'experimental'}
 
 
 @pytest.mark.parametrize('auth',[
@@ -149,6 +165,22 @@ def test_initialization_preserves_account(tmp_path,config):
   assert (state/'client.key').stat().st_mode & 0o077 == 0
   with pytest.raises(ValueError):Store(tmp_path/'empty',require_existing=True)
 
+
+def test_selfhost_runtime_uses_built_in_broker_when_enabled(tmp_path,config):
+  data=deployment_data(config)
+  data.update(gateway_auth=jwt_auth(identity_claims={}),target_auth={'mode':'none'},
+    access_broker={'enabled':True,'tenant_id':'tenant-a'})
+  secured=Deployment.model_validate(data)
+  state=tmp_path/'state';initialize(state,tmp_path/'generated',secured,'synthetic-password-039')
+  runtime=SelfhostRuntime(state,secured)
+  assert runtime.broker is not None and runtime.config(runtime.policy()).access_broker_enabled
+  agent=runtime.register_agent({'agent_id':'agent-a','owner_id':'owner-a','risk_tier':'medium',
+    'allowed_tools':['notes.read']},{'principal_id':'admin','tenant_id':'tenant-a','authentication':'local'})
+  delegation=runtime.create_delegation({'agent_id':'agent-a','user_id':'user-a','task_id':'task-a',
+    'purpose':'Read notes','ttl_seconds':3600},
+    {'principal_id':'admin','tenant_id':'tenant-a','authentication':'local'})
+  assert agent['tenant_id']=='tenant-a' and delegation['tenant_id']=='tenant-a'
+
 def test_gateway_signs_actual_request_and_separates_auth(config,tmp_path):
   calls=[]
   def upstream(request):
@@ -196,12 +228,12 @@ def test_static_bearer_and_conflict(config):
   assert len(seen)==1
 
 
-def test_jwt_metadata_challenge_and_separate_target_credential(config):
+def test_jwt_metadata_challenge_and_separate_target_credential(config,tmp_path):
   signing_key=rsa.generate_private_key(public_exponent=65537,key_size=2048)
   class Keys:
     def get_signing_key_from_jwt(self,token):return SimpleNamespace(key=signing_key.public_key())
   data=deployment_data(config)
-  data.update(gateway_auth=jwt_auth(),
+  data.update(gateway_auth=jwt_auth(identity_claims={}),
     target_auth={'mode':'static_bearer','secret_file':'/state/target.token'})
   secured=Deployment.model_validate(data)
   authenticator=GatewayAuthenticator(secured.gateway_auth,client_key=KEY,jwk_client=Keys())
@@ -210,6 +242,11 @@ def test_jwt_metadata_challenge_and_separate_target_credential(config):
     calls.append(request)
     assert request.headers['authorization']=='Bearer synthetic-target-token'
     assert 'x-td-client-key' not in request.headers
+    message=HttpMessage(request.method,request.headers['host'],request.url.raw_path.decode(),
+      dict(request.headers),request.content)
+    identity=AttestationVerifier(SIGN,str(tmp_path/'jwt-nonces')).verify(message,consume=True)
+    assert identity['tenant_id']=='tenant-a' and identity['agent_id']=='agent-a'
+    assert identity['delegation_id']=='delegation-a' and identity['task_id']=='task-a'
     return httpx.Response(200,headers={'content-type':'application/json'},stream=httpx.ByteStream(b'{}'))
   client=TestClient(create_gateway(secured,KEY,SIGN,target_secret='synthetic-target-token',
     authenticator=authenticator,transport=httpx.MockTransport(target)))
@@ -221,7 +258,8 @@ def test_jwt_metadata_challenge_and_separate_target_credential(config):
   assert calls==[]
   now=int(time.time())
   token=jwt.encode({'iss':'https://issuer.example/tenant','aud':'https://firewall.example/mcp',
-    'sub':'synthetic-agent','iat':now,'exp':now+300,'scope':'mcp.invoke'},signing_key,
+    'sub':'synthetic-agent','iat':now,'exp':now+300,'scope':'mcp.invoke',
+    'tid':'tenant-a','agent_id':'agent-a','delegation_id':'delegation-a','task_id':'task-a'},signing_key,
     algorithm='RS256',headers={'kid':'synthetic'})
   response=client.post('/api/notes',headers={'authorization':'Bearer '+token},json={})
   assert response.status_code==200 and len(calls)==1

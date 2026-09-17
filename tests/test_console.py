@@ -1,4 +1,4 @@
-"""Standalone Community console boundaries, without private packages or SDK."""
+"""Standalone open-source console boundaries, without private packages or SDK."""
 import importlib.util
 import pytest
 pytest.importorskip('psutil')
@@ -20,9 +20,15 @@ def test_public_dependency_and_capability_boundary(tmp_path):
     c.headers.update(HEADERS)
     assert c.post('/demo-api/login',json={'username':'admin','password':'1234'}).status_code==200
     view=c.get('/demo-api/overview').json()
-    assert view['edition']=='community' and view['capabilities']['broker'] is False
-    assert all(case['id'] not in ('deploy','unknown') for case in view['scenarios'])
-    assert c.post('/demo-api/approvals/fake/approve',json={'comment':'No fake approvals'}).status_code==404
+    assert view['product']=='open_source' and view['capabilities']['broker'] is True
+    assert view['capabilities']['broker_maturity']=='experimental'
+    assert any(case['id']=='deploy' for case in view['scenarios'])
+    assert view['broker']['agents'] and view['broker']['delegations']
+    assert c.post('/demo-api/agents',json={'agent_id':'new-agent','owner_id':'security-team',
+      'risk_tier':'medium','allowed_tools':['notes.read']}).status_code==200
+    assert c.post('/demo-api/delegations',json={'agent_id':'new-agent','user_id':'user-a',
+      'task_id':'task-a','purpose':'Read approved notes','ttl_seconds':3600}).status_code==200
+    assert c.post('/demo-api/approvals/fake/approve',json={'comment':'No fake approvals'}).status_code==400
     assert c.post('/demo-api/network',headers={'origin':'https://invalid.test'},json={}).status_code==403
     assert c.post('/demo-api/network',json={'listen_address':'0.0.0.0'}).status_code==422
 
@@ -33,7 +39,8 @@ def test_password_policy_and_persistence(tmp_path):
     c.post('/demo-api/login',json={'username':'admin','password':'1234'}).raise_for_status()
     cookie=c.cookies.get('td_demo_session')
     policy=c.get('/demo-api/policy').json()
-    assert policy['pii_rules']=={'notes.read':'inherit','notes.delete':'inherit'}
+    assert policy['pii_rules']=={
+      'notes.read':'inherit','notes.delete':'inherit','infra.deploy':'inherit'}
     policy['rules']['notes.read']='block'
     policy['pii_rules']['notes.read']='block'
     assert c.post('/demo-api/policy',json=policy).status_code==200
@@ -58,6 +65,27 @@ def test_network_rejects_unsafe_settings_and_stale_revision(tmp_path):
   before=manager.current()
   with pytest.raises(ValueError,match='refresh'):manager.apply({**before,'version':99})
   assert manager.current()==before
+
+
+def test_synthetic_deployment_uses_real_bound_approval(tmp_path):
+  import httpx
+  from asr_proxy.inspection.contracts import HttpMessage
+  runtime=Runtime(tmp_path)
+
+  def inspect(approval_id=None):
+    with httpx.Client() as client:
+      request,_=runtime.signed_request(client,'deploy',approval_id)
+      message=HttpMessage(request.method,request.headers['host'],request.url.raw_path.decode(),
+        dict(request.headers),request.content)
+      return runtime.engine.inspect_request(message,mode='inline')
+
+  pending=inspect()
+  assert pending.action=='approval_required' and pending.approval_id
+  runtime.review_approval(pending.approval_id,{'comment':'Synthetic release approved'},
+    {'principal_id':'admin','tenant_id':'synthetic-tenant','authentication':'local'},True)
+  assert inspect(pending.approval_id).action=='allow'
+  replay=inspect(pending.approval_id)
+  assert (replay.action,replay.reason)==('block','approval_consumed')
 
 
 def test_stream_response_reuses_request_selected_pii_policy(tmp_path):
