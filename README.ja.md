@@ -17,6 +17,19 @@ AI agent → 認証 gateway → trusted request binding → Envoy + inspector
          → 任意の内蔵 Access Broker → Tool / MCP / HTTP API
 ```
 
+## コンソール画面
+
+合成データを使用した実際の 0.41 画面です。ダッシュボードには意図的な7秒のプロバイダー遅延テストが含まれ、性能ベンチマークではありません。Agent 管理は別のローカルデモです。
+
+![ランタイムダッシュボード](docs/assets/console-dashboard-041.png)
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/console-agents-041.png" alt="Agent 権限 · 実験的機能"><br><strong>Agent 権限 · 実験的機能</strong></td>
+<td width="50%"><img src="docs/assets/console-provider-041.png" alt="プロバイダー接続設定"><br><strong>プロバイダー接続設定</strong></td>
+</tr>
+</table>
+
 ## 1 つのオープンソース製品
 
 Community / Enterprise のコード版は分けません。Runtime Gateway、HTTP/MCP 検査、PII/secret 防御、外部 OAuth JWT 検証、Agent Registry、delegation、Access Broker、human approval、audit、運用コンソール、Docker セルフホストをこの公開リポジトリに含めます。非公開ランタイムは不要です。

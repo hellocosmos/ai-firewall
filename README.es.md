@@ -17,6 +17,19 @@ AI agent → gateway autenticado → enlace de solicitud confiable → Envoy + i
          → Access Broker integrado opcional → Tool / MCP / HTTP API
 ```
 
+## La consola en acción
+
+Pantallas reales de 0.41 con datos sintéticos. El panel incluye una prueba con un retraso deliberado de siete segundos del proveedor; no es una referencia de rendimiento. La gestión de agentes corresponde a otra demostración local.
+
+![Panel de ejecución](docs/assets/console-dashboard-041.png)
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/console-agents-041.png" alt="Permisos de agentes · Experimental"><br><strong>Permisos de agentes · Experimental</strong></td>
+<td width="50%"><img src="docs/assets/console-provider-041.png" alt="Configuración del proveedor"><br><strong>Configuración del proveedor</strong></td>
+</tr>
+</table>
+
 ## Un único producto de código abierto
 
 No existen ediciones de código Community y Enterprise. Este repositorio público contiene Runtime Gateway, inspección HTTP/MCP, protección PII/secret, validación OAuth JWT externa, Agent Registry, delegation, Access Broker, human approval, audit, consola operativa y despliegue Docker. No se requiere un paquete runtime privado.

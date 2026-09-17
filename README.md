@@ -30,6 +30,19 @@ AI agent / client
 
 The earlier embedded SDK remains available in [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security). This repository is the proxy product and requires no private runtime package.
 
+## Console in action
+
+Actual 0.41 screens with synthetic data. The dashboard includes a deliberate seven-second provider delay test; these numbers are not a performance benchmark. Agent management is shown in a separate local demo.
+
+![Runtime dashboard](docs/assets/console-dashboard-041.png)
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/console-agents-041.png" alt="Agent permissions · Experimental"><br><strong>Agent permissions · Experimental</strong></td>
+<td width="50%"><img src="docs/assets/console-provider-041.png" alt="Provider connection settings"><br><strong>Provider connection settings</strong></td>
+</tr>
+</table>
+
 ## One open-source product
 
 There are no Community and Enterprise code editions. This repository contains:

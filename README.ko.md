@@ -17,6 +17,19 @@ AI agent → 인증 gateway → trusted request binding → Envoy + inspector
          → 선택적 내장 Access Broker → Tool / MCP / HTTP API
 ```
 
+## 콘솔 화면
+
+합성 데이터를 사용한 실제 0.41 화면입니다. 대시보드에는 의도적인 7초 제공사 지연 테스트가 포함되어 있어 성능 벤치마크가 아닙니다. Agent 관리는 별도의 로컬 데모 화면입니다.
+
+![런타임 대시보드](docs/assets/console-dashboard-041.png)
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/console-agents-041.png" alt="Agent 권한 · 실험적 기능"><br><strong>Agent 권한 · 실험적 기능</strong></td>
+<td width="50%"><img src="docs/assets/console-provider-041.png" alt="제공사 연결 설정"><br><strong>제공사 연결 설정</strong></td>
+</tr>
+</table>
+
 ## 하나의 오픈소스 제품
 
 Community/Enterprise 코드 에디션을 구분하지 않는다. Runtime Gateway, HTTP/MCP 검사, PII/secret 보호, 외부 OAuth JWT 검증, Agent Registry, delegation, Access Broker, human approval, audit, 운영 콘솔과 Docker 셀프호스팅이 모두 이 공개 저장소에 있다. 실행 시 비공개 패키지는 필요하지 않다.

@@ -17,6 +17,19 @@ AI agent → 认证网关 → 可信请求绑定 → Envoy + inspector
          → 可选内置 Access Broker → Tool / MCP / HTTP API
 ```
 
+## 控制台预览
+
+使用合成数据的实际 0.41 界面。仪表板包含人为设置的七秒提供商延迟测试，并非性能基准。Agent 管理来自独立的本地演示。
+
+![运行时仪表板](docs/assets/console-dashboard-041.png)
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/console-agents-041.png" alt="Agent 权限 · 实验性"><br><strong>Agent 权限 · 实验性</strong></td>
+<td width="50%"><img src="docs/assets/console-provider-041.png" alt="提供商连接设置"><br><strong>提供商连接设置</strong></td>
+</tr>
+</table>
+
 ## 单一开源产品
 
 不再区分 Community 与 Enterprise 代码版本。本公开仓库包含 Runtime Gateway、HTTP/MCP 检查、PII/secret 防护、外部 OAuth JWT 验证、Agent Registry、delegation、Access Broker、人工审批、审计、运维控制台和 Docker 自托管。运行时不需要私有软件包。
