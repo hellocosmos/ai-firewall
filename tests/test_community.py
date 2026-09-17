@@ -1,4 +1,4 @@
-"""Community boundary: verify the trusted forwarding hop without an Enterprise package."""
+"""Gateway-only boundary and optional built-in Access Broker."""
 import json
 from dataclasses import replace
 from uuid import uuid4
@@ -21,7 +21,7 @@ def scanner():
 
 @pytest.fixture
 def engine(tmp_path, scanner):
-  config = InspectionConfig(edition="community", trusted_sources=["decryptor-a"], routes=[{
+  config = InspectionConfig(trusted_sources=["decryptor-a"], routes=[{
     "authority": "example.test", "path": "/mcp", "tools": {
       "notes.read": {"action": "read", "resource": "notes"},
       "notes.delete": {"action": "delete", "resource": "notes", "effect": "block"},
@@ -83,14 +83,15 @@ def test_mirror_does_not_consume_nonce_and_inline_replay_blocks(engine):
   assert engine.inspect_request(request, mode="inline").reason == "attestation_replay"
 
 
-def test_enterprise_plugin_missing_never_falls_back(monkeypatch):
-  monkeypatch.setattr("asr_proxy.inspection.authorization.entry_points", lambda **kw: [])
-  with pytest.raises(RuntimeError, match="enterprise_authorizer_not_installed"):
-    load_authorizer(InspectionConfig(edition="enterprise", routes=[]))
+def test_built_in_broker_requires_no_private_provider(tmp_path):
+  config = InspectionConfig(access_broker_enabled=True, routes=[],
+    broker_store=str(tmp_path / "broker.json"))
+  assert load_authorizer(config).__class__.__name__ == "AccessBroker"
 
 
-def test_legacy_config_remains_enterprise():
-  assert InspectionConfig(routes=[]).edition == "enterprise"
+def test_legacy_edition_config_is_rejected():
+  with pytest.raises(ValueError, match="edition"):
+    InspectionConfig.model_validate({"edition": "community", "routes": []})
 
 
 def test_scanner_error_is_fail_closed(engine):

@@ -152,8 +152,6 @@ class InspectorPool:
 
   def run(self):
     config = InspectionConfig.model_validate(yaml.safe_load(Path(self.args.config).read_text()))
-    if config.edition != 'community':
-      raise PoolError('pool_requires_community_shared_state')
     key_path = Path(self.args.key_file).resolve()
     key = key_path.read_bytes()
     if key_path.stat().st_mode & 0o077 or len(key) < 32:
@@ -208,7 +206,7 @@ class InspectorPool:
 
 
 def parser():
-  value = argparse.ArgumentParser(description='Supervise 1, 2 or 4 same-host Community inspectors')
+  value = argparse.ArgumentParser(description='Supervise 1, 2 or 4 same-host TrapDefense inspectors')
   value.add_argument('--config', required=True)
   value.add_argument('--key-file', required=True)
   value.add_argument('--state-directory', required=True)

@@ -41,8 +41,7 @@ class RouteRule(BaseModel):
 
 class InspectionConfig(BaseModel):
   model_config = ConfigDict(extra="forbid")
-  # Legacy configurations remain Enterprise to avoid silently removing authorization.
-  edition: Literal["community", "enterprise"] = "enterprise"
+  access_broker_enabled: bool = False
   trusted_sources: list[str] = Field(default_factory=list)
   routes: list[RouteRule]
   allowed_egress_origins: list[str] = Field(default_factory=list)

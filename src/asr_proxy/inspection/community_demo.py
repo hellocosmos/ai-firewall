@@ -44,7 +44,7 @@ def _private_create(path: Path, content: bytes):
 
 def demo_config(state: Path) -> InspectionConfig:
   return InspectionConfig.model_validate({
-    "edition": "community", "trusted_sources": ["demo-decryptor"],
+    "access_broker_enabled": False, "trusted_sources": ["demo-decryptor"],
     "routes": [{"authority": "example.test", "path": "/mcp", "method": "POST",
       "protocol": "mcp", "tools": {
         "notes.read": {"action": "read", "resource": "notes"},
@@ -68,7 +68,7 @@ def init_demo(state_dir: str | Path) -> dict:
   _private_create(state / "demo.json", encode_json({"format": FORMAT, "identity": DEMO_IDENTITY}))
   _private_create(state / "inspector.yaml", yaml.safe_dump(demo_config(state).model_dump(), sort_keys=False).encode())
   _private_create(state / "inspection.jsonl", b"")
-  return {"state_dir": str(state), "edition": "community", "scope": "synthetic_local_only"}
+  return {"state_dir": str(state), "product": "open_source", "scope": "synthetic_local_only"}
 
 
 def load_demo(state_dir: str | Path) -> Path:

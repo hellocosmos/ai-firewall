@@ -164,7 +164,7 @@ class InspectionEngine:
       verdict.request_digest = request_digest(final_message)
       verdict.body = new_body if new_body != message.body else None
       identity = self.verifier.verify(message, consume=mode == "inline")
-      if self.config.edition == "community":
+      if self.broker is None:
         if identity.get("source_id") not in self.config.trusted_sources:
           raise InspectionError("untrusted_source")
         verdict.source_verified = True
@@ -183,7 +183,7 @@ class InspectionEngine:
       )
       check_deadline()
       decision = self.broker.authorize(request) if mode == "inline" else self.broker.evaluate(request)
-      verdict.authorization_scope = "enterprise_broker"
+      verdict.authorization_scope = "access_broker"
       if decision.action != "allow":
         verdict.action = decision.action
         verdict.reason = decision.reason_code
@@ -234,8 +234,8 @@ class InspectionEngine:
         verdict.action, verdict.reason = "redact", "pii_detected_unmapped_context"
       try:
         identity = self.verifier.verify(message, consume=False)
-        verdict.source_verified = self.config.edition == "enterprise" or identity.get("source_id") in self.config.trusted_sources
-        verdict.identity_verified = self.config.edition == "enterprise"
+        verdict.source_verified = self.broker is not None or identity.get("source_id") in self.config.trusted_sources
+        verdict.identity_verified = self.broker is not None
       except InspectionError:
         pass
     except InspectionError as exc:

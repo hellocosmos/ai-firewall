@@ -27,7 +27,6 @@ class SyntheticPii:
 @pytest.fixture
 def engine(tmp_path):
   config = InspectionConfig(
-    edition="community",
     trusted_sources=["decryptor-a"],
     pii_action="redact",
     nonce_db=str(tmp_path / "nonces.sqlite"),

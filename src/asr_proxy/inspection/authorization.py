@@ -1,33 +1,13 @@
-"""Public authorization contract. Enterprise uses an entry point from a separate distribution."""
-from importlib.metadata import entry_points
-from typing import Any
+"""Construct the optional built-in Agent Access Broker."""
 
-from pydantic import BaseModel, Field
+from asr_proxy.access_broker import AccessBroker, AccessRequest, FileAccessBrokerStore
 
 from .contracts import InspectionConfig
 
-
-class AuthorizationRequest(BaseModel):
-  tenant_id: str
-  user_id: str
-  agent_id: str
-  delegation_id: str
-  task_id: str
-  tool_name: str
-  resource_id: str
-  requested_action: str
-  agent_instance_id: str | None = None
-  approval_id: str | None = None
-  metadata: dict[str, Any] = Field(default_factory=dict)
+AuthorizationRequest = AccessRequest
 
 
 def load_authorizer(config: InspectionConfig):
-  if config.edition == "community":
+  if not config.access_broker_enabled:
     return None
-  providers = list(entry_points(group="trapdefense.authorizers", name="enterprise"))
-  if len(providers) != 1:
-    raise RuntimeError("enterprise_authorizer_not_installed_or_ambiguous")
-  provider = providers[0].load()(config)
-  if not callable(getattr(provider, "authorize", None)) or not callable(getattr(provider, "evaluate", None)):
-    raise RuntimeError("invalid_enterprise_authorizer")
-  return provider
+  return AccessBroker(FileAccessBrokerStore(config.broker_store))

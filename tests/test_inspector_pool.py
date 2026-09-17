@@ -44,15 +44,12 @@ def test_atomic_key_snapshot_preserves_binary_bytes_and_permissions(tmp_path):
   assert target.stat().st_mode & 0o777 == 0o600
 
 
-@pytest.mark.parametrize('problem', ['enterprise', 'insecure_key', 'overlapping_output'])
+@pytest.mark.parametrize('problem', ['insecure_key', 'overlapping_output'])
 def test_invalid_pool_configuration_never_spawns(tmp_path, monkeypatch, problem):
   demo = tmp_path/'demo'; init_demo(demo)
   args = arguments(tmp_path)
   args.config = str(demo/'inspector.yaml'); args.key_file = str(demo/'attestation.key')
-  if problem == 'enterprise':
-    config = yaml.safe_load(Path(args.config).read_text()); config['edition'] = 'enterprise'
-    Path(args.config).write_text(yaml.safe_dump(config))
-  elif problem == 'insecure_key': Path(args.key_file).chmod(0o644)
+  if problem == 'insecure_key': Path(args.key_file).chmod(0o644)
   else: args.envoy_output = args.key_file
   pool = InspectorPool(args)
   monkeypatch.setattr(pool, 'spawn', lambda *args: pytest.fail('invalid configuration spawned a child'))

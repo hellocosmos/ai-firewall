@@ -295,7 +295,7 @@ async def run(args):
     raise ValueError("key_file_must_be_owner_only")
   verifier = AttestationVerifier(key_path.read_bytes(), config.nonce_db,
     max_age=config.attestation_max_age_seconds,
-    required_fields=("source_id",) if config.edition == "community" else IDENTITY_FIELDS)
+    required_fields=IDENTITY_FIELDS if config.access_broker_enabled else ("source_id",))
   engine = InspectionEngine(config, PresidioScanner(score_threshold=config.pii_min_score), verifier,
                             authorizer)
   audit = InspectionAudit(config.audit_path)

@@ -56,6 +56,6 @@ def test_candidates_and_unicode_still_use_complete_pipeline(scanner, text):
 
 @pytest.mark.parametrize("control", [chr(i) for i in range(32)] + [chr(127)])
 def test_control_obfuscated_egress_stays_blocked(control):
-  config = InspectionConfig.model_validate({"edition": "community", "routes": []})
+  config = InspectionConfig.model_validate({"routes": []})
   with pytest.raises(InspectionError, match="ambiguous_nested_url"):
     check_egress({"url": "ht" + control + "tps://example.com"}, config)
