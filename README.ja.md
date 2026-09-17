@@ -18,16 +18,17 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 Community は単一テナントの Microsoft Entra ID コンソール SSO と管理者・閲覧者ロールを提供します。コンソール認証はエージェントの実行認可ではなく、委任と承認は Enterprise の機能です。 [Entra SSO](docs/ja/identity.md).
 
-## Docker セルフホスティング · 0.37
+## Docker セルフホスティング · 0.38
 
 [Docker セルフホスティング: integration contract, installation and verification](docs/ja/self-hosting.md)
 
+0.38 Compatibility Lab は公式 MCP SDK で Entra・Okta・Keycloak 形式の claims、discovery、PKCE、RFC 8707 resource binding、MCP `2025-11-25` を検証します。さらに digest 固定の公式 Keycloak コンテナが発行した実ローカルトークンを検証します。これは再現可能な統合証拠であり、実顧客 tenant の認証ではありません。[証拠と正確な制限](docs/ja/gateway-compatibility.md)。
 
 ## 導入条件と提供状況
 
 対応する検査経路を通る HTTP API・リモート MCP 呼び出しを保護します。MCP サーバーとコネクターの既存認証を維持し、IAM を置き換えません。
 
-0.37 はアダプター、Envoy、検査器、管理 UI と分離したゲートウェイ/宛先認証を提供します。接続キーまたは外部 IdP JWT を検証し、別の宛先資格情報を使用します。イメージはソースからビルドし、TrapDefense Cloud は計画段階です。
+0.38 はアダプター、Envoy、検査器、管理 UI と分離したゲートウェイ/宛先認証を提供します。接続キーまたは外部 IdP JWT を検証し、別の宛先資格情報を使用します。イメージはソースからビルドし、TrapDefense Cloud は計画段階です。
 
 [提供形態と互換性](docs/ja/deployment-fit.md) · [ゲートウェイクライアント互換性](docs/ja/gateway-compatibility.md)
 

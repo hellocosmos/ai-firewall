@@ -29,8 +29,8 @@ def synthetic_target(calls):
       body={'received':payload}
     elif payload['method']=='initialize':
       body={'jsonrpc':'2.0','id':payload['id'],'result':{
-        'protocolVersion':'2025-06-18','capabilities':{},
-        'serverInfo':{'name':'synthetic-trapdefense-target','version':'0.37'}}}
+        'protocolVersion':'2025-11-25','capabilities':{},
+        'serverInfo':{'name':'synthetic-trapdefense-target','version':'0.38'}}}
     elif payload['method']=='tools/list':
       body={'jsonrpc':'2.0','id':payload['id'],'result':{'tools':[
         {'name':'notes.read','description':'Read a synthetic note','inputSchema':{'type':'object'}}]}}
@@ -68,7 +68,8 @@ async def test_official_mcp_sdk_initializes_and_discovers_tools():
       async with ClientSession(read_stream,write_stream) as session:
         initialized=await session.initialize()
         tools=await session.list_tools()
-  assert initialized.protocolVersion=='2025-06-18'
+  assert initialized.protocolVersion=='2025-11-25'
   assert [tool.name for tool in tools.tools]==['notes.read']
   assert [json.loads(call.content)['method'] for call in calls]==[
     'initialize','notifications/initialized','tools/list']
+  assert calls[-1].headers['mcp-protocol-version']=='2025-11-25'

@@ -18,16 +18,17 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 
 Community 提供单租户 Microsoft Entra ID 控制台 SSO 及管理员、查看者角色。控制台认证不授予智能体操作权限；委派和审批属于 Enterprise。 [Entra SSO](docs/zh-CN/identity.md).
 
-## Docker 自托管 · 0.37
+## Docker 自托管 · 0.38
 
 [Docker 自托管: integration contract, installation and verification](docs/zh-CN/self-hosting.md)
 
+0.38 Compatibility Lab 使用官方 MCP SDK 验证类 Entra、Okta、Keycloak claims、discovery、PKCE、RFC 8707 resource binding 与 MCP `2025-11-25`。它还验证固定 digest 的官方 Keycloak 容器签发的真实本地 token。这是可复现的集成证据，并非真实客户 tenant 认证。[证据与准确边界](docs/zh-CN/gateway-compatibility.md)。
 
 ## 部署条件与提供状态
 
 保护可通过受支持检查路径的 HTTP API 和远程 MCP 调用。保留 MCP 服务器和连接器中的现有服务认证，不替代 IAM。
 
-0.37 提供适配器、Envoy、检查器、管理界面以及分离的网关/目标认证。它验证连接密钥或外部 IdP JWT，并使用独立目标凭据。镜像从源码构建，TrapDefense Cloud 仍在规划中。
+0.38 提供适配器、Envoy、检查器、管理界面以及分离的网关/目标认证。它验证连接密钥或外部 IdP JWT，并使用独立目标凭据。镜像从源码构建，TrapDefense Cloud 仍在规划中。
 
 [交付与兼容性](docs/zh-CN/deployment-fit.md) · [网关客户端兼容性](docs/zh-CN/gateway-compatibility.md)
 

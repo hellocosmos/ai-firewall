@@ -18,16 +18,17 @@ Flux logique du produit. Consultez l’[architecture de déploiement](docs/fr/ar
 
 Community inclut le SSO de console Microsoft Entra ID à locataire unique, avec les rôles Administrateur et Lecteur. L’authentification de console n’autorise pas les actions des agents ; délégation et approbation restent dans Enterprise. [Entra SSO](docs/fr/identity.md).
 
-## Auto-hébergement Docker · 0.37
+## Auto-hébergement Docker · 0.38
 
 [Auto-hébergement Docker: integration contract, installation and verification](docs/fr/self-hosting.md)
 
+Le Compatibility Lab 0.38 vérifie les claims aux formats Entra, Okta et Keycloak, discovery, PKCE, RFC 8707 resource binding et MCP `2025-11-25` avec le SDK MCP officiel. Il valide aussi un token local réel émis par un conteneur Keycloak officiel fixé par digest. Il s’agit d’une preuve d’intégration reproductible, pas d’une certification de tenant réel. [Preuves et limites exactes](docs/fr/gateway-compatibility.md).
 
 ## Compatibilité et disponibilité
 
 Protégez les appels HTTP API et MCP distants que vous pouvez acheminer via un chemin d’inspection pris en charge. Conservez l’authentification des serveurs MCP et connecteurs ; ne remplacez pas votre IAM.
 
-0.37 fournit adaptateur, Envoy, inspecteur, console et authentifications séparées pour passerelle/cible. Il valide une clé ou un JWT d’IdP externe et utilise un identifiant cible indépendant. L’image se construit depuis les sources ; TrapDefense Cloud reste prévu.
+0.38 fournit adaptateur, Envoy, inspecteur, console et authentifications séparées pour passerelle/cible. Il valide une clé ou un JWT d’IdP externe et utilise un identifiant cible indépendant. L’image se construit depuis les sources ; TrapDefense Cloud reste prévu.
 
 [Offres et compatibilité](docs/fr/deployment-fit.md) · [Compatibilité de la passerelle](docs/fr/gateway-compatibility.md)
 

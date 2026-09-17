@@ -1,8 +1,8 @@
-# Autoalojamiento con Docker — 0.37 Community Preview
+# Autoalojamiento con Docker — 0.38 Community Preview
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.37 ofrece adaptador, Envoy, inspector, consola y autenticación separada para gateway y destino. La imagen se compila localmente desde el código fuente. TrapDefense Cloud sigue previsto.
+0.38 ofrece adaptador, Envoy, inspector, consola y autenticación separada para gateway y destino. La imagen se compila localmente desde el código fuente. TrapDefense Cloud sigue previsto.
 
 El cliente debe poder cambiar la URL MCP/API y usar `X-TD-Client-Key` o un JWT Bearer OAuth. Cada despliegue tiene un destino fijo y rutas/herramientas explícitas. Consulte la [matriz de compatibilidad](gateway-compatibility.md).
 

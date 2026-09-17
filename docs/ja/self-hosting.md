@@ -1,8 +1,8 @@
-# Docker セルフホスティング — 0.37 Community Preview
+# Docker セルフホスティング — 0.38 Community Preview
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.37 はアダプター、Envoy、検査器、管理 UI と、分離したゲートウェイ/宛先認証を提供します。イメージはソースからローカルでビルドします。TrapDefense Cloud は計画段階です。
+0.38 はアダプター、Envoy、検査器、管理 UI と、分離したゲートウェイ/宛先認証を提供します。イメージはソースからローカルでビルドします。TrapDefense Cloud は計画段階です。
 
 クライアントは MCP/API URL を変更し、`X-TD-Client-Key` または OAuth Bearer JWT を使用できる必要があります。導入ごとに宛先を一つに固定し、ルートとツールを明示します。証拠は[互換性表](gateway-compatibility.md)を参照してください。
 

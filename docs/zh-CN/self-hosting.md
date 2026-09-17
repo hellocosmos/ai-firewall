@@ -1,8 +1,8 @@
-# Docker 自托管 — 0.37 Community Preview
+# Docker 自托管 — 0.38 Community Preview
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.37 提供适配器、Envoy、检查器、管理界面以及相互独立的网关/目标认证。镜像从源码本地构建。TrapDefense Cloud 仍在规划中，尚未开放注册。
+0.38 提供适配器、Envoy、检查器、管理界面以及相互独立的网关/目标认证。镜像从源码本地构建。TrapDefense Cloud 仍在规划中，尚未开放注册。
 
 客户端必须能修改 MCP/API URL，并使用 `X-TD-Client-Key` 或 OAuth Bearer JWT。每个部署只有一个固定目标，并显式映射路由和工具。证据见[兼容性表](gateway-compatibility.md)。
 

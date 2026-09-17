@@ -23,7 +23,7 @@ Logical product flow. See [deployment architecture](docs/en/architecture.md) for
 
 Community includes single-tenant Microsoft Entra ID console SSO with Administrator and Viewer roles. Console authentication does not authorize agent actions; delegation and approval remain Enterprise features. [Entra SSO](docs/en/identity.md).
 
-## Docker self-hosting · 0.37
+## Docker self-hosting · 0.38
 
 [Docker self-hosting: integration contract, installation and verification](docs/en/self-hosting.md)
 
@@ -34,14 +34,16 @@ docker compose run --rm app init
 docker compose --profile smoke up -d
 ```
 
-After cloning this repository, run the commands above. Open `http://localhost:18080` with `admin` and your chosen password. This starts the synthetic fixture; follow the guide to connect a real service. Clients need a configurable URL and either a connection-key header or an OAuth Bearer JWT. 0.37 validates gateway JWTs as an OAuth Resource Server and injects a separate target credential; it does not issue tokens, broker login or support long-lived SSE.
+After cloning this repository, run the commands above. Open `http://localhost:18080` with `admin` and your chosen password. This starts the synthetic fixture; follow the guide to connect a real service. Clients need a configurable URL and either a connection-key header or an OAuth Bearer JWT. 0.38 validates gateway JWTs as an OAuth Resource Server and injects a separate target credential; it does not issue tokens, broker login or support long-lived SSE.
+
+The 0.38 compatibility lab exercises Entra-, Okta- and Keycloak-shaped OAuth claims through the official MCP SDK using discovery, PKCE, RFC 8707 resource binding and MCP `2025-11-25`. A pinned, unmodified Keycloak container also issues a real local token. These results are reproducible integration evidence, not certification of a customer tenant or production policy. [Evidence matrix and exact limits](docs/en/gateway-compatibility.md).
 
 
 ## Deployment fit and availability
 
 Protect the HTTP API and remote MCP calls you can route through a supported inspection path. Keep existing service authentication in your MCP servers and connectors; do not replace your IAM.
 
-Self-hosted Community 0.37 includes a source-built Docker Compose package for the adapter, Envoy, inspector, console and separated gateway/target authentication. TrapDefense Cloud remains planned and is not available for sign-up.
+Self-hosted Community 0.38 includes a source-built Docker Compose package for the adapter, Envoy, inspector, console and separated gateway/target authentication. TrapDefense Cloud remains planned and is not available for sign-up.
 
 [Delivery and compatibility](docs/en/deployment-fit.md) · [Gateway client compatibility](docs/en/gateway-compatibility.md)
 

@@ -2,9 +2,23 @@
 
 All notable changes to TrapDefense Community are documented here.
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases currently run from `0.31` through `0.37`.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Community source releases currently run from `0.31` through `0.38`.
 
 ## [Unreleased]
+
+## [0.38] - 2026-09-17
+
+### Compatibility lab
+
+- Exercise Entra-, Okta- and Keycloak-shaped OAuth claim dialects through the pinned official MCP SDK, including authorization-server discovery, dynamic client registration, authorization code with PKCE, RFC 8707 resource binding and MCP `2025-11-25` initialization/tool discovery.
+- Accept OAuth scope claims as either a space-delimited string or a string array, and optionally restrict caller applications through common `azp`, `appid` or `cid` claims.
+- Validate a real token from an unmodified, digest-pinned Keycloak 26.7.3 container using its discovery and JWKS endpoints; consume the gateway token without forwarding it to the target.
+- Add a loopback-only VS Code fixture and workspace for real-client acceptance. Configuration discovery was observed in VS Code 1.135; client connection remains unverified until server-side MCP receipts are captured.
+
+### Boundaries
+
+- Provider-shaped tests use synthetic authorization-server behavior and do not prove a real Entra or Okta tenant, Conditional Access, revocation, TLS or production claims policy.
+- Stateful MCP session headers, upstream SSE, WebSocket, stdio and multi-node HA remain unsupported and fail closed in this profile.
 
 ## [0.37] - 2026-09-17
 
@@ -172,6 +186,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Com
 - Local audit storage is mutable, and content detection can produce false positives or false negatives.
 - Enterprise Access Broker, approvals and delegated authorization are distributed separately.
 
+[0.38]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.38
+[0.37]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.37
+[0.36]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.36
+[0.35]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.35
+[0.34]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.34
 [0.33]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.33
 [0.32]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.32
 [0.31]: https://github.com/hellocosmos/ai-firewall/releases/tag/v0.31

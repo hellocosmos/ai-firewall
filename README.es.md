@@ -18,16 +18,17 @@ Flujo lógico del producto. Consulte la [arquitectura de despliegue](docs/es/arc
 
 Community incluye SSO de consola Microsoft Entra ID de un solo tenant, con roles Administrador y Lector. La autenticación de consola no autoriza acciones de agentes; delegación y aprobación siguen en Enterprise. [Entra SSO](docs/es/identity.md).
 
-## Autoalojamiento con Docker · 0.37
+## Autoalojamiento con Docker · 0.38
 
 [Autoalojamiento con Docker: integration contract, installation and verification](docs/es/self-hosting.md)
 
+El Compatibility Lab 0.38 verifica claims con forma de Entra, Okta y Keycloak, discovery, PKCE, RFC 8707 resource binding y MCP `2025-11-25` mediante el SDK oficial de MCP. También valida un token local real emitido por un contenedor oficial de Keycloak fijado por digest. Es evidencia reproducible de integración, no certificación de un tenant real. [Evidencia y límites exactos](docs/es/gateway-compatibility.md).
 
 ## Compatibilidad y disponibilidad
 
 Proteja llamadas HTTP API y MCP remoto que pueda dirigir por una ruta de inspección compatible. Mantenga la autenticación existente en servidores MCP y conectores; no sustituya su IAM.
 
-0.37 ofrece adaptador, Envoy, inspector, consola y autenticación separada para gateway/destino. Valida una clave o JWT de IdP externo y usa una credencial independiente para el destino. La imagen se compila desde fuentes; TrapDefense Cloud sigue previsto.
+0.38 ofrece adaptador, Envoy, inspector, consola y autenticación separada para gateway/destino. Valida una clave o JWT de IdP externo y usa una credencial independiente para el destino. La imagen se compila desde fuentes; TrapDefense Cloud sigue previsto.
 
 [Entrega y compatibilidad](docs/es/deployment-fit.md) · [Compatibilidad del gateway](docs/es/gateway-compatibility.md)
 

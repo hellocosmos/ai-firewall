@@ -1,4 +1,4 @@
-# Docker self-hosting (0.37 Community Preview)
+# Docker self-hosting (0.38 Community Preview)
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
@@ -81,7 +81,7 @@ curl -sS http://localhost:18084/mcp \
   --data '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"notes.delete","arguments":{}}}'
 ```
 
-Expected: blocked by the configured action policy. The optional fixture is a small synthetic protocol target, not proof of a particular MCP vendor. 0.37 also runs the pinned official Python MCP SDK through the adapter for initialization and discovery; see [gateway compatibility](gateway-compatibility.md). The broader [MCP pilot](mcp-pilot.md) remains a separate tool-operation path.
+Expected: blocked by the configured action policy. The optional fixture is a small synthetic protocol target, not proof of a particular MCP vendor. 0.38 runs the pinned official Python MCP SDK through the adapter for current-protocol initialization and discovery; see [gateway compatibility](gateway-compatibility.md). The broader [MCP pilot](mcp-pilot.md) remains a separate tool-operation path.
 
 ## Connect your own destination
 
@@ -120,12 +120,13 @@ gateway_auth:
   resource: https://firewall.example.com/mcp
   authorization_servers: [https://login.example.com/tenant/v2.0]
   required_scopes: [mcp.invoke]
+  authorized_parties: [configured-client-id]
 target_auth:
   mode: static_bearer
   secret_file: /run/secrets/destination
 ```
 
-Production identity and metadata URLs require HTTPS. `allow_insecure_loopback: true` exists only for explicit local synthetic tests. The resource-derived metadata URL for the example is `https://firewall.example.com/.well-known/oauth-protected-resource/mcp`.
+Production identity and metadata URLs require HTTPS. `allow_insecure_loopback: true` exists only for explicit local synthetic tests. The resource-derived metadata URL for the example is `https://firewall.example.com/.well-known/oauth-protected-resource/mcp`. `authorized_parties` is optional; when configured, the token must carry a matching `azp`, `appid` or `cid` client identifier. Scope validation accepts the OAuth `scope`/`scp` claim as a space-delimited string or string array. Entra application roles in `roles` are not treated as scopes in 0.38.
 
 ## Integration acceptance checklist
 

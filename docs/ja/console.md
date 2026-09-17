@@ -1,6 +1,6 @@
 # コンソールのインストールと運用
 
-> Docker 0.37: [セルフホスティング](self-hosting.md) · [ゲートウェイ互換性](gateway-compatibility.md)。このページは別のソース版合成デモを説明します。
+> Docker 0.38: [セルフホスティング](self-hosting.md) · [ゲートウェイ互換性](gateway-compatibility.md)。このページは別のソース版合成デモを説明します。
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 

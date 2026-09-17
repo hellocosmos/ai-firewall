@@ -1,0 +1,52 @@
+{
+  "realm": "trapdefense-lab",
+  "enabled": true,
+  "accessTokenLifespan": 300,
+  "clientScopes": [
+    {
+      "name": "mcp.invoke",
+      "description": "Synthetic TrapDefense MCP invocation scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "trapdefense-gateway",
+      "name": "Synthetic TrapDefense protected resource",
+      "enabled": true,
+      "bearerOnly": true,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "trapdefense-lab-client",
+      "name": "Synthetic compatibility client",
+      "enabled": true,
+      "secret": "synthetic-keycloak-client-secret",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "fullScopeAllowed": false,
+      "defaultClientScopes": ["mcp.invoke"],
+      "protocolMappers": [
+        {
+          "name": "trapdefense-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "trapdefense-gateway",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "lightweight.claim": "false"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -35,6 +35,7 @@ class JwtGatewayAuth(BaseModel):
   resource: str
   authorization_servers: list[str] = Field(min_length=1,max_length=5)
   required_scopes: list[str] = Field(min_length=1,max_length=32)
+  authorized_parties: list[str] = Field(default_factory=list,max_length=32)
   allow_insecure_loopback: bool = False
 
   @model_validator(mode='after')
@@ -51,6 +52,9 @@ class JwtGatewayAuth(BaseModel):
     if len(set(self.required_scopes))!=len(self.required_scopes) or any(
         not re.fullmatch(r'[A-Za-z0-9._:/-]{1,128}', scope) for scope in self.required_scopes):
       raise ValueError('required_scopes must be unique OAuth scope tokens')
+    if len(set(self.authorized_parties))!=len(self.authorized_parties) or any(
+        not value or len(value)>256 or any(c.isspace() for c in value) for value in self.authorized_parties):
+      raise ValueError('authorized_parties must contain unique non-empty client identifiers')
     if any(c.isspace() for c in self.audience):raise ValueError('audience must not contain whitespace')
     if resource.path=='':self.resource=self.resource.rstrip('/')
     return self

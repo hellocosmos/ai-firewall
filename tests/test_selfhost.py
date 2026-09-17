@@ -76,6 +76,8 @@ def test_jwt_gateway_requires_separate_target_credential(config):
   jwt_auth(authorization_servers=['http://issuer.example/tenant']),
   jwt_auth(authorization_servers=['https://other.example/tenant']),
   jwt_auth(required_scopes=['mcp.invoke','mcp.invoke']),
+  jwt_auth(authorized_parties=['duplicate','duplicate']),
+  jwt_auth(authorized_parties=['contains whitespace']),
 ])
 def test_jwt_gateway_rejects_unsafe_contract(config,auth):
   data=deployment_data(config)

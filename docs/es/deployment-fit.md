@@ -4,7 +4,7 @@
 
 Proteja llamadas HTTP API y MCP remoto que pueda dirigir por una ruta de inspección compatible. Mantenga la autenticación existente en servidores MCP y conectores; no sustituya su IAM.
 
-0.37 ofrece un paquete Docker Compose con clave o JWT externo para el gateway y credenciales independientes para el destino. La imagen se compila desde fuentes; TrapDefense Cloud sigue previsto.
+0.38 ofrece un paquete Docker Compose con clave o JWT externo para el gateway y credenciales independientes para el destino. La imagen se compila desde fuentes; TrapDefense Cloud sigue previsto.
 
 Debe controlar el endpoint del cliente, la entrada del servidor o una ruta de inspección de red compatible. Se requiere conectividad al destino y evitar rutas alternativas. Las llamadas internas de SaaS, stdio local, shell, archivos y acceso directo a bases de datos quedan fuera del proxy HTTP.
 

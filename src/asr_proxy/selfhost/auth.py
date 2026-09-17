@@ -47,8 +47,13 @@ class GatewayAuthenticator:
       subject=claims['sub']
       if not isinstance(subject,str) or not subject:raise ValueError()
       raw_scopes=claims.get('scope',claims.get('scp',''))
-      if not isinstance(raw_scopes,str):raise TypeError()
-      scopes=frozenset(raw_scopes.split())
+      if isinstance(raw_scopes,str):scopes=frozenset(raw_scopes.split())
+      elif isinstance(raw_scopes,list) and all(isinstance(scope,str) for scope in raw_scopes):
+        scopes=frozenset(raw_scopes)
+      else:raise TypeError()
+      if self.config.authorized_parties:
+        party=next((claims[name] for name in ('azp','appid','cid') if name in claims),None)
+        if not isinstance(party,str) or party not in self.config.authorized_parties:raise ValueError()
     except (jwt.PyJWTError,ValueError,TypeError,KeyError):
       raise AuthError('invalid_token',401) from None
     if not set(self.config.required_scopes).issubset(scopes):

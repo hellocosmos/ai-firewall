@@ -1,20 +1,22 @@
-# Compatibilité des clients de passerelle — 0.37
+# Compatibilité des clients de passerelle — 0.38
 
 [English](../en/gateway-compatibility.md) · [한국어](../ko/gateway-compatibility.md) · [简体中文](../zh-CN/gateway-compatibility.md) · [日本語](../ja/gateway-compatibility.md) · [Español](../es/gateway-compatibility.md) · [Français](../fr/gateway-compatibility.md)
 
-Le client doit pouvoir remplacer l’URL HTTP/MCP distante par TrapDefense et utiliser un en-tête de clé de connexion ou un JWT Bearer OAuth. L’authentification client→TrapDefense est séparée de l’authentification TrapDefense→cible.
+Le client doit pouvoir remplacer l’URL HTTP/MCP distante par TrapDefense et envoyer une clé de connexion ou un JWT Bearer OAuth. L’authentification client→TrapDefense reste séparée de TrapDefense→cible.
 
-| Chemin | Preuve 0.37 |
+| Chemin | Preuve 0.38 |
 |---|---|
 | JSON HTTP générique | Intégration synthétique vérifiée avec HTTPX |
-| SDK Python MCP officiel 1.30.0 | Le SDK réel a effectué initialisation, notification et liste d’outils en Streamable HTTP vers une cible synthétique |
-| MCP distant VS Code | Configuration compatible avec `url`, `headers` et OAuth officiels ; exécution dans VS Code non vérifiée |
-| Métadonnées OAuth et JWT RS256 | Lecture HTTP réelle de JWKS et validation synthétique de issuer/audience/time/subject/scope |
-| Entra/Okta/Keycloak réel | Validation séparée du tenant, TLS, Conditional Access et révocation requise |
-| MCP avec état, SSE longue durée, WebSocket, stdio | Non pris en charge par ce profil |
+| SDK Python MCP officiel 1.30.0 | Initialisation, notification et liste d’outils MCP `2025-11-25` vérifiées en intégration synthétique |
+| OAuth au format Entra | `scp`, `tid`, `oid`, `azp`, discovery, DCR, PKCE et resource binding vérifiés synthétiquement ; aucun tenant Entra réel |
+| OAuth au format Okta | `scp` sous forme de tableau et `cid` vérifiés dans le flux synthétique complet ; aucun serveur Okta réel |
+| Keycloak synthétique / local réel | En plus du flux synthétique, un Keycloak 26.7.3 officiel fixé par digest a émis un token local réel validé via discovery et JWKS |
+| MCP distant VS Code 1.135 | La configuration workspace est reconnue ; cette exécution n’a pas capturé le démarrage ni les receipts, donc la connexion réelle reste non vérifiée |
+| MCP avec état, SSE longue durée, WebSocket, stdio | Non pris en charge ; session headers et upstream SSE échouent en mode fermé |
+| HA multinœud | Non prise en charge ; une instance avec SQLite, replay et audit state locaux |
 
-`gateway_auth` utilise `client_key` ou `jwt`. En mode JWT, TrapDefense agit comme OAuth Resource Server et publie les métadonnées RFC 9728 ainsi que le défi `WWW-Authenticate`. La connexion, l’émission, DCR, refresh et OBO appartiennent à l’IdP externe ou à un fournisseur d’identifiants séparé.
+`gateway_auth` utilise `client_key` ou `jwt`. En mode JWT, TrapDefense est un OAuth Resource Server avec metadata RFC 9728 et `WWW-Authenticate`. `scope`/`scp` accepte une chaîne séparée par des espaces ou un tableau ; `authorized_parties` optionnel limite `azp`, `appid` ou `cid`. En 0.38, les app roles Entra dans `roles` ne sont pas interprétés comme des scopes.
 
-`target_auth` prend en charge `none`, `passthrough_bearer`, `static_bearer` et `static_api_key`. Le JWT de passerelle n’est pas transmis à la cible. `passthrough_bearer` sert uniquement à l’intégration HTTP héritée avec client-key et ne constitue pas une conformité OAuth MCP.
+`target_auth` accepte `none`, `passthrough_bearer`, `static_bearer` et `static_api_key`. Le JWT de passerelle n’est pas transmis à la cible. L’IdP externe ou un credential provider séparé gère login, émission, refresh et OBO.
 
-Avant d’approuver une intégration, vérifiez URL, deux authentifications, initialisation/découverte MCP, action autorisée et refusée, effet côté cible, PII/secret, 401 cible, panne d’inspection et absence de fallback direct. La configuration et l’exemple VS Code figurent dans le [guide anglais](../en/gateway-compatibility.md).
+Avant d’approuver une intégration, vérifiez URL, deux authentifications, initialisation/découverte MCP, action autorisée et refusée, effet côté cible, PII/secret, 401 cible, panne d’inspection et absence de fallback direct. Consultez commandes, configuration et sources dans le [guide anglais](../en/gateway-compatibility.md).

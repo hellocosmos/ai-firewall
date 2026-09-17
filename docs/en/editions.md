@@ -4,7 +4,7 @@
 
 ## Deployment fit and availability
 
-Self-hosted Community 0.37 includes a source-built Docker Compose package with client-key or external-JWT gateway authentication and independent target credentials. TrapDefense Cloud remains planned and is not available for sign-up.
+Self-hosted Community 0.38 includes a source-built Docker Compose package with client-key or external-JWT gateway authentication and independent target credentials. TrapDefense Cloud remains planned and is not available for sign-up.
 
 [Delivery and compatibility](deployment-fit.md)
 
@@ -28,4 +28,4 @@ The private provider connects through the `trapdefense.authorizers` / `enterpris
 
 Central fleet management, distributed HA, hosted billing and immutable audit storage are not shipped features. Commercial scope can include the private provider, deployment, policy integration and support; pricing and support terms are separate. Local SQLite and JSONL storage remain mutable.
 
-[Docker 0.37](self-hosting.md) · [Gateway compatibility](gateway-compatibility.md)
+[Docker 0.38](self-hosting.md) · [Gateway compatibility](gateway-compatibility.md)

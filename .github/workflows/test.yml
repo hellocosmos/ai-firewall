@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '${{ matrix.python }}'
-      - run: pip install -e '.[dev,console]'
+      - run: pip install -e '.[dev,console,compat]'
       - run: python -c "import importlib.util; assert importlib.util.find_spec('trapdefense_enterprise') is None; assert importlib.util.find_spec('asr') is None"
       - run: pytest -q
       - run: trapdefense-inspector-pool --help && trapdefense-inspector --help && trapdefense-console --help && trapdefense-benchmark --help
@@ -42,7 +42,9 @@ jobs:
       - run: TD_CONSOLE_E2E=1 pytest tests/test_console.py -q
       - run: TD_RUNTIME_SMOKE=1 pytest tests/runtime/test_inspector_pool_runtime.py tests/runtime/test_console_pool_runtime.py -q
       - run: TD_MCP_PILOT=1 python -m pytest tests/test_mcp_pilot.py tests/runtime/test_mcp_pilot_runtime.py -q
-      - run: python -m pytest tests/runtime/test_gateway_client_compat.py -q
+      - run: python -m pytest tests/runtime/test_gateway_client_compat.py tests/compat/test_oauth_provider_profiles.py tests/compat/test_unsupported_capabilities.py -q
+      - run: docker pull quay.io/keycloak/keycloak@sha256:29be7252db0a106f1cd2ac17b9a56ff2668073da645638a38b9fc67deeb2d6c4
+      - run: TD_KEYCLOAK_E2E=1 python -m pytest tests/runtime/test_keycloak_compat.py -q
 
   selfhost-package:
     runs-on: ubuntu-latest

@@ -37,7 +37,9 @@ def encoded(signing_key,**updates):
   now=int(time.time())
   claims={'iss':ISSUER,'aud':AUDIENCE,'sub':'synthetic-agent','iat':now,'exp':now+300,
           'scope':'mcp.invoke notes.read'}
-  claims.update(updates)
+  for name,value in updates.items():
+    if value is None:claims.pop(name,None)
+    else:claims[name]=value
   return jwt.encode(claims,signing_key,algorithm='RS256',headers={'kid':'synthetic-key'})
 
 
@@ -67,6 +69,32 @@ def test_valid_jwt_and_resource_metadata(signing_key):
     'resource':RESOURCE,'authorization_servers':[ISSUER],
     'bearer_methods_supported':['header'],'scopes_supported':['mcp.invoke']}
   assert auth.challenge()=='Bearer resource_metadata="https://firewall.example/.well-known/oauth-protected-resource/mcp"'
+
+
+def test_okta_array_scope_and_authorized_party_claims(signing_key):
+  auth=GatewayAuthenticator(auth_config(authorized_parties=['expected-client']),client_key=CLIENT_KEY,
+    jwk_client=KeyClient(signing_key))
+  result=auth.authenticate({'authorization':'Bearer '+encoded(signing_key,
+    scope=None,scp=['mcp.invoke','notes.read'],cid='expected-client')})
+  assert result.scopes==frozenset({'mcp.invoke','notes.read'})
+
+
+@pytest.mark.parametrize(('claim','value'),[
+  ('azp','expected-client'),('appid','expected-client'),('cid','expected-client'),
+])
+def test_common_authorized_party_claims(signing_key,claim,value):
+  auth=GatewayAuthenticator(auth_config(authorized_parties=[value]),client_key=CLIENT_KEY,
+    jwk_client=KeyClient(signing_key))
+  assert auth.authenticate({'authorization':'Bearer '+encoded(signing_key,**{claim:value})}).subject=='synthetic-agent'
+
+
+def test_wrong_or_missing_authorized_party_fails_closed(signing_key):
+  auth=GatewayAuthenticator(auth_config(authorized_parties=['expected-client']),client_key=CLIENT_KEY,
+    jwk_client=KeyClient(signing_key))
+  for updates in ({},{'azp':'wrong-client'}):
+    with pytest.raises(AuthError) as error:
+      auth.authenticate({'authorization':'Bearer '+encoded(signing_key,**updates)})
+    assert error.value.code=='invalid_token'
 
 
 @pytest.mark.parametrize('headers',[

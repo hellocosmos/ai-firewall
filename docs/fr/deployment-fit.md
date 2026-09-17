@@ -4,7 +4,7 @@
 
 Protégez les appels HTTP API et MCP distants que vous pouvez acheminer via un chemin d’inspection pris en charge. Conservez l’authentification des serveurs MCP et connecteurs ; ne remplacez pas votre IAM.
 
-0.37 fournit un paquet Docker Compose avec clé ou JWT externe pour la passerelle et identifiants indépendants pour la cible. L’image se construit depuis les sources ; TrapDefense Cloud reste prévu.
+0.38 fournit un paquet Docker Compose avec clé ou JWT externe pour la passerelle et identifiants indépendants pour la cible. L’image se construit depuis les sources ; TrapDefense Cloud reste prévu.
 
 Vous devez contrôler l’adresse du client, l’entrée du serveur ou un chemin d’inspection réseau compatible. Le service cible doit être joignable et le contournement empêché. Les appels internes SaaS, stdio local, shell, fichiers et accès directs aux bases de données sont hors périmètre du proxy HTTP.
 
