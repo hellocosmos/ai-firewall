@@ -35,6 +35,8 @@ class RouteRule(BaseModel):
   tool: str = "http.request"
   rule: ToolRule | None = None
   tools: dict[str, ToolRule] = Field(default_factory=dict)
+  llm_provider: Literal["openai", "anthropic", "google", "openrouter"] | None = None
+  allowed_models: list[str] = Field(default_factory=list)
   # JSON pointers relative to the entire body; * matches a single segment.
   redact_fields: list[str] = Field(default_factory=list)
 

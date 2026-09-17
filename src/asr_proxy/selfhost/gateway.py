@@ -2,6 +2,7 @@
 import asyncio
 from uuid import uuid4
 from urllib.parse import urlsplit
+from .providers import gateway_headers
 import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
@@ -32,7 +33,16 @@ def create_gateway(config, client_key, signing_key, *, target_secret=None, authe
       name = key.decode('latin1').lower()
       if name in headers: return JSONResponse({'error':'duplicate_header'}, status_code=400)
       headers[name] = value.decode('latin1')
-    try:auth_result=await asyncio.to_thread(authenticator.authenticate,headers)
+    outbound_headers=headers
+    auth_headers=headers
+    if config.llm:
+      try:outbound_headers,auth_headers=gateway_headers(headers,config.llm,config.gateway_auth.mode)
+      except ValueError as error:return JSONResponse({'error':str(error)},status_code=401)
+      query=request.scope.get('query_string',b'').decode('ascii')
+      if query and not (config.llm.provider=='google' and query=='alt=sse'
+          and request.url.path.endswith(':streamGenerateContent')):
+        return JSONResponse({'error':'unsupported_provider_query'},status_code=400)
+    try:auth_result=await asyncio.to_thread(authenticator.authenticate,auth_headers)
     except AuthError as error:
       response_headers={}
       if challenge:=authenticator.challenge(error):response_headers['WWW-Authenticate']=challenge
@@ -50,11 +60,12 @@ def create_gateway(config, client_key, signing_key, *, target_secret=None, authe
     if headers.get('content-encoding','identity').lower() != 'identity':
       return JSONResponse({'error':'unsupported_content_encoding'}, status_code=415)
     try:
-      clean = {k:v for k,v in headers.items() if k not in TRANSPORT_HEADERS and not reserved_header(k)}
-      try:clean=credentials.apply(clean,headers.get('authorization'))
+      clean = {k:v for k,v in outbound_headers.items() if k not in TRANSPORT_HEADERS and not reserved_header(k)}
+      try:clean=credentials.apply(clean,None if config.llm else headers.get('authorization'))
       except CredentialError as error:
         return JSONResponse({'error':str(error)},status_code=400)
-      async with slots, asyncio.timeout(12):
+      duration=config.llm.timeout_seconds+5 if config.llm else 12
+      async with slots, asyncio.timeout(duration):
         body = await bounded_body(request, config.max_body_bytes)
         if body and headers.get('content-type','').split(';')[0].strip() not in ('application/json','application/json-rpc'):
           return JSONResponse({'error':'unsupported_request_media_type'},status_code=415)
@@ -66,7 +77,7 @@ def create_gateway(config, client_key, signing_key, *, target_secret=None, authe
         clean['accept-encoding'] = 'identity'
         query = request.scope.get('query_string', b'')
         target = raw_path + ('?' + query.decode('ascii') if query else '')
-        async with httpx.AsyncClient(timeout=8, trust_env=False, follow_redirects=False, transport=transport) as client:
+        async with httpx.AsyncClient(timeout=config.llm.timeout_seconds+2 if config.llm else 8, trust_env=False, follow_redirects=False, transport=transport) as client:
           outgoing = client.build_request(request.method, 'http://envoy:18082'+target, headers=clean, content=body)
           # Sign the actual serialized target and defaults added by the HTTP client.
           message = HttpMessage(request.method, authority, outgoing.url.raw_path.decode('ascii'), dict(outgoing.headers), body)
@@ -77,7 +88,7 @@ def create_gateway(config, client_key, signing_key, *, target_secret=None, authe
           try:
             if 300 <= response.status_code < 400:
               return JSONResponse({'error':'upstream_redirect_not_supported'}, status_code=502)
-            if response.headers.get('content-type','').split(';')[0] == 'text/event-stream':
+            if response.headers.get('content-type','').split(';')[0] == 'text/event-stream' and not config.llm:
               return JSONResponse({'error':'streaming_not_supported'}, status_code=502)
             if 'set-cookie' in response.headers or 'mcp-session-id' in response.headers:
               return JSONResponse({'error':'upstream_session_not_supported'}, status_code=502)

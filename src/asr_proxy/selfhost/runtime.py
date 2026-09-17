@@ -59,7 +59,14 @@ class SelfhostRuntime(Runtime):
     self.broker=load_authorizer(config)
     return InspectionEngine(config,self.scanner,verifier,self.broker)
 
+  def broker_resources(self,tools):
+    if self.deployment.llm:return list(self.deployment.llm.models)
+    return super().broker_resources(tools)
+
   def broker_tool_map(self):
+    if self.deployment.llm:
+      return {name:(rule.action,", ".join(self.deployment.llm.models))
+        for _,name,rule in self.deployment.entries()}
     # Dynamic resource pointers cannot be safely converted into registry scope
     # from the console. Operators can manage fixed-resource routes here and use
     # the broker API/store integration for resource instances discovered later.

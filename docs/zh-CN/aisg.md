@@ -1,5 +1,7 @@
 # TrapDefense — AI Security Gateway (0.40)
 
+> **0.41:** [模型提供商连接](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
+
 [en](../en/aisg.md) · [ko](../ko/aisg.md) · [zh-CN](../zh-CN/aisg.md) · [ja](../ja/aisg.md) · [es](../es/aisg.md) · [fr](../fr/aisg.md)
 
 通过明确的安全边界连接受支持的 HTTP API 和远程 MCP 服务器。需要逐代理控制时添加代理身份。

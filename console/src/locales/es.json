@@ -493,5 +493,11 @@
   "Disable agent": "Deshabilitar agente",
   "Enable agent": "Habilitar agente",
   "Approval is bound to this request. After approval, retry the exact request with the approval ID; it can execute only once.": "La aprobación está vinculada a esta solicitud. Tras aprobarla, repita la solicitud exacta con el ID de aprobación; solo puede ejecutarse una vez.",
-  "Revoked": "Revocada"
+  "Revoked": "Revocada",
+  "Model provider": "Proveedor de modelos",
+  "Allowed models": "Modelos permitidos",
+  "Response delivery": "Entrega de respuesta",
+  "Buffered SSE: complete inspection before delivery": "SSE almacenado: inspección completa antes de entregar",
+  "Provider timeout": "Tiempo límite del proveedor",
+  "Native text and function calls. Files, media, provider-side tools and real-time streaming are not supported.": "Texto y llamadas a funciones nativas. Sin archivos, medios, herramientas del proveedor ni streaming en tiempo real."
 }

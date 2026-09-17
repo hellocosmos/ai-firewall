@@ -7,6 +7,7 @@ import re
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from asr_proxy.inspection.contracts import RouteRule
+from .providers import ProviderProfile, ORIGINS
 from asr_proxy.inspection.identity import TRANSPORT_HEADERS, reserved_header
 
 
@@ -148,6 +149,7 @@ class TargetAuth(BaseModel):
 class Deployment(BaseModel):
   model_config = ConfigDict(extra='forbid')
   upstream: str
+  llm: ProviderProfile | None = None
   allow_plaintext_upstream: bool = False
   console_origin: str = 'http://localhost:18080'
   gateway_auth: GatewayAuth = Field(default_factory=ClientKeyGatewayAuth,discriminator='mode')
@@ -163,6 +165,11 @@ class Deployment(BaseModel):
   def normalize_legacy_auth(cls,value):
     if not isinstance(value,dict):return value
     data=dict(value)
+    if data.get('llm'):
+      profile=ProviderProfile.model_validate(data['llm'])
+      data.setdefault('upstream',ORIGINS[profile.provider])
+      data.setdefault('routes',profile.routes())
+      data.setdefault('target_auth',profile.target())
     legacy_mode=data.pop('destination_auth',None)
     legacy_file=data.pop('bearer_file',None)
     if 'target_auth' in data and (legacy_mode is not None or legacy_file is not None):
@@ -202,11 +209,21 @@ class Deployment(BaseModel):
     if self.access_broker.enabled and not (self.gateway_auth.mode=='agent_key' or (
         self.gateway_auth.mode=='jwt' and self.gateway_auth.identity_claims is not None)):
       raise ValueError('Access Broker requires agent_key or JWT gateway authentication with identity_claims')
+    if self.llm:
+      if self.upstream != ORIGINS[self.llm.provider]:
+        raise ValueError('Provider profile requires its fixed HTTPS origin')
+      if self.target_auth.mode not in ('static_bearer','static_api_key'):
+        raise ValueError('Provider profiles require separate static target credentials')
+      expected=self.llm.target()
+      if self.target_auth.mode!=expected['mode'] or self.target_auth.header!=expected.get('header') or self.target_auth.prefix:
+        raise ValueError('Provider authentication does not match its native API')
+      if self.routes != [RouteRule.model_validate(r) for r in self.llm.routes()]:
+        raise ValueError('Provider profiles use generated exact routes and model scopes')
     seen = set()
     for route in self.routes:
       if route.authority != target.netloc:
         raise ValueError('Every route authority must equal the fixed upstream authority')
-      if (not re.fullmatch(r'/[A-Za-z0-9_./~-]*', route.path) or '..' in route.path.split('/')
+      if (not re.fullmatch(r'/[A-Za-z0-9_./~:-]*', route.path) or '..' in route.path.split('/')
           or '//' in route.path or route.method not in ('GET','POST','PUT','PATCH','DELETE','HEAD')):
         raise ValueError('Routes require unambiguous exact paths and supported HTTP methods')
       pair = (route.method, route.path)
@@ -228,7 +245,7 @@ class Deployment(BaseModel):
         yield f'{index}:{name}', name, rule
 
   def public(self):
-    return {'upstream': self.upstream, 'console_origin': self.console_origin,
+    return {'llm': self.llm.model_dump() if self.llm else None, 'upstream': self.upstream, 'console_origin': self.console_origin,
       'gateway_auth':{'mode':self.gateway_auth.mode},'target_auth':self.target_auth.public(),
       'access_broker':{'enabled':self.access_broker.enabled,'tenant_id':self.access_broker.tenant_id,
         'maturity':'experimental'},
@@ -258,5 +275,12 @@ def envoy_config(config):
         'trusted_ca':{'filename':'/etc/ssl/certs/ca-certificates.crt'},
         'match_typed_subject_alt_names':[{'san_type':'DNS','matcher':{'exact':target.hostname}}]}}}}
   listener = value['static_resources']['listeners'][0]
+  if config.llm:
+    manager=listener['filter_chains'][0]['filters'][0]['typed_config']
+    duration=f'{config.llm.timeout_seconds}s'
+    manager['stream_idle_timeout']=duration
+    route=manager['route_config']['virtual_hosts'][0]['routes'][0]['route']
+    route['timeout']=duration
+    route['max_stream_duration']['max_stream_duration']=duration
   listener['per_connection_buffer_limit_bytes'] = config.max_body_bytes
   return yaml.safe_dump(value, sort_keys=False)

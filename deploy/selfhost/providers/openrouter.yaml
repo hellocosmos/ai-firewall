@@ -1,0 +1,9 @@
+# Replace YOUR_MODEL_ID with an exact model available to your provider account.
+llm:
+  provider: openrouter
+  models:
+  - YOUR_MODEL_ID
+  timeout_seconds: 120
+target_auth:
+  mode: static_bearer
+  secret_file: /state/provider-key

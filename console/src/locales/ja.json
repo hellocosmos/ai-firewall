@@ -493,5 +493,11 @@
   "Disable agent": "エージェントを無効化",
   "Enable agent": "エージェントを有効化",
   "Approval is bound to this request. After approval, retry the exact request with the approval ID; it can execute only once.": "承認はこのリクエストに紐付きます。承認後、承認 ID を付けて同じリクエストを再試行してください。実行は一度だけです。",
-  "Revoked": "失効済み"
+  "Revoked": "失効済み",
+  "Model provider": "モデル提供者",
+  "Allowed models": "許可モデル",
+  "Response delivery": "応答配信",
+  "Buffered SSE: complete inspection before delivery": "バッファリング SSE：全体検査後に配信",
+  "Provider timeout": "提供者のタイムアウト",
+  "Native text and function calls. Files, media, provider-side tools and real-time streaming are not supported.": "ネイティブのテキストと関数呼び出しに対応。ファイル、メディア、提供者側ツール、リアルタイム配信は対象外です。"
 }

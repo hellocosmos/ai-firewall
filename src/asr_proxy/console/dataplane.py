@@ -108,7 +108,8 @@ class ConsoleProcessor(rpc.ExternalProcessorServicer):
 
   async def Process(self,request_iterator,context):
     inspection=StreamInspection(self.runtime)
-    processor=ExternalProcessor(inspection,inspection)
+    profile=getattr(getattr(self.runtime,'deployment',None),'llm',None)
+    processor=ExternalProcessor(inspection,inspection,stream_timeout=profile.timeout_seconds+5 if profile else 20)
     processor.slots=self.slots
     processor.workers=self.workers
     response_has_no_body=False

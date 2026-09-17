@@ -1,5 +1,7 @@
 # TrapDefense — AI Security Gateway (0.40)
 
+> **0.41:** [モデル提供者への接続](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
+
 [en](../en/aisg.md) · [ko](../ko/aisg.md) · [zh-CN](../zh-CN/aisg.md) · [ja](../ja/aisg.md) · [es](../es/aisg.md) · [fr](../fr/aisg.md)
 
 対応するHTTP APIとリモートMCPサーバーを明示的なセキュリティ境界で接続します。エージェント単位の制御にはIDを追加します。

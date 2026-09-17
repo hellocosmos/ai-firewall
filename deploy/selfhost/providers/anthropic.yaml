@@ -1,0 +1,10 @@
+# Replace YOUR_MODEL_ID with an exact model available to your provider account.
+llm:
+  provider: anthropic
+  models:
+  - YOUR_MODEL_ID
+  timeout_seconds: 120
+target_auth:
+  mode: static_api_key
+  secret_file: /state/provider-key
+  header: x-api-key

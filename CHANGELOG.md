@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.41 — Native model provider connections
+
+- Add fixed-origin OpenAI, Anthropic, Gemini and OpenRouter profiles with exact model allowlists.
+- Accept native SDK credential slots for gateway connection keys or individual agent keys; replace them with separately stored provider credentials.
+- Support native text/function calls and bounded, fully inspected SSE delivery. Add Gemini event reconstruction and escaped JSON argument inspection.
+- Preserve HTTP/MCP defaults; expose provider/model/buffering limits in six-language console guidance.
+- Add official Python SDK synthetic compatibility tests. Streaming is buffered, not real-time; no live-provider certification or package release is implied.
+
+
 ## 0.40 — AI Security Gateway
 
 - Explicit AISG positioning and six-language connection guides.

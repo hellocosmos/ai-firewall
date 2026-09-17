@@ -493,5 +493,11 @@
   "Disable agent": "Désactiver l’agent",
   "Enable agent": "Activer l’agent",
   "Approval is bound to this request. After approval, retry the exact request with the approval ID; it can execute only once.": "L’approbation est liée à cette requête. Après approbation, renvoyez la requête exacte avec son identifiant d’approbation ; elle ne peut être exécutée qu’une fois.",
-  "Revoked": "Révoquée"
+  "Revoked": "Révoquée",
+  "Model provider": "Fournisseur de modèles",
+  "Allowed models": "Modèles autorisés",
+  "Response delivery": "Transmission de réponse",
+  "Buffered SSE: complete inspection before delivery": "SSE mis en tampon : inspection complète avant transmission",
+  "Provider timeout": "Délai du fournisseur",
+  "Native text and function calls. Files, media, provider-side tools and real-time streaming are not supported.": "Texte et appels de fonctions natifs. Fichiers, médias, outils côté fournisseur et streaming en temps réel non pris en charge."
 }

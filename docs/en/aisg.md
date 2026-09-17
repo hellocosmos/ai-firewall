@@ -1,5 +1,7 @@
 # TrapDefense — AI Security Gateway (0.40)
 
+> **0.41:** [Model provider connections](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
+
 [en](../en/aisg.md) · [ko](../ko/aisg.md) · [zh-CN](../zh-CN/aisg.md) · [ja](../ja/aisg.md) · [es](../es/aisg.md) · [fr](../fr/aisg.md)
 
 Connect supported HTTP APIs and remote MCP servers through one explicit security boundary. Add agent identity when you need per-agent control.
@@ -18,7 +20,7 @@ Local credentials expire after 1 hour, 24 hours or up to 30 days. Only their has
 
 ## Compatibility and limits
 
-One fixed destination per installation; explicitly mapped HTTP JSON and stateless MCP JSON POST. No SSE, stateful sessions, stdio, WebSocket or closed SaaS-internal calls. A model API base_url change does not route separately executed tools. Configure each protected tool/API endpoint and prevent bypass with customer network controls.
+One fixed destination per installation; explicitly mapped HTTP JSON and stateless MCP JSON POST. The generic HTTP/MCP profile has no SSE, stateful sessions, stdio, WebSocket or closed SaaS-internal calls. Opt-in [model provider profiles](providers.md) support bounded, fully inspected SSE with buffered delivery. A model API base_url change does not route separately executed tools. Configure each protected tool/API endpoint and prevent bypass with customer network controls.
 
 ## Approvals
 

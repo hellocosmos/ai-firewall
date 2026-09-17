@@ -116,6 +116,10 @@ class Runtime:
   def broker_tool_map(self):
     return TOOLS
 
+  def broker_resources(self,tools):
+    tool_map=self.broker_tool_map()
+    return sorted({tool_map[tool][1] for tool in tools})
+
   def register_agent(self,payload,actor):
     if self.broker is None:raise ValueError('Access Broker is disabled.')
     tool_map=self.broker_tool_map()
@@ -124,7 +128,7 @@ class Runtime:
     with self.broker.store.read_transaction():
       if self.broker.store.get_agent(payload['agent_id']) is not None:
         raise ValueError('Agent ID is already registered.')
-    resources=sorted({tool_map[tool][1] for tool in tools})
+    resources=self.broker_resources(tools)
     record=AgentRecord(**payload,tenant_id=self.broker_tenant,runtime='console',
       allowed_resources=resources,allowed_actions=sorted({tool_map[tool][0] for tool in tools}))
     return self.broker.register_agent(record,actor=actor).model_dump(mode='json')

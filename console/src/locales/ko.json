@@ -493,5 +493,11 @@
   "Disable agent": "에이전트 비활성화",
   "Enable agent": "에이전트 활성화",
   "Approval is bound to this request. After approval, retry the exact request with the approval ID; it can execute only once.": "승인은 이 요청에 묶입니다. 승인 후 승인 ID로 같은 요청을 재시도하세요. 한 번만 실행할 수 있습니다.",
-  "Revoked": "폐기됨"
+  "Revoked": "폐기됨",
+  "Model provider": "모델 제공자",
+  "Allowed models": "허용 모델",
+  "Response delivery": "응답 전달",
+  "Buffered SSE: complete inspection before delivery": "버퍼링 SSE: 전체 검사 후 전달",
+  "Provider timeout": "제공자 응답 제한 시간",
+  "Native text and function calls. Files, media, provider-side tools and real-time streaming are not supported.": "네이티브 텍스트와 함수 호출을 지원합니다. 파일, 미디어, 제공자 측 도구, 실시간 스트리밍은 지원하지 않습니다."
 }

@@ -19,6 +19,7 @@ from .protocol import (
   validate_message,
 )
 from .secret_detection import contains_secret
+from .llm import validate_llm
 
 
 def field_allowed(path: tuple[str, ...], patterns: list[str]) -> bool:
@@ -111,18 +112,26 @@ class InspectionEngine:
           raise InspectionError("pii_in_request_target")
 
   def _redact_json(self, value, fields: list[str] | None, entities: list[str],
-                   pii_action: str, path=()):
+                   pii_action: str, path=(), *, json_arguments=False):
     if isinstance(value, dict):
       result = {}
       for key, child in value.items():
         if self._find(key):
           raise InspectionError("pii_in_structural_field")
-        result[key] = self._redact_json(child, fields, entities, pii_action, (*path, key))
+        result[key] = self._redact_json(child, fields, entities, pii_action, (*path, key), json_arguments=json_arguments)
       return result
     if isinstance(value, list):
-      return [self._redact_json(child, fields, entities, pii_action, (*path, str(i)))
+      return [self._redact_json(child, fields, entities, pii_action, (*path, str(i)), json_arguments=json_arguments)
               for i, child in enumerate(value)]
     if isinstance(value, str):
+      if json_arguments and path and path[-1]=='arguments':
+        decoded=strict_json(value.encode(),self.config.max_json_depth)
+        self._signatures(decoded)
+        modified=self._redact_json(decoded,None,entities,pii_action)
+        if modified!=decoded:
+          if fields is not None and not field_allowed(path,fields):raise InspectionError('pii_in_nonredactable_field')
+          return encode_json(modified).decode()
+        return value
       findings = self._find(value)
       entities.extend(f.entity_type for f in findings)
       if findings:
@@ -146,6 +155,7 @@ class InspectionEngine:
       ):
         raise InspectionError("unsupported_request_media_type")
       value = strict_json(message.body, self.config.max_json_depth) if message.body else {}
+      if route.llm_provider:validate_llm(value,route)
       original_semantics = semantics(message, route, value)
       verdict.tool, verdict.access_action, _ = original_semantics
       rule = route.tools.get(original_semantics[0]) if route.protocol == "mcp" else route.rule
@@ -155,7 +165,7 @@ class InspectionEngine:
       self._signatures(value)
       check_egress(value, self.config)
       modified = self._redact_json(value, route.redact_fields, verdict.entities,
-                                   verdict.pii_policy_action)
+                                   verdict.pii_policy_action,json_arguments=bool(route.llm_provider))
       # Only serialize when content actually changes; preserve original wire bytes otherwise.
       new_body = encode_json(modified) if modified != value else message.body
       if semantics(message, route, modified) != original_semantics:
@@ -247,11 +257,9 @@ class InspectionEngine:
 
   def inspect_response(self, message: HttpMessage, *, mode: str, pii_action: str | None = None,
                        pii_policy_scope: str | None = None) -> Verdict:
+    try:route=route_for(message,self.config)
+    except InspectionError:route=None
     if pii_action is None:
-      try:
-        route = route_for(message, self.config)
-      except InspectionError:
-        route = None
       pii_action, pii_policy_scope = self._pii_policy(route)
     verdict = Verdict("allow", "response_clean", mode, pii_policy_action=pii_action,
                       pii_policy_scope=pii_policy_scope)
@@ -264,7 +272,8 @@ class InspectionEngine:
       if media in ("application/json", "application/json-rpc"):
         value = strict_json(message.body, self.config.max_json_depth)
         self._signatures(value)
-        modified = self._redact_json(value, None, verdict.entities, pii_action)
+        if route and route.llm_provider:validate_llm(value,route,response=True)
+        modified = self._redact_json(value, None, verdict.entities, pii_action,json_arguments=bool(route and route.llm_provider))
         new_body = encode_json(modified) if modified != value else message.body
       elif media == "text/event-stream":
         new_body = self._redact_sse(message.body, verdict.entities, pii_action)
@@ -307,8 +316,9 @@ class InspectionEngine:
     events, lanes = [], {}
     family, terminal, anthropic_started = None, False, False
     anthropic_open, anthropic_seen = set(), set()
+    gemini_seen, gemini_finished = set(), set()
     structural = {"id", "type", "object", "model", "role", "name", "item_id",
-                  "call_id", "tool_use_id", "finish_reason", "signature"}
+                  "call_id", "tool_use_id", "finish_reason", "signature", "finishReason", "modelVersion", "responseId"}
     response_deltas = {"response.output_text.delta": "text",
                        "response.refusal.delta": "text",
                        "response.function_call_arguments.delta": "json"}
@@ -335,6 +345,8 @@ class InspectionEngine:
           return ("chat", path[1], *path[3:]), "json" if path[-1] == "arguments" else "structural"
         if path[3] == "tool_calls" and path[-1] in {"name", "arguments", "id"}:
           return ("chat", path[1], *path[3:]), "json" if path[-1] == "arguments" else "structural"
+      if family == "gemini" and len(path)==6 and path[0]=='candidates' and path[2:4]==('content','parts') and path[-1]=='text':
+        return ('gemini',path[1],path[4]), 'text'
       event_type = value.get("type")
       if family == "responses" and event_type in response_deltas and path == ("delta",):
         return ("responses", value["item_id"], index(value["output_index"]),
@@ -363,7 +375,7 @@ class InspectionEngine:
 
     def collect(value, event_value, ordinal, parent=None, key=None, path=()):
       if isinstance(value, dict):
-        if value.get("type") in {"image", "audio", "redacted_thinking"} or "encrypted_content" in value:
+        if value.get("type") in {"image", "audio", "redacted_thinking"} or any(k in value for k in ("encrypted_content","inlineData","fileData","thoughtSignature","partialArgs")):
           raise InspectionError("unsupported_sse_encoded_payload")
         for k, child in value.items():
           if k == "logprobs" and child is not None:
@@ -377,7 +389,7 @@ class InspectionEngine:
       elif isinstance(value, list):
         seen = set()
         for i, child in enumerate(value):
-          if family == "chat" and path and path[-1] in {"choices", "tool_calls"}:
+          if path and ((family == "chat" and path[-1] in {"choices", "tool_calls"}) or (family == "gemini" and path[-1]=="candidates")):
             if not isinstance(child, dict) or "index" not in child:
               raise InspectionError("invalid_sse_index")
             lane_index = index(child["index"])
@@ -505,6 +517,30 @@ class InspectionEngine:
         terminal = event_type == "message_stop"
         if terminal and anthropic_open:
           raise InspectionError("incomplete_sse_stream")
+      elif 'candidates' in value or 'usageMetadata' in value:
+        current='gemini'
+        candidates=value.get('candidates',[])
+        if not isinstance(candidates,list):raise InspectionError('unsupported_sse_schema')
+        for candidate in candidates:
+          if not isinstance(candidate,dict):raise InspectionError('unsupported_sse_schema')
+          number=index(candidate.get('index',0))
+          # Index zero may be omitted by Gemini for a single candidate.
+          candidate.setdefault('index',0)
+          content=candidate.get('content',{})
+          if not isinstance(content,dict):raise InspectionError('unsupported_sse_schema')
+          parts=content.get('parts',[])
+          if not isinstance(parts,list):raise InspectionError('unsupported_sse_schema')
+          if number in gemini_finished and parts:raise InspectionError('sse_data_after_terminal')
+          gemini_seen.add(number)
+          for part in parts:
+            if not isinstance(part,dict) or set(part)-{'text','functionCall','thought'}:
+              raise InspectionError('unsupported_sse_encoded_payload')
+            if 'text' in part and not isinstance(part['text'],str):raise InspectionError('unsupported_sse_delta')
+            if 'functionCall' in part:
+              call=part['functionCall']
+              if not isinstance(call,dict) or set(call)-{'name','args','id'} or not isinstance(call.get('args',{}),dict):
+                raise InspectionError('unsupported_sse_delta')
+          if candidate.get('finishReason'):gemini_finished.add(number)
       elif value.get("jsonrpc") == "2.0" and any(k in value for k in ("method", "result", "error")):
         current = "mcp"
       else:
@@ -518,6 +554,9 @@ class InspectionEngine:
       events.append((lines, value))
     if family in {"chat", "responses", "anthropic"} and not terminal:
       raise InspectionError("incomplete_sse_stream")
+
+    if family=='gemini' and (not gemini_seen or gemini_seen!=gemini_finished):
+      raise InspectionError('incomplete_sse_stream')
 
     changed = False
     for (_, kind), string_refs in lanes.items():

@@ -493,5 +493,11 @@
   "Disable agent": "禁用代理",
   "Enable agent": "启用代理",
   "Approval is bound to this request. After approval, retry the exact request with the approval ID; it can execute only once.": "批准绑定到此请求。批准后携带批准 ID 重试完全相同的请求；只能执行一次。",
-  "Revoked": "已撤销"
+  "Revoked": "已撤销",
+  "Model provider": "模型提供商",
+  "Allowed models": "允许的模型",
+  "Response delivery": "响应传递",
+  "Buffered SSE: complete inspection before delivery": "缓冲 SSE：完整检查后传递",
+  "Provider timeout": "提供商超时",
+  "Native text and function calls. Files, media, provider-side tools and real-time streaming are not supported.": "支持原生文本和函数调用。不支持文件、媒体、提供商端工具和实时流式传递。"
 }

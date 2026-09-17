@@ -1,5 +1,7 @@
 # TrapDefense — Open-source AI Security Gateway
 
+**0.41:** [Model provider connections](docs/en/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
+
 **Connect supported HTTP APIs and remote MCP servers through one explicit security boundary. Add agent identity when you need per-agent control.**
 
 [Connect, identify, control, verify →](docs/en/aisg.md)
@@ -11,7 +13,7 @@
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-> **Open Source Preview 0.40:** the full runtime and operator experience are MIT licensed. The built-in Agent Access Broker is implemented and synthetically verified, but remains **Experimental** until production IdP, customer policy, HA, and capacity validation are complete.
+> **Open Source Preview 0.41:** the full runtime and operator experience are MIT licensed. The built-in Agent Access Broker is implemented and synthetically verified, but remains **Experimental** until production IdP, customer policy, HA, and capacity validation are complete.
 
 **Control the path from model intent to real action.**
 
@@ -41,7 +43,7 @@ There are no Community and Enterprise code editions. This repository contains:
 
 Future paid work can provide a managed cloud service, fleet operations, multi-node HA, immutable external audit storage, customer integrations, and support. The open-source runtime does not hide current enforcement features behind a license gate. See [One open-source product](docs/en/editions.md).
 
-## Docker self-hosting · 0.40
+## Docker self-hosting · 0.41
 
 ```bash
 git clone https://github.com/hellocosmos/ai-security-gateway.git

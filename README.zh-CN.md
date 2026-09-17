@@ -1,12 +1,14 @@
 # TrapDefense — Open-source AI Security Gateway
 
+**0.41:** [模型提供商连接](docs/zh-CN/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
+
 **通过明确的安全边界连接受支持的 HTTP API 和远程 MCP 服务器。需要逐代理控制时添加代理身份。**
 
 [连接、识别、控制、验证 →](docs/zh-CN/aisg.md)
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-> **Open Source Preview 0.40：**完整运行时与运维界面采用 MIT 许可证。内置 Agent Access Broker 已实现并通过合成验证；在真实 IdP、客户策略、HA 和容量验证完成前仍标记为 **Experimental**。
+> **Open Source Preview 0.41：**完整运行时与运维界面采用 MIT 许可证。内置 Agent Access Broker 已实现并通过合成验证；在真实 IdP、客户策略、HA 和容量验证完成前仍标记为 **Experimental**。
 
 TrapDefense 是用于受支持 HTTP 与 MCP 流量的自托管 AI Firewall。它检查请求和响应，执行 action、PII 与 secret 策略，保存脱敏证据，并可根据已注册的 agent、delegation、task、resource、action 与一次性人工审批进行授权。
 
