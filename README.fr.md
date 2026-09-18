@@ -1,5 +1,11 @@
 # TrapDefense — Open-source AI Security Gateway
 
+## Least Privilege, Least Agency
+
+**Le moindre privilège limite l’accès. L’autonomie minimale encadre l’action autonome.**
+
+Notre principe de conception : accorder uniquement les accès nécessaires et délimiter les actions qu’un agent peut accomplir seul. TrapDefense complète IAM et les permissions du service de destination en appliquant des politiques d’action et de données aux appels pris en charge et routés par la passerelle. L’identité facultative de l’agent ajoute des périmètres individuels, des délégations et des approbations.
+
 [0.43: Espace d’exploitation (0.43)](docs/fr/operator-workspace.md)
 
 

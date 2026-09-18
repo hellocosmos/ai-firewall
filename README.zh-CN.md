@@ -1,5 +1,11 @@
 # TrapDefense — Open-source AI Security Gateway
 
+## Least Privilege, Least Agency
+
+**最小权限限制访问，最小自主性约束自主行动。**
+
+我们的设计原则：仅授予代理所需的访问权限，并限定其独立行动的范围。TrapDefense 补充现有 IAM 和目标服务权限，对经网关路由的受支持调用执行操作和数据策略。可选的代理身份支持按代理设置权限范围、委托和审批控制。
+
 [0.43: 运维工作区（0.43）](docs/zh-CN/operator-workspace.md)
 
 
