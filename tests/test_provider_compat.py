@@ -191,3 +191,49 @@ def test_broker_registry_uses_explicit_profile_models(tmp_path):
   runtime=SelfhostRuntime(tmp_path/'state',c)
   record=runtime.register_agent({'agent_id':'llm-agent','owner_id':'test','allowed_tools':['llm.chat'],'allow_autonomous':True},'test')
   assert record['allowed_resources']==['model-test'] and record['allowed_actions']==['invoke']
+
+
+@pytest.mark.parametrize("nested,blocked", [(False,False),(True,True)])
+def test_chat_timestamp_does_not_exempt_numeric_business_data(scanner,tmp_path,nested,blocked):
+  c=config('openai')
+  engine=InspectionEngine(InspectionConfig(routes=c.routes),scanner,None,None)
+  value={"object":"chat.completion","created":1779123456,"choices":[]}
+  if nested:value['business']={"created":1779123456}
+  route=c.routes[0]
+  result=engine.inspect_response(HttpMessage('POST',route.authority,route.path,
+    {'content-type':'application/json'},json.dumps(value).encode()),mode='inline')
+  assert (result.action=='block')==blocked
+  if blocked:assert result.reason=='pii_in_numeric_field'
+
+
+@pytest.mark.parametrize('provider',['openai','openrouter'])
+@pytest.mark.parametrize('api',['chat','responses'])
+@pytest.mark.parametrize('stream',[False,True])
+def test_native_response_timestamps_are_preserved(scanner,provider,api,stream):
+  c=config(provider)
+  if provider=='openrouter' and api=='responses':pytest.skip('OpenRouter Responses is not a supported route')
+  path='/v1/responses' if api=='responses' else c.routes[0].path
+  route=next(r for r in c.routes if r.path==path)
+  engine=InspectionEngine(InspectionConfig(routes=c.routes),scanner,None,None)
+  _,headers,data=reply(provider,path,{'model':'model-test','stream':stream,'messages':[{'content':'hello'}]})
+  data=data.replace(b'"created": 1',b'"created": 1779123456').replace(b'"created_at": 1',b'"created_at": 1779123456')
+  result=engine.inspect_response(HttpMessage('POST',route.authority,path,headers,data),mode='inline')
+  assert result.action=='allow',result.reason
+  assert b'1779123456' in (result.body or data)
+
+
+@pytest.mark.parametrize('provider',['openai','anthropic'])
+@pytest.mark.parametrize('value',[1779123456,'1779123456',1779123456.0,True,946684799,4102444801])
+def test_timestamp_exception_has_exact_provider_type_and_range(scanner,provider,value):
+  c=config(provider);route=c.routes[0]
+  engine=InspectionEngine(InspectionConfig(routes=c.routes),scanner,None,None)
+  # Deterministic detector forces every candidate to be treated as PII unless the
+  # exact protocol exception applies. Other tests use the actual Presidio scanner.
+  from asr_proxy.inspection.pii import PiiFinding
+  engine._find=lambda text:[PiiFinding('PHONE_NUMBER',0,len(text),1)] if text==str(value) else []
+  body=json.dumps({'object':'chat.completion','created':value,'choices':[]}).encode()
+  result=engine.inspect_response(HttpMessage('POST',route.authority,route.path,{'content-type':'application/json'},body),mode='inline')
+  exempt=provider=='openai' and type(value) is int and 946684800<=value<=4102444800
+  if type(value) is bool:assert result.action=='allow' # booleans are not numeric PII
+  elif exempt:assert result.action=='allow'
+  else:assert result.action in ('block','redact')

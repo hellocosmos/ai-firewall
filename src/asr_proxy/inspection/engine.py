@@ -19,7 +19,7 @@ from .protocol import (
   validate_message,
 )
 from .secret_detection import contains_secret
-from .llm import validate_llm
+from .llm import validate_llm, response_timestamp
 
 
 def field_allowed(path: tuple[str, ...], patterns: list[str]) -> bool:
@@ -273,10 +273,18 @@ class InspectionEngine:
         value = strict_json(message.body, self.config.max_json_depth)
         self._signatures(value)
         if route and route.llm_provider:validate_llm(value,route,response=True)
-        modified = self._redact_json(value, None, verdict.entities, pii_action,json_arguments=bool(route and route.llm_provider))
+        # Remove only recognized top-level metadata from content scanning, then
+        # restore its exact value. Nested business data is never exempted.
+        provider = route.llm_provider if route else None
+        timestamps = {key: child for key, child in value.items()
+                      if response_timestamp(child, value, (key,), provider)} if isinstance(value, dict) else {}
+        scan_value = {key: child for key, child in value.items() if key not in timestamps} if timestamps else value
+        modified = self._redact_json(scan_value, None, verdict.entities, pii_action,json_arguments=bool(provider))
+        if timestamps:
+          modified.update(timestamps)
         new_body = encode_json(modified) if modified != value else message.body
       elif media == "text/event-stream":
-        new_body = self._redact_sse(message.body, verdict.entities, pii_action)
+        new_body = self._redact_sse(message.body, verdict.entities, pii_action, provider=route.llm_provider if route else None)
       elif media == "text/plain":
         value = message.body.decode("utf-8")
         self._signatures(value)
@@ -306,7 +314,7 @@ class InspectionEngine:
                      coverage="incomplete", pii_policy_action=pii_action,
                      pii_policy_scope=pii_policy_scope)
 
-  def _redact_sse(self, body: bytes, entities: list[str], pii_action: str) -> bytes:
+  def _redact_sse(self, body: bytes, entities: list[str], pii_action: str, *, provider=None) -> bytes:
     """Reassemble only complete, supported SSE streams; do not infer unknown delta semantics."""
     text = body.decode("utf-8").removeprefix("\ufeff").replace("\r\n", "\n").replace("\r", "\n")
     if not text.endswith("\n\n"):
@@ -403,6 +411,8 @@ class InspectionEngine:
         lane, kind = select_lane(event_value, path, ordinal)
         lanes.setdefault((lane, kind), []).append((parent, key, value))
       elif type(value) in (int, float):
+        if response_timestamp(value, event_value, path, provider):
+          return
         findings = self._find(str(value))
         if findings:
           entities.extend(f.entity_type for f in findings)

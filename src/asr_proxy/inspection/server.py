@@ -23,7 +23,7 @@ from .budget import INSPECTION_DEADLINE
 from .contracts import HttpMessage, InspectionConfig, InspectionError, Verdict
 from .engine import InspectionEngine
 from .identity import IDENTITY_FIELDS, AttestationVerifier, reserved_header
-from .protocol import encode_json, strict_json
+from .protocol import encode_json, strict_json, route_for
 
 
 def normalized_headers(values) -> dict[str, str]:
@@ -155,14 +155,28 @@ class ExternalProcessor(rpc.ExternalProcessorServicer):
             elif kind == "response_headers":
               if not request_checked or response_headers is not None:
                 raise InspectionError("unexpected_protocol_sequence")
-              response_headers = proto_headers(event.response_headers.headers)
+              # Native model APIs do not establish browser sessions. Discard their
+              # cookies before scanning and forwarding; never exempt forwarded data.
+              remove_cookie = False
+              config = getattr(self.engine, "config", None)
+              if config is not None and getattr(self.engine, "policy", {}).get("mode") != "mirror":
+                route = route_for(HttpMessage(method, authority, path, request_headers, b""), config)
+                remove_cookie = bool(route.llm_provider)
+              header_values = event.response_headers.headers
+              if remove_cookie:
+                header_values = type(header_values)(headers=[h for h in header_values.headers
+                  if h.key.lower() != "set-cookie"])
+              response_headers = proto_headers(header_values)
               if response_headers.get("content-encoding", "identity").lower() != "identity":
                 raise InspectionError("unsupported_content_encoding")
               await self._inspect(self.engine.inspect_metadata,
                 HttpMessage(method, authority, path, response_headers, b""), response=True, deadline=deadline)
               if event.response_headers.end_of_stream:
                 response_checked = True
-              yield pb.ProcessingResponse(response_headers=pb.HeadersResponse(response=pb.CommonResponse()))
+              common = pb.CommonResponse()
+              if remove_cookie:
+                common.header_mutation.remove_headers.append("set-cookie")
+              yield pb.ProcessingResponse(response_headers=pb.HeadersResponse(response=common))
             elif kind == "response_body":
               if response_headers is None or response_checked:
                 raise InspectionError("unexpected_protocol_sequence")

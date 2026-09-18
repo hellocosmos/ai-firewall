@@ -289,3 +289,18 @@ def test_cancellation_is_propagated():
     assert context.aborts == []
 
   asyncio.run(exercise())
+
+
+@pytest.mark.parametrize("provider,mirror,removed", [("openai",False,True),(None,False,False),("openai",True,False)])
+def test_model_response_cookies_are_removed_not_exempted(provider,mirror,removed):
+  engine=Engine()
+  engine.config=InspectionConfig(routes=[{"authority":"example.test","path":"/mcp","llm_provider":provider}])
+  engine.policy={"mode":"mirror" if mirror else "inline"}
+  output,_=run([headers(),body(),headers("response_headers",values=[
+    (":status","200"),("content-type","application/json"),("set-cookie","opaque=1234567890"),
+    ("x-business-data","alex@example.com")]),body("response_body")],engine=engine)
+  mutation=output[2].response_headers.response.header_mutation
+  assert ("set-cookie" in mutation.remove_headers)==removed
+  response_metadata=[c[1] for c in engine.calls if c[0]=="metadata" and c[2]][0]
+  assert ("set-cookie" not in response_metadata.headers)==removed
+  assert response_metadata.headers["x-business-data"]=="alex@example.com"

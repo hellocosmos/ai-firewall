@@ -36,7 +36,7 @@ def reply(provider,path,body):
   elif path.endswith('/responses'):
     item={'type':'function_call','id':'fc_test','call_id':'call_test','name':'notes_read','arguments':json.dumps({'query':output}),'status':'completed'} if tool else {
       'type':'message','id':'msg_test','role':'assistant','status':'completed','content':[{'type':'output_text','text':output,'annotations':[]}]}
-    value={'id':'resp_test','object':'response','created_at':1,'model':model,'status':'completed','output':[item],
+    value={'id':'resp_test','object':'response','created_at':1779123456,'model':model,'status':'completed','output':[item],
       'error':None,'incomplete_details':None,'parallel_tool_calls':True,'tool_choice':'auto','tools':[],
       'usage':{'input_tokens':2,'output_tokens':1,'total_tokens':3}}
     if stream:
@@ -50,7 +50,7 @@ def reply(provider,path,body):
   else:
     call={'id':'call_test','type':'function','function':{'name':'notes_read','arguments':json.dumps({'query':output})}}
     message={'role':'assistant','content':None,'tool_calls':[call]} if tool else {'role':'assistant','content':output}
-    value={'id':'chatcmpl-test','object':'chat.completion','created':1,'model':model,
+    value={'id':'chatcmpl-test','object':'chat.completion','created':1779123456,'model':model,
       'choices':[{'index':0,'message':message,'finish_reason':'tool_calls' if tool else 'stop'}],
       'usage':{'prompt_tokens':2,'completion_tokens':1,'total_tokens':3}}
     if stream:

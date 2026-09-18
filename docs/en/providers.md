@@ -1,4 +1,4 @@
-# Model provider connections (0.41)
+# Model provider connections (0.42)
 
 [English](../en/providers.md) · [한국어](../ko/providers.md) · [简体中文](../zh-CN/providers.md) · [日本語](../ja/providers.md) · [Español](../es/providers.md) · [Français](../fr/providers.md)
 
@@ -94,7 +94,7 @@ Recreate the app, register an agent in the console, grant the relevant `llm.chat
 
 ## Streaming and security boundaries
 
-**SSE is buffered, inspected in full, then delivered in its native event format. This is not real-time token streaming.** This prevents a secret or PII split across chunks from escaping before a later chunk completes it. In inline mode, unknown, malformed, oversized, timed-out or incomplete streams fail closed. Mirror mode remains observational and does not enforce content verdicts. Clients must allow the configured full-response wait. Client disconnect cancellation has not been qualified; an abandoned generation may continue upstream until completion or the configured timeout.
+**SSE is buffered, inspected in full, then delivered in its native event format. This is not real-time token streaming.** This prevents a secret or PII split across chunks from escaping before a later chunk completes it. In inline mode, unknown, malformed, oversized, timed-out or incomplete streams fail closed. Mirror mode remains observational and does not enforce content verdicts. Clients must allow the configured full-response wait. A 0.42 synthetic TLS test confirmed that the upstream completed after a client timeout. Immediate upstream generation cancellation is not guaranteed; an abandoned generation may continue until completion or the configured timeout.
 
 The verified subset is text and client-executed function calls, including JSON arguments, ordinary responses and bounded SSE. Files/uploads, images/audio/video, realtime/WebSocket, provider-executed tools, background/stored conversation retrieval, encrypted reasoning, Gemini thought signatures and partial-argument extensions are not supported. Unknown SSE event extensions can be rejected. Provider authentication failures and HTTP rate-limit statuses are preserved when their response is inspectable.
 
@@ -107,3 +107,8 @@ A returned function call is a **proposal**, not proof that a tool was executed. 
 On 2026-09-17, a separate local Docker smoke also exercised all four profiles through real Envoy and synthetic TLS origins, including a seven-second provider response. This validates local transport and contract handling, not live provider accounts.
 
 Official references: [OpenAI SDK](https://github.com/openai/openai-python), [Claude API](https://platform.claude.com/docs/en/api/overview), [Gemini API](https://ai.google.dev/api/generate-content), [Gemini SDK](https://github.com/googleapis/python-genai), [OpenRouter](https://openrouter.ai/docs/quickstart).
+
+
+### 0.42 qualification update
+
+See the [agent workflow](agent-workflow.md) for the live OpenAI model-to-MCP result, response-cookie and timestamp handling, and measured operating limits. Other live provider accounts remain unqualified.

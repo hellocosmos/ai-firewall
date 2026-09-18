@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.42 — Two-gateway agent workflow
+
+- Add a reproducible Docker example joining an official OpenAI SDK tool loop to an official MCP client through independent fixed-origin gateways.
+- Verify Agent A allow, Agent B scope denial, local deletion policy, request/response PII redaction, used-key revocation and seeded expired credentials against actual target receipts and sanitized decision records.
+- Scripted synthetic TLS model by default; explicit optional live OpenAI mode with a private key file, request/token limits, no retries and no synthetic fallback. Live OpenAI gpt-4.1-mini passed all three scenarios on 2026-09-18 with a synthetic MCP target.
+- Fix live-model response false positives: discard native LLM response cookies before forwarding and recognize bounded native Chat Completions and OpenAI Responses creation timestamps, including supported SSE paths; preserve nested business-data inspection.
+- Add six-language workflow guides. Existing provider, streaming, IAM and HA boundaries remain unchanged.
+- Add a deterministic Docker agent-workflow CI job and document local MCP, same-host recovery, buffered-stream and bounded overload evidence. Cross-host HA and other live provider accounts remain unqualified.
+
 ## 0.41 — Native model provider connections
 
 - Add fixed-origin OpenAI, Anthropic, Gemini and OpenRouter profiles with exact model allowlists.

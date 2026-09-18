@@ -32,3 +32,20 @@ def validate_llm(value, route, *, response=False):
         if tool.get('type','custom')!='custom' or not isinstance(tool.get('name'),str):
           raise InspectionError('unsupported_llm_tools')
       elif tool.get('type')!='function':raise InspectionError('unsupported_llm_tools')
+
+
+def response_timestamp(value, envelope, path, provider):
+  """Recognize only native protocol timestamps, never similarly named tool data."""
+  if provider not in ("openai", "openrouter", "google") or type(value) is not int:
+    return False
+  if not 946684800 <= value <= 4102444800:
+    return False
+  if path == ("created",):
+    return envelope.get("object") in ("chat.completion", "chat.completion.chunk")
+  if provider == "openai" and path == ("created_at",):
+    return envelope.get("object") == "response"
+  if (provider == "openai" and path == ("response", "created_at")
+      and envelope.get("type") in ("response.created", "response.in_progress",
+        "response.completed", "response.failed")):
+    return isinstance(envelope.get("response"), dict) and envelope["response"].get("object") == "response"
+  return False
