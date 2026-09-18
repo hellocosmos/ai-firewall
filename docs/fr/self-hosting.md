@@ -1,12 +1,20 @@
-# Auto-hébergement Docker — 0.39 Open Source Preview
+# Auto-hébergement Docker — 0.42 Open Source Preview
 
-> **0.41:** [Connexions aux fournisseurs de modèles](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
+> [Connexions aux fournisseurs de modèles](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
 
-> **0.40 · AISG:** [Connecter, identifier, contrôler, vérifier](aisg.md). La passerelle utilise une clé de déploiement ou un JWT vérifié. agent_key identifie un agent enregistré sans IAM externe. JWT identity_mode: agent utilise les attributs vérifiés du tenant et de l’agent ; delegated exige aussi utilisateur, tâche et délégation. Les agents existants nécessitent une délégation par défaut.
+> **AISG:** [Connecter, identifier, contrôler, vérifier](aisg.md). La passerelle utilise une clé de déploiement ou un JWT vérifié. agent_key identifie un agent enregistré sans IAM externe. JWT identity_mode: agent utilise les attributs vérifiés du tenant et de l’agent ; delegated exige aussi utilisateur, tâche et délégation. Les agents existants nécessitent une délégation par défaut.
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.39 fournit adaptateur, Envoy, inspecteur, console et authentifications séparées pour passerelle et cible. L’image se construit localement depuis les sources. TrapDefense Cloud reste prévu.
+## Choisir un point de départ pour 0.42
+
+- **API de modèles :** utilisez un [profil fournisseur](providers.md) pour OpenAI, Anthropic, Gemini ou OpenRouter. Modifiez la base URL du SDK et gardez la clé fournisseur sur la passerelle.
+- **Outils HTTP / MCP :** suivez le démarrage Docker puis remplacez la cible synthétique par un service explicitement configuré.
+- **Évaluation complète :** lancez l’[exemple modèle → MCP → modèle avec deux agents](agent-workflow.md). Aucune clé payante par défaut ; le guide distingue preuve OpenAI réelle, tests synthétiques et limites mesurées.
+
+L’authentification accepte `client_key`, `agent_key` et un `jwt` externe. Le registre local d’agents et leurs permissions sont optionnels et ne remplacent pas l’authentification cible. Chaque déploiement vise une origine fixe ; modèles et outils exécutés séparément nécessitent leurs propres routes. Le SSE modèle est entièrement mis en mémoire puis inspecté avant livraison, sans diffusion de tokens en temps réel.
+
+0.42 fournit adaptateur, Envoy, inspecteur, console et authentifications séparées pour passerelle et cible. L’image se construit localement depuis les sources. TrapDefense Cloud reste prévu.
 
 Le client doit pouvoir modifier l’URL MCP/API et utiliser `X-TD-Client-Key` ou un JWT Bearer OAuth. Chaque déploiement possède une cible fixe et des routes/outils explicites. Consultez la [matrice de compatibilité](gateway-compatibility.md).
 
@@ -18,7 +26,7 @@ Le client doit pouvoir modifier l’URL MCP/API et utiliser `X-TD-Client-Key` ou
 | Authentification cible | none, Bearer hérité transmis, Bearer/API Key fixe depuis fichier |
 | Non pris en charge | Émission OAuth, connexion intermédiaire, DCR, OBO, cookies/sessions, SSE longue durée, WebSocket, stdio, SaaS interne fermé |
 
-Le mot de passe sert à la console. La clé ou le JWT authentifie l’accès à TrapDefense. Le JWT est validé pour l’audience de la passerelle et n’est pas transmis à la cible, qui utilise un identifiant séparé. Ce n’est ni un registre Agent IAM ni un OAuth Authorization Server.
+Le mot de passe sert à la console. La clé ou le JWT authentifie l’accès à TrapDefense. Le JWT est validé pour l’audience de la passerelle et n’est pas transmis à la cible, qui utilise un identifiant séparé. Une clé ou un JWT n’enregistre pas automatiquement un agent. L’Access Broker optionnel gère séparément registre et permissions ; l’IdP externe émet les jetons OAuth.
 
 ## Docker
 
@@ -35,7 +43,7 @@ docker compose run --rm app client-key
 
 Connectez-vous comme admin sur http://localhost:18080. Lisez la clé avec client-key et stockez-la dans les en-têtes secrets du client. La passerelle est sur http://localhost:18084 ; le jeton cible synthétique est Bearer synthetic-target-token.
 
-Pour votre service, modifiez upstream, authority, chemins, outils et resource. `gateway_auth` accepte `client_key` ou `jwt`; `target_auth` accepte `none`, `passthrough_bearer`, `static_bearer` et `static_api_key`. JWT et passthrough sont incompatibles. Les identifiants fixes utilisent un fichier 0600 lisible par UID 10001 et refusent les entrées en conflit.
+Pour votre service, modifiez upstream, authority, chemins, outils et resource. `gateway_auth` accepte `client_key`, `agent_key` ou `jwt`; `target_auth` accepte `none`, `passthrough_bearer`, `static_bearer` et `static_api_key`. JWT et passthrough sont incompatibles. Les identifiants fixes utilisent un fichier 0600 lisible par UID 10001 et refusent les entrées en conflit.
 
 L’UI gère politiques et mots de passe. Pour changer les correspondances : sauvegardez, exécutez policy-reset, render puis recréez les services. Seules les politiques enregistrées sont réinitialisées ; comptes, clés et événements restent présents. Les nouvelles requêtes utilisent la nouvelle politique.
 

@@ -2,6 +2,8 @@
 
 ## 0.42 — Two-gateway agent workflow
 
+- Align current installation, identity, compatibility and provider guides across six languages; check documentation links and current guide titles in CI. Historical migration versions and labeled screenshots retain their provenance.
+
 - Add a reproducible Docker example joining an official OpenAI SDK tool loop to an official MCP client through independent fixed-origin gateways.
 - Verify Agent A allow, Agent B scope denial, local deletion policy, request/response PII redaction, used-key revocation and seeded expired credentials against actual target receipts and sanitized decision records.
 - Scripted synthetic TLS model by default; explicit optional live OpenAI mode with a private key file, request/token limits, no retries and no synthetic fallback. Live OpenAI gpt-4.1-mini passed all three scenarios on 2026-09-18 with a synthetic MCP target.

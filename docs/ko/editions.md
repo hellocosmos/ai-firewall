@@ -1,10 +1,10 @@
 # 하나의 오픈소스 제품
 
-> **0.40 · AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
+> **AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
-TrapDefense 0.39는 하나의 MIT 코드베이스다. Runtime Gateway와 Agent Access Broker를 이 공개 저장소에서 함께 제공하며, 비공개 Python 배포판·provider entry point·license key·edition switch가 필요하지 않다.
+TrapDefense 0.42는 하나의 MIT 코드베이스다. Runtime Gateway와 Agent Access Broker를 이 공개 저장소에서 함께 제공하며, 비공개 Python 배포판·provider entry point·license key·edition switch가 필요하지 않다.
 
 ## 제공 상태
 
@@ -21,4 +21,4 @@ Gateway-only는 로컬 검사 정책과 trusted source를 검증한다. Broker-e
 
 파일 store는 동일 호스트 POSIX 프로세스에서 atomic replace와 file lock을 사용한다. 분산 DB가 아니며 NFS/SMB multi-host HA 용도가 아니다. 로컬 JSON/SQLite 증거는 변경 가능하다. 합성 테스트는 실제 IdP, Conditional Access, 고객 MCP 인증, TLS 라우팅과 용량을 인증하지 않는다.
 
-[Docker 0.39](self-hosting.md) · [아키텍처](architecture.md) · [보안](security.md) · [호환성](gateway-compatibility.md)
+[Docker 0.42](self-hosting.md) · [아키텍처](architecture.md) · [보안](security.md) · [호환성](gateway-compatibility.md)

@@ -1,12 +1,20 @@
-# Docker 自托管 — 0.39 Open Source Preview
+# Docker 自托管 — 0.42 Open Source Preview
 
-> **0.41:** [模型提供商连接](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
+> [模型提供商连接](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
 
-> **0.40 · AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
+> **AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.39 提供适配器、Envoy、检查器、管理界面以及相互独立的网关/目标认证。镜像从源码本地构建。TrapDefense Cloud 仍在规划中，尚未开放注册。
+## 选择 0.42 起点
+
+- **模型 API：**使用[供应商配置](providers.md)连接 OpenAI、Anthropic、Gemini 或 OpenRouter。修改 SDK base URL，供应商密钥保存在网关。
+- **HTTP / MCP 工具：**从下方 Docker 示例开始，再将合成目标替换为显式映射的服务。
+- **端到端验证：**运行[双代理模型 → MCP → 模型示例](agent-workflow.md)。默认无需付费密钥；指南区分真实 OpenAI 证据、合成测试和测量限制。
+
+网关支持 `client_key`、`agent_key` 和外部 `jwt`。本地 Agent Registry 和 agent_key 权限控制可选，不能替代目标认证。每个部署仅有一个固定目标，模型与单独执行的工具需要各自路由。模型 SSE 完整缓冲并检查后才交付，不是实时 token 流。
+
+0.42 提供适配器、Envoy、检查器、管理界面以及相互独立的网关/目标认证。镜像从源码本地构建。TrapDefense Cloud 仍在规划中，尚未开放注册。
 
 客户端必须能修改 MCP/API URL，并使用 `X-TD-Client-Key` 或 OAuth Bearer JWT。每个部署只有一个固定目标，并显式映射路由和工具。证据见[兼容性表](gateway-compatibility.md)。
 
@@ -18,7 +26,7 @@
 | 目标认证 | none、旧式 Bearer 透传、文件支持的固定 Bearer/API Key |
 | 不支持 | OAuth 签发、登录代理、DCR、OBO、Cookie/会话、长连接 SSE、WebSocket、stdio、封闭 SaaS 内部调用 |
 
-管理员密码用于控制台登录。连接密钥或 JWT 用于访问 TrapDefense。JWT 针对配置的网关 audience 验证且不会传给目标；目标服务使用独立凭据检查权限。这不是 Agent IAM 注册或 OAuth Authorization Server。
+管理员密码用于控制台登录。连接密钥或 JWT 用于访问 TrapDefense。JWT 针对配置的网关 audience 验证且不会传给目标；目标服务使用独立凭据检查权限。连接密钥或 JWT 不会自动注册代理。代理注册与权限由可选 Access Broker 单独管理；OAuth 签发由外部 IdP 负责。
 
 ## Docker
 
@@ -35,7 +43,7 @@ docker compose run --rm app client-key
 
 在 `http://localhost:18080` 以 admin 登录。使用 client-key 命令读取连接密钥，并存入客户端的机密请求头配置。网关为 `http://localhost:18084`；合成目标令牌为 `Bearer synthetic-target-token`。
 
-连接真实服务时修改 deployment.yaml 中的 upstream、authority、路径、工具和 resource。`gateway_auth` 使用 `client_key` 或 `jwt`；`target_auth` 使用 `none`、`passthrough_bearer`、`static_bearer` 或 `static_api_key`。JWT 不能与 passthrough 组合。固定凭据必须使用 UID 10001 可读的 0600 文件，冲突输入会被拒绝。
+连接真实服务时修改 deployment.yaml 中的 upstream、authority、路径、工具和 resource。`gateway_auth` 使用 `client_key`、`agent_key` 或 `jwt`；`target_auth` 使用 `none`、`passthrough_bearer`、`static_bearer` 或 `static_api_key`。JWT 不能与 passthrough 组合。固定凭据必须使用 UID 10001 可读的 0600 文件，冲突输入会被拒绝。
 
 UI 管理策略和密码。变更映射时，先备份，再运行 policy-reset、render 并重建服务。此操作仅重置已保存策略，保留账户、密钥和事件。新请求使用新策略。
 

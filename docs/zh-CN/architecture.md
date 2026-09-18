@@ -1,6 +1,8 @@
 # 架构与信任边界
 
-> **0.40 · AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
+**安装路径：**Docker 部署请遵循[自托管指南](self-hosting.md)。独立源码控制台的 Entra SSO 和合成演示配置不会自动应用到 Docker。
+
+> **AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
@@ -19,7 +21,7 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 ## 信任契约
 
 1. 在 TrapDefense 外强制路由，防止受保护流量绕过代理。
-2. 使用已授权的现有 TLS 解密设备。演示不解密生产 TLS。
+2. 在 TLS ingress 终止客户端 HTTPS，并使用内置签名适配器。外部 TLS 解密设备仅是独立网络集成的可选项，不是 base_url/MCP URL 部署的前提。
 3. 可信适配器删除客户端提供的 `x-td-*`、`x-asr-*` 上下文，对实际观察到的请求签名。保留 method、authority、path/query、应用标头和完整正文。规范绑定及排除项见 `inspection/identity.py`。
 4. HMAC 密钥仅留在可信节点和检查器，不分发给智能体。为 gateway-only 配置 `source_id` 允许列表。隔离明文及 ExtProc 链路；示例不认证公开 gRPC 监听器。
 5. Envoy 使用完整缓冲、大小/时间上限和 `failure_mode_allow: false`，转发前移除证明标头。签名绑定原请求；若使用持久审批，则绑定脱敏后操作的摘要。

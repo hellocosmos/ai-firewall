@@ -1,6 +1,8 @@
 # アーキテクチャと信頼境界
 
-> **0.40 · AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
+**導入経路：**Docker 構成は[セルフホストガイド](self-hosting.md)に従います。別のソース版コンソールの Entra SSO・合成デモ設定は Docker に自動適用されません。
+
+> **AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
@@ -19,7 +21,7 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 ## 信頼契約
 
 1. TrapDefense 外部で経路を強制し、保護通信の迂回を防ぎます。
-2. 承認済みの既存 TLS 復号装置を使用します。デモは本番 TLS を復号しません。
+2. クライアント HTTPS は TLS ingress で終端し、同梱の署名アダプターを使います。外部 TLS 復号装置は別途設計するネットワーク連携の選択肢で、base_url/MCP URL 構成の必須条件ではありません。
 3. 信頼済みアダプターがクライアント由来の `x-td-*`、`x-asr-*` を除去し、実際に観察した要求へ署名します。method・authority・path/query・アプリケーションヘッダー・完全な本文を保持します。結合規則と除外項目は `inspection/identity.py` にあります。
 4. HMAC キーは信頼済みホップと検査器だけに保管し、エージェントへ渡しません。gateway-only の `source_id` を許可リスト化し、平文と ExtProc の経路を隔離します。例は公開 gRPC 待受を認証しません。
 5. Envoy は本文全体のバッファリング、サイズ・時間上限、`failure_mode_allow: false` を使い、転送前に証明ヘッダーを除去します。署名は元要求に、永続的承認がある場合はマスキング後の操作ダイジェストに結び付きます。

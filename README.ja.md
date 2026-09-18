@@ -2,7 +2,7 @@
 
 [0.42: モデル → MCP → モデルの検証](docs/ja/agent-workflow.md)
 
-**0.41:** [モデル提供者への接続](docs/ja/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
+**0.42:** [モデル提供者への接続](docs/ja/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
 
 **対応するHTTP APIとリモートMCPサーバーを明示的なセキュリティ境界で接続します。エージェント単位の制御にはIDを追加します。**
 

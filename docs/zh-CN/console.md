@@ -1,8 +1,8 @@
 # 控制台安装与操作
 
-> **0.40 · AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
+> **AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
 
-> Docker 0.39: [自托管](self-hosting.md) · [网关兼容性](gateway-compatibility.md)。本页说明独立的源码合成演示。
+> Docker 0.42: [自托管](self-hosting.md) · [网关兼容性](gateway-compatibility.md)。本页说明独立的源码合成演示。
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
@@ -88,6 +88,6 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 未设置 `TD_CONSOLE_E2E=1` 时跳过 Docker 测试。语言检查要求六个词典的键和占位符一致，并检查应用代码使用英语。修改英文键时同步更新全部 JSON，不改变稳定 API 代码。译文有差异时以英语为准。另见[架构](architecture.md)、[版本](editions.md)、[迁移](migration.md)和[安全](security.md)。
 
 
-## 同一主机运维 — 0.34 候选版
+## 同一主机运维
 
 [1 / 2 / 4 inspectors · Linux service](operations.md)

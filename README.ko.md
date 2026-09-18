@@ -2,7 +2,7 @@
 
 [0.42: 모델 → MCP → 모델 검증](docs/ko/agent-workflow.md)
 
-**0.41:** [모델 제공자 연결](docs/ko/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
+**0.42:** [모델 제공자 연결](docs/ko/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
 
 **지원되는 HTTP API와 원격 MCP 서버를 명시적인 보안 경로로 연결합니다. 에이전트별 통제가 필요하면 신원을 추가합니다.**
 

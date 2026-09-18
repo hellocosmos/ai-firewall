@@ -1,8 +1,8 @@
 # Installation et utilisation de la console
 
-> **0.40 · AISG:** [Connecter, identifier, contrôler, vérifier](aisg.md). La passerelle utilise une clé de déploiement ou un JWT vérifié. agent_key identifie un agent enregistré sans IAM externe. JWT identity_mode: agent utilise les attributs vérifiés du tenant et de l’agent ; delegated exige aussi utilisateur, tâche et délégation. Les agents existants nécessitent une délégation par défaut.
+> **AISG:** [Connecter, identifier, contrôler, vérifier](aisg.md). La passerelle utilise une clé de déploiement ou un JWT vérifié. agent_key identifie un agent enregistré sans IAM externe. JWT identity_mode: agent utilise les attributs vérifiés du tenant et de l’agent ; delegated exige aussi utilisateur, tâche et délégation. Les agents existants nécessitent une délégation par défaut.
 
-> Docker 0.39 : [Auto-hébergement](self-hosting.md) · [Compatibilité de la passerelle](gateway-compatibility.md). Cette page décrit la démonstration synthétique distincte depuis les sources.
+> Docker 0.42 : [Auto-hébergement](self-hosting.md) · [Compatibilité de la passerelle](gateway-compatibility.md). Cette page décrit la démonstration synthétique distincte depuis les sources.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
@@ -88,6 +88,6 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 Sans `TD_CONSOLE_E2E=1`, les tests Docker sont ignorés. Les contrôles vérifient les mêmes clés et paramètres dans les six dictionnaires et un code en anglais. Modifiez ensemble les clés anglaises et tous les JSON, sans changer les codes API stables. En cas de divergence, le document anglais fait référence. Consultez [architecture](architecture.md), [éditions](editions.md), [migration](migration.md) et [sécurité](security.md).
 
 
-## Exploitation sur un même hôte — candidat 0.34
+## Exploitation sur un même hôte
 
 [1 / 2 / 4 inspectors · Linux service](operations.md)

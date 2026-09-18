@@ -1,12 +1,20 @@
-# Docker セルフホスティング — 0.39 Open Source Preview
+# Docker セルフホスティング — 0.42 Open Source Preview
 
-> **0.41:** [モデル提供者への接続](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
+> [モデル提供者への接続](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
 
-> **0.40 · AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
+> **AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.39 はアダプター、Envoy、検査器、管理 UI と、分離したゲートウェイ/宛先認証を提供します。イメージはソースからローカルでビルドします。TrapDefense Cloud は計画段階です。
+## 0.42 の開始方法を選ぶ
+
+- **モデル API：**[プロバイダー設定](providers.md)で OpenAI・Anthropic・Gemini・OpenRouter に接続します。SDK base URL を変更し、プロバイダーキーはゲートウェイに保存します。
+- **HTTP / MCP ツール：**以下の Docker サンプルから始め、合成宛先を明示的にマッピングしたサービスに変更します。
+- **全体検証：**[2エージェントのモデル → MCP → モデル例](agent-workflow.md)を実行します。既定では有料キー不要です。実 OpenAI の証拠、合成試験、測定上の限界を区別しています。
+
+ゲートウェイ認証は `client_key`・`agent_key`・外部 `jwt` に対応します。ローカル Agent Registry と agent_key の権限制御は任意で、宛先認証を置き換えません。導入ごとに宛先は1つです。モデルと別途実行するツールはそれぞれ経路設定が必要です。モデル SSE は全体をバッファして検査後に配信し、リアルタイムのトークン配信ではありません。
+
+0.42 はアダプター、Envoy、検査器、管理 UI と、分離したゲートウェイ/宛先認証を提供します。イメージはソースからローカルでビルドします。TrapDefense Cloud は計画段階です。
 
 クライアントは MCP/API URL を変更し、`X-TD-Client-Key` または OAuth Bearer JWT を使用できる必要があります。導入ごとに宛先を一つに固定し、ルートとツールを明示します。証拠は[互換性表](gateway-compatibility.md)を参照してください。
 
@@ -18,7 +26,7 @@
 | 宛先認証 | none、旧式 Bearer 転送、ファイルベースの固定 Bearer/API Key |
 | 未対応 | OAuth 発行・ログイン仲介・DCR・OBO、Cookie/セッション、長時間 SSE、WebSocket、stdio、閉鎖型 SaaS 内部呼び出し |
 
-管理者パスワードはコンソール用です。接続キーまたは JWT は TrapDefense へのアクセス用です。JWT は設定した gateway audience に対して検証され、宛先へ転送されません。宛先サービスは別の資格情報で権限を確認します。Agent IAM 登録や OAuth Authorization Server ではありません。
+管理者パスワードはコンソール用です。接続キーまたは JWT は TrapDefense へのアクセス用です。JWT は設定した gateway audience に対して検証され、宛先へ転送されません。宛先サービスは別の資格情報で権限を確認します。接続キーや JWT だけでエージェントを自動登録しません。登録と権限は任意の Access Broker で別途管理し、OAuth 発行は外部 IdP が担当します。
 
 ## Docker
 
@@ -35,7 +43,7 @@ docker compose run --rm app client-key
 
 http://localhost:18080 で admin としてログインします。client-key で接続キーを確認し、クライアントの秘密ヘッダー設定に保存します。ゲートウェイは http://localhost:18084、合成宛先のトークンは Bearer synthetic-target-token です。
 
-実際の接続では deployment.yaml の upstream、authority、パス、ツール、resource を変更します。`gateway_auth` は `client_key` または `jwt`、`target_auth` は `none`、`passthrough_bearer`、`static_bearer`、`static_api_key` を使います。JWT と passthrough は併用できません。固定資格情報は UID 10001 が読める 0600 ファイルでマウントし、競合する入力を拒否します。
+実際の接続では deployment.yaml の upstream、authority、パス、ツール、resource を変更します。`gateway_auth` は `client_key`、`agent_key` または `jwt`、`target_auth` は `none`、`passthrough_bearer`、`static_bearer`、`static_api_key` を使います。JWT と passthrough は併用できません。固定資格情報は UID 10001 が読める 0600 ファイルでマウントし、競合する入力を拒否します。
 
 UI はポリシーとパスワードを管理します。マッピング変更時はバックアップ後に policy-reset、render、スタック再作成を行います。保存済みポリシーのみリセットし、アカウント・キー・イベントは保持します。新しい要求に新ポリシーが適用されます。
 

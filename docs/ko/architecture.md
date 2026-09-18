@@ -1,6 +1,8 @@
 # 아키텍처와 신뢰 경계
 
-> **0.40 · AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
+**설치 경로:** Docker 배포는 [설치 가이드](self-hosting.md)를 따릅니다. 별도 소스 콘솔의 Entra SSO·합성 데모 설정은 Docker에 자동 적용되지 않습니다.
+
+> **AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
@@ -19,7 +21,7 @@ AI agents → TrapDefense AI Firewall → Tools / MCP servers / APIs
 ## 신뢰 계약
 
 1. 보호 트래픽이 우회하지 못하도록 TrapDefense 외부에서 경로를 강제합니다.
-2. 승인된 기존 TLS 복호화 장비를 사용합니다. 데모는 운영 TLS를 복호화하지 않습니다.
+2. 클라이언트 HTTPS는 TLS ingress에서 종료하고 내장 서명 어댑터를 사용합니다. 외부 TLS 복호화 장비는 별도 네트워크 연동 시의 선택 사항이며 base_url/MCP URL 구성의 필수 조건이 아닙니다.
 3. 신뢰된 어댑터가 클라이언트의 `x-td-*`, `x-asr-*` 문맥을 제거하고 실제 관찰한 요청에 서명합니다. method·authority·path/query·애플리케이션 헤더·전체 본문을 보존합니다. 결합 규칙과 제외 항목은 `inspection/identity.py`에 정의합니다.
 4. HMAC 키는 신뢰된 홉과 검사기에만 보관하고 에이전트에 배포하지 않습니다. gateway-only `source_id`를 허용 목록에 등록합니다. 평문·ExtProc 구간을 격리하세요. 예제는 공개 gRPC 리스너를 인증하지 않습니다.
 5. Envoy는 본문 전체 버퍼링, 크기·시간 상한, `failure_mode_allow: false`를 사용하며 전달 전 서명 헤더를 제거합니다. 서명은 원본 요청에, 영속 승인은 제공되는 경우 마스킹 후 동작 digest에 결합됩니다.

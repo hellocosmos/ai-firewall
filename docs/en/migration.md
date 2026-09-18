@@ -5,10 +5,10 @@
 The earlier embedded Python SDK and its history remain at [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security). This repository is the open-source proxy product. SDK compatibility or automatic package migration is not implied.
 
 1. Inventory the HTTP/MCP calls and destinations to protect.
-2. Establish a trusted signing adapter after TLS decryption and enforce routing through the proxy.
+2. Terminate client HTTPS at your TLS ingress and use the bundled signing adapter. External TLS decryption equipment is optional for separately designed network integrations; it is not required for the base_url/MCP URL deployment.
 3. Configure explicit tool/action mappings, limits and redaction fields.
 4. Run synthetic observation, then verify inline allow, redact, block and failure behavior.
-5. Enable the built-in Access Broker only after configuring verified JWT identity claims, registry records and delegations.
+5. For per-agent control, enable the built-in Access Broker with registered local agent credentials or explicitly mapped JWT identity. Configure agent scopes; add user/task delegation only when that mode is required.
 
 Existing SDK users can retain pinned versions while evaluating a separately routed pilot. Start with the [console guide](console.md). Source installation does not imply a PyPI release or an upgrade of customer deployments. Back up state before changing versions; do not copy synthetic credentials or signing keys into production.
 

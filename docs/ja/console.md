@@ -1,8 +1,8 @@
 # コンソールのインストールと運用
 
-> **0.40 · AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
+> **AISG:** [接続・識別・制御・検証](aisg.md). ゲートウェイは接続キーまたは検証済みJWTを使用します。agent_keyは外部IAMなしで登録済みエージェントを識別します。JWT identity_mode: agentは検証済みテナントとエージェントのクレームを使用し、delegatedはユーザー・タスク・委任も要求します。既存エージェントは既定で委任が必要です。
 
-> Docker 0.39: [セルフホスティング](self-hosting.md) · [ゲートウェイ互換性](gateway-compatibility.md)。このページは別のソース版合成デモを説明します。
+> Docker 0.42: [セルフホスティング](self-hosting.md) · [ゲートウェイ互換性](gateway-compatibility.md)。このページは別のソース版合成デモを説明します。
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
@@ -88,6 +88,6 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 `TD_CONSOLE_E2E=1` がなければ Docker テストはスキップします。言語検査では全 6 辞書のキー・プレースホルダーと英語ソースを確認します。英語キーと全 JSON を同時更新し、API コードは変更しません。訳に差異がある場合は英語版を基準とします。[構成](architecture.md)、[エディション](editions.md)、[移行](migration.md)、[セキュリティ](security.md)も参照してください。
 
 
-## 同一ホストの運用 — 0.34 候補版
+## 同一ホストの運用
 
 [1 / 2 / 4 inspectors · Linux service](operations.md)

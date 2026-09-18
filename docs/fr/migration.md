@@ -5,10 +5,10 @@
 L’ancien SDK Python embarqué et son historique restent dans [agent-runtime-security](https://github.com/hellocosmos/agent-runtime-security). Ce dépôt est le produit proxy open source. Il n’implique ni compatibilité SDK ni migration automatique des paquets.
 
 1. Recensez les appels HTTP/MCP et les destinations à protéger.
-2. Placez un adaptateur de signature fiable après le déchiffrement TLS et imposez le passage par le proxy.
+2. Terminez le HTTPS client sur votre ingress TLS et utilisez l’adaptateur de signature inclus. Le déchiffrement TLS externe est optionnel pour une intégration réseau distincte, sans être requis pour base_url/MCP URL.
 3. Configurez les mappages outil/action explicites, les limites et les champs à masquer.
 4. Observez des données synthétiques, puis validez autorisation, masquage, blocage et défaillances inline.
-5. Configurez des claims JWT vérifiés et l’Access Broker intégré pour l’accès délégué et l’approbation liée à la requête.
+5. Pour contrôler chaque agent, activez Access Broker avec agent_key enregistré ou identité JWT explicitement mappée. Configurez les permissions et ajoutez la délégation utilisateur/tâche selon le mode choisi.
 
 Les utilisateurs du SDK peuvent conserver leur version tout en évaluant un pilote routé séparément. Consultez le [guide de console](console.md). L’installation depuis les sources n’implique ni publication PyPI ni mise à niveau de clients. Sauvegardez l’état avant de changer de version et ne copiez pas les identifiants ou clés synthétiques en production.
 

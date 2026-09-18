@@ -1,37 +1,47 @@
-# Docker self-hosting (0.39 Open Source Preview)
+# Docker self-hosting (0.42 Open Source Preview)
 
-> **0.41:** [Model provider connections](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
+> [Model provider connections](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
 
-> **0.40 · AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
+> **AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
+
+## Choose your 0.42 starting point
+
+- **Model APIs:** use a [provider profile](providers.md) for OpenAI, Anthropic, Gemini or OpenRouter. Change the native SDK base URL; put the provider key on the gateway.
+- **HTTP / MCP tools:** follow the Docker quickstart below, then replace the synthetic destination with an explicitly mapped service.
+- **End-to-end evaluation:** run the [two-agent model → MCP → model example](agent-workflow.md). Default mode needs no paid model key; the guide separates live OpenAI evidence from synthetic tests and lists measured limits.
+
+Gateway authentication supports `client_key`, `agent_key` and external `jwt`. Optional agent identity adds scope checks; it does not replace destination authentication. Each deployment has one fixed origin. Route the model and separately executed tools through their own gateway deployments.
 
 ## Start here: does your client fit?
 
 This package supports **one fixed destination origin per installation** and an explicit list of HTTP routes/MCP actions. The client must let you change its API/MCP URL and use either `X-TD-Client-Key`, a local agent Bearer credential, or an OAuth Bearer JWT. Target credentials remain separate. Use a server-side client or a separately configured same-origin application; this package does not enable permissive browser CORS. If the required settings are unavailable, this package is not a drop-in integration for that client. See the [gateway compatibility matrix](gateway-compatibility.md).
 
 ```text
-Client -- gateway key or JWT --> bundled adapter
+Client -- connection key, agent key or JWT --> bundled adapter
        -- separate target credential --> private Envoy --> inspector --> configured MCP / HTTP API
        <-- inspected, bounded response <--
 Operator --> console login --> policies and sanitized decision records
 ```
 
-The bundled adapter verifies the connection key or configured JWT issuer/audience/scope, removes submitted forwarding identities, binds the actual request to a private signature and forwards only through Envoy. Clients never receive the signing key. `source_verified` means this trusted forwarding path was verified; it does **not** prove the user's or agent's identity. A validated JWT authenticates gateway access. It creates broker identity only when `identity_claims` is configured and the built-in Access Broker is enabled.
+The bundled adapter verifies the connection key or individual agent credential or configured JWT issuer/audience/scope, removes submitted forwarding identities, binds the actual request to a private signature and forwards only through Envoy. Clients never receive the signing key. `source_verified` means this trusted forwarding path was verified; it does **not** prove the user's or agent's identity. A validated JWT authenticates gateway access. It creates broker identity only when `identity_claims` is configured and the built-in Access Broker is enabled.
 
 ## What works, and what does not
 
 | Connection | Package contract | Customer changes |
 |---|---|---|
+| Model provider APIs | Native text/function calls and fully buffered SSE via [provider profiles](providers.md) | Change SDK base URL; configure provider key, profile and model allowlist |
 | JSON HTTP API | Exact method/path mapping; bounded request/response; fixed origin | Change base URL; set connection key; define route/action/resource and redaction fields |
 | Remote MCP | Stateless JSON POST; explicitly mapped control methods and tools | Change MCP URL; use client key or OAuth JWT; server must return JSON and not require sessions |
+| Local agent key | Registered agent identity, expiry/revocation and broker scope checks | Enable `agent_key` and Access Broker; register an agent and issue its credential |
 | Gateway JWT | RS256, issuer, audience, time, subject and scope validation; RFC 9728 metadata and gateway challenge | Register TrapDefense as a resource in the external IdP; acquire tokens outside TrapDefense |
 | Existing target Bearer | `passthrough_bearer` with client-key mode only; legacy HTTP onboarding, not MCP OAuth compliance | Target validates the token; acquire and refresh it outside TrapDefense |
 | Fixed target credential | `static_bearer` or `static_api_key` injects a private file-backed credential; conflicting inbound credentials are rejected | Mount a secret file, rotate it and recreate the app; every allowed caller shares this service identity |
 | Console login | Locally initialized `admin`; password changes revoke sessions | Set a unique password during initialization |
 | Entra console SSO | Existing source-console capability; **not wired into this Docker profile** | See [identity guide](identity.md); never interpret console SSO as agent authorization |
 | OAuth login/token exchange/DCR/OBO, Basic auth | **Not provided by this profile**; an external authorization server owns OAuth issuance and the target challenge is not relayed | Use a supported IdP/credential provider and validate the complete client flow |
-| SSE, stateful MCP, cookies, WebSocket, uploads/binary content | **Not supported by this profile** | Use another explicitly validated profile; do not assume HTTP implies compatibility |
+| Stateful MCP, MCP SSE, cookie sessions, WebSocket, uploads/binary content | **Not supported by the generic HTTP/MCP profile** | Model profiles separately support bounded buffered SSE; no real-time token delivery |
 | stdio, shell, local files, direct DB or closed SaaS-internal calls | Outside this proxy's visibility | Not covered |
 
 In JWT mode, TrapDefense is an OAuth resource server, not an authorization server. It validates a token issued for the configured TrapDefense audience and does not forward that token to the target. Target services still enforce their own permissions using an independent credential. A client key or unmapped JWT subject is not an agent registry, delegation record or per-agent IAM.
@@ -85,7 +95,7 @@ curl -sS http://localhost:18084/mcp \
   --data '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"notes.delete","arguments":{}}}'
 ```
 
-Expected: blocked by the configured action policy. The optional fixture is a small synthetic protocol target, not proof of a particular MCP vendor. 0.39 runs the pinned official Python MCP SDK through the adapter for current-protocol initialization and discovery; see [gateway compatibility](gateway-compatibility.md). The broader [MCP pilot](mcp-pilot.md) remains a separate tool-operation path.
+Expected: blocked by the configured action policy. The optional fixture is a small synthetic protocol target, not proof of a particular MCP vendor. 0.42 runs the pinned official Python MCP SDK through the adapter for current-protocol initialization and discovery; see [gateway compatibility](gateway-compatibility.md). The broader [MCP pilot](mcp-pilot.md) remains a separate tool-operation path.
 
 ## Connect your own destination
 
@@ -141,7 +151,7 @@ target_auth:
   secret_file: /run/secrets/destination
 ```
 
-Production identity and metadata URLs require HTTPS. `allow_insecure_loopback: true` exists only for explicit local synthetic tests. The resource-derived metadata URL for the example is `https://firewall.example.com/.well-known/oauth-protected-resource/mcp`. `authorized_parties` is optional; when configured, the token must carry a matching `azp`, `appid` or `cid` client identifier. Scope validation accepts the OAuth `scope`/`scp` claim as a space-delimited string or string array. Entra application roles in `roles` are not treated as scopes in 0.39.
+Production identity and metadata URLs require HTTPS. `allow_insecure_loopback: true` exists only for explicit local synthetic tests. The resource-derived metadata URL for the example is `https://firewall.example.com/.well-known/oauth-protected-resource/mcp`. `authorized_parties` is optional; when configured, the token must carry a matching `azp`, `appid` or `cid` client identifier. Scope validation accepts the OAuth `scope`/`scp` claim as a space-delimited string or string array. Entra application roles in `roles` are not treated as scopes in 0.42.
 
 `identity_claims` is an explicit allowlist. The broker-enabled gateway copies only those verified claims into the signed inspector context. In the default delegated JWT mode, required values are tenant, user, agent, delegation and task. The configured `access_broker.tenant_id` is the console management boundary and must match request identities. Register the agent and create a matching delegation in the console before sending traffic. High-risk requests can create an approval; the caller must obtain a new JWT carrying the returned `approval_id` (or otherwise place that value in the configured approval claim) and repeat the exact request once. Do not let an untrusted caller mint or rewrite these claims.
 

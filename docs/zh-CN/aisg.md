@@ -1,6 +1,6 @@
-# TrapDefense — AI Security Gateway (0.40)
+# TrapDefense — AI Security Gateway (0.42)
 
-> **0.41:** [模型提供商连接](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
+> [模型提供商连接](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
 
 [en](../en/aisg.md) · [ko](../ko/aisg.md) · [zh-CN](../zh-CN/aisg.md) · [ja](../ja/aisg.md) · [es](../es/aisg.md) · [fr](../fr/aisg.md)
 

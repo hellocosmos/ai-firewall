@@ -1,6 +1,8 @@
 # Arquitectura y límite de confianza
 
-> **0.40 · AISG:** [Conectar, identificar, controlar, verificar](aisg.md). El gateway autentica con una clave de despliegue o JWT verificado. agent_key identifica agentes registrados sin IAM externo. JWT identity_mode: agent usa los atributos verificados de tenant y agente; delegated también exige usuario, tarea y delegación. Los agentes existentes requieren delegación por defecto.
+**Instalación:** siga la [guía Docker](self-hosting.md). Entra SSO y la demostración de la consola desde fuentes son una instalación separada; no se aplican automáticamente a Docker.
+
+> **AISG:** [Conectar, identificar, controlar, verificar](aisg.md). El gateway autentica con una clave de despliegue o JWT verificado. agent_key identifica agentes registrados sin IAM externo. JWT identity_mode: agent usa los atributos verificados de tenant y agente; delegated también exige usuario, tarea y delegación. Los agentes existentes requieren delegación por defecto.
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
@@ -19,7 +21,7 @@ La API autentica al operador local, guarda políticas y sirve la UI. Envoy reenv
 ## Contrato de confianza
 
 1. Fuerce las rutas fuera de TrapDefense para impedir el bypass del proxy.
-2. Use un descifrador TLS existente y autorizado. La demo no descifra TLS de producción.
+2. Termine HTTPS del cliente en su ingress TLS y use el adaptador de firma incluido. El descifrado TLS externo es opcional para integraciones de red diseñadas aparte; no es un requisito para base_url/MCP URL.
 3. El adaptador de confianza elimina `x-td-*` y `x-asr-*` del cliente y firma lo que observó. Preserve método, autoridad, ruta/consulta, cabeceras de aplicación y cuerpo completo. `inspection/identity.py` define la vinculación y exclusiones.
 4. Guarde la clave HMAC solo en el salto de confianza y el inspector, nunca en agentes. Permita explícitamente el `source_id` del modo gateway-only. Aísle texto claro y ExtProc: los ejemplos no autentican una escucha gRPC pública.
 5. Envoy usa búfer completo, límites de tamaño/tiempo y `failure_mode_allow: false`. Elimina la atestación antes de reenviar. La firma vincula el original; una aprobación persistente, si existe, vincula el resumen de la acción después de ocultar datos.

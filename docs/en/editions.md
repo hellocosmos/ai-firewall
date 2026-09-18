@@ -1,10 +1,10 @@
 # One open-source product
 
-> **0.40 · AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
+> **AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
-TrapDefense 0.39 has one MIT-licensed codebase. Runtime inspection and Agent Access Broker capabilities ship together in this repository. No private Python distribution, provider entry point, license key, or edition switch is required.
+TrapDefense 0.42 has one MIT-licensed codebase. Runtime inspection and Agent Access Broker capabilities ship together in this repository. No private Python distribution, provider entry point, license key, or edition switch is required.
 
 ## What is shipped
 
@@ -27,4 +27,4 @@ The built-in file store is safe for same-host POSIX processes with atomic replac
 
 Synthetic tests establish protocol behavior, not production certification for Entra, Okta, Keycloak, Conditional Access, customer MCP authentication, TLS routing, or capacity.
 
-[Docker 0.39](self-hosting.md) · [Architecture](architecture.md) · [Security](security.md) · [Gateway compatibility](gateway-compatibility.md)
+[Docker 0.42](self-hosting.md) · [Architecture](architecture.md) · [Security](security.md) · [Gateway compatibility](gateway-compatibility.md)

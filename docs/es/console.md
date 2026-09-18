@@ -1,8 +1,8 @@
 # Instalación y operación de la consola
 
-> **0.40 · AISG:** [Conectar, identificar, controlar, verificar](aisg.md). El gateway autentica con una clave de despliegue o JWT verificado. agent_key identifica agentes registrados sin IAM externo. JWT identity_mode: agent usa los atributos verificados de tenant y agente; delegated también exige usuario, tarea y delegación. Los agentes existentes requieren delegación por defecto.
+> **AISG:** [Conectar, identificar, controlar, verificar](aisg.md). El gateway autentica con una clave de despliegue o JWT verificado. agent_key identifica agentes registrados sin IAM externo. JWT identity_mode: agent usa los atributos verificados de tenant y agente; delegated también exige usuario, tarea y delegación. Los agentes existentes requieren delegación por defecto.
 
-> Docker 0.39: [Autoalojamiento](self-hosting.md) · [Compatibilidad del gateway](gateway-compatibility.md). Esta página describe la demostración sintética separada desde fuentes.
+> Docker 0.42: [Autoalojamiento](self-hosting.md) · [Compatibilidad del gateway](gateway-compatibility.md). Esta página describe la demostración sintética separada desde fuentes.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
@@ -88,6 +88,6 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 Sin `TD_CONSOLE_E2E=1` se omiten las pruebas Docker. Se comprueba la igualdad de claves y marcadores en los seis diccionarios y que el código esté en inglés. Actualice las claves inglesas y todos los JSON a la vez, sin cambiar los códigos API estables. En caso de discrepancia, la documentación inglesa es la referencia. Consulte [arquitectura](architecture.md), [ediciones](editions.md), [migración](migration.md) y [seguridad](security.md).
 
 
-## Operaciones en un mismo host — candidato 0.34
+## Operaciones en un mismo host
 
 [1 / 2 / 4 inspectors · Linux service](operations.md)

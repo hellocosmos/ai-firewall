@@ -2,7 +2,7 @@
 
 [0.42: Model → MCP → model verification](docs/en/agent-workflow.md)
 
-**0.41:** [Model provider connections](docs/en/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
+**0.42:** [Model provider connections](docs/en/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
 
 **Connect supported HTTP APIs and remote MCP servers through one explicit security boundary. Add agent identity when you need per-agent control.**
 

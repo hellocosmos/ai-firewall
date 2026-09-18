@@ -2,7 +2,7 @@
 
 [0.42: 模型 → MCP → 模型验证](docs/zh-CN/agent-workflow.md)
 
-**0.41:** [模型提供商连接](docs/zh-CN/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
+**0.42:** [模型提供商连接](docs/zh-CN/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
 
 **通过明确的安全边界连接受支持的 HTTP API 和远程 MCP 服务器。需要逐代理控制时添加代理身份。**
 

@@ -1,6 +1,8 @@
 # Architecture et frontière de confiance
 
-> **0.40 · AISG:** [Connecter, identifier, contrôler, vérifier](aisg.md). La passerelle utilise une clé de déploiement ou un JWT vérifié. agent_key identifie un agent enregistré sans IAM externe. JWT identity_mode: agent utilise les attributs vérifiés du tenant et de l’agent ; delegated exige aussi utilisateur, tâche et délégation. Les agents existants nécessitent une délégation par défaut.
+**Installation :** suivez le [guide Docker](self-hosting.md). Entra SSO et la démonstration de la console depuis les sources sont distincts et ne s’appliquent pas automatiquement à Docker.
+
+> **AISG:** [Connecter, identifier, contrôler, vérifier](aisg.md). La passerelle utilise une clé de déploiement ou un JWT vérifié. agent_key identifie un agent enregistré sans IAM externe. JWT identity_mode: agent utilise les attributs vérifiés du tenant et de l’agent ; delegated exige aussi utilisateur, tâche et délégation. Les agents existants nécessitent une délégation par défaut.
 
 [English](../en/architecture.md) · [한국어](../ko/architecture.md) · [简体中文](../zh-CN/architecture.md) · [日本語](../ja/architecture.md) · [Español](../es/architecture.md) · [Français](../fr/architecture.md)
 
@@ -19,7 +21,7 @@ L’API authentifie l’opérateur local, conserve les politiques et sert l’UI
 ## Contrat de confiance
 
 1. Imposez le routage hors de TrapDefense pour empêcher le contournement du proxy.
-2. Utilisez un déchiffreur TLS existant et autorisé. La démo ne déchiffre pas le TLS de production.
+2. Terminez le HTTPS client sur votre ingress TLS et utilisez l’adaptateur de signature inclus. Le déchiffrement TLS externe est optionnel pour une intégration réseau distincte, sans être requis pour base_url/MCP URL.
 3. L’adaptateur de confiance retire `x-td-*` et `x-asr-*` fournis par le client et signe ce qu’il a observé. Préservez méthode, autorité, chemin/requête, en-têtes applicatifs et corps complet. `inspection/identity.py` définit la liaison canonique et ses exclusions.
 4. Gardez la clé HMAC sur le relais et l’inspecteur uniquement, jamais chez les agents. Autorisez explicitement le `source_id` gateway-only. Isolez les liens en clair et ExtProc : les exemples n’authentifient pas une écoute gRPC publique.
 5. Envoy utilise un tampon complet, des limites de taille/temps et `failure_mode_allow: false`. Il retire l’attestation avant transfert. La signature lie l’original ; l’approbation persistante éventuelle lie l’empreinte de l’action après masquage.

@@ -1,8 +1,8 @@
 # Console installation and operation
 
-> **0.40 · AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
+> **AISG:** [Connect, identify, control, verify](aisg.md). Gateway access uses a deployment key or verified JWT. Local agent_key mode identifies a registered agent without an external IAM. JWT identity_mode: agent uses verified tenant/agent claims; delegated mode additionally requires user, task and delegation. Existing agents require delegation by default.
 
-> Docker 0.39: [Self-hosting / integration guide](self-hosting.md) · [Gateway client compatibility](gateway-compatibility.md). This page describes the separate source-based synthetic demo.
+> Docker 0.42: [Self-hosting / integration guide](self-hosting.md) · [Gateway client compatibility](gateway-compatibility.md). This page describes the separate source-based synthetic demo.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
@@ -88,6 +88,6 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 Without `TD_CONSOLE_E2E=1`, Docker tests are skipped. Locale checks require identical keys and placeholders across all six dictionaries and English application source. Update English keys and all locale JSON files together; keep stable API codes unchanged. English documentation is the reference when translations differ. See [architecture](architecture.md), [editions](editions.md), [migration](migration.md) and [security](security.md).
 
 
-## Same-host operations (0.34)
+## Same-host operations
 
 [1 / 2 / 4 inspectors · Linux service](operations.md)

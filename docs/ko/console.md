@@ -1,8 +1,8 @@
 # 콘솔 설치와 운영
 
-> **0.40 · AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
+> **AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
 
-> Docker 0.39: [셀프호스팅](self-hosting.md) · [게이트웨이 호환성](gateway-compatibility.md). 이 페이지는 별도 소스 기반 합성 데모를 설명합니다.
+> Docker 0.42: [셀프호스팅](self-hosting.md) · [게이트웨이 호환성](gateway-compatibility.md). 이 페이지는 별도 소스 기반 합성 데모를 설명합니다.
 
 [English](../en/console.md) · [한국어](../ko/console.md) · [简体中文](../zh-CN/console.md) · [日本語](../ja/console.md) · [Español](../es/console.md) · [Français](../fr/console.md)
 
@@ -88,6 +88,6 @@ TD_CONSOLE_E2E=1 .venv/bin/python -m pytest tests/test_console.py -q
 `TD_CONSOLE_E2E=1`이 없으면 Docker 검증은 건너뜁니다. 언어 검사에서는 6개 사전의 키·치환자가 일치하고 애플리케이션 코드가 영어인지 확인합니다. 영어 키와 모든 JSON 번역을 함께 수정하고 API 코드는 유지하세요. 번역 간 차이가 있으면 영어 문서를 기준으로 합니다. [아키텍처](architecture.md), [에디션](editions.md), [이전](migration.md), [보안](security.md)도 참고하세요.
 
 
-## 동일 서버 운영 — 0.34 후보
+## 동일 서버 운영
 
 [1 / 2 / 4 inspectors · Linux service](operations.md)

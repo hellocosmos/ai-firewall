@@ -1,10 +1,10 @@
 # 单一开源产品
 
-> **0.40 · AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
+> **AISG:** [连接、识别、控制、验证](aisg.md). 网关使用部署密钥或已验证 JWT。agent_key 无需外部 IAM 即可识别注册代理。JWT identity_mode: agent 使用已验证的租户和代理声明；delegated 还要求用户、任务和委托。现有代理默认需要委托。
 
 [English](../en/editions.md) · [한국어](../ko/editions.md) · [简体中文](../zh-CN/editions.md) · [日本語](../ja/editions.md) · [Español](../es/editions.md) · [Français](../fr/editions.md)
 
-TrapDefense 0.39 使用一个 MIT 许可代码库。Runtime Gateway 与 Agent Access Broker 一同发布在本公开仓库中，不需要私有 Python 包、provider entry point、license key 或 edition switch。
+TrapDefense 0.42 使用一个 MIT 许可代码库。Runtime Gateway 与 Agent Access Broker 一同发布在本公开仓库中，不需要私有 Python 包、provider entry point、license key 或 edition switch。
 
 ## 发布状态
 
@@ -21,4 +21,4 @@ TrapDefense 0.39 使用一个 MIT 许可代码库。Runtime Gateway 与 Agent Ac
 
 文件 store 通过 atomic replace 与 file lock 支持同主机 POSIX 进程，但不是分布式数据库，不能作为 NFS/SMB 多主机 HA。合成测试不等同于真实 IdP、Conditional Access、客户 MCP 认证、TLS 路由或容量认证。
 
-[Docker 0.39](self-hosting.md) · [架构](architecture.md) · [安全](security.md) · [兼容性](gateway-compatibility.md)
+[Docker 0.42](self-hosting.md) · [架构](architecture.md) · [安全](security.md) · [兼容性](gateway-compatibility.md)

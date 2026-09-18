@@ -1,12 +1,20 @@
-# Docker 셀프호스팅 — 0.39 Open Source Preview
+# Docker 셀프호스팅 — 0.42 Open Source Preview
 
-> **0.41:** [모델 제공자 연결](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
+> [모델 제공자 연결](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
 
-> **0.40 · AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
+> **AISG:** [연결 → 신원 → 통제 → 확인](aisg.md). Gateway 접속은 연결 키 또는 검증된 JWT로 인증합니다. 로컬 agent_key는 외부 IAM 없이 등록된 에이전트를 식별합니다. JWT identity_mode: agent는 검증된 테넌트·에이전트 정보를 사용하고, delegated는 사용자·작업·위임도 요구합니다. 기존 에이전트는 기본적으로 위임이 필요합니다.
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-0.39은 어댑터·Envoy·검사기·운영 UI와 분리된 게이트웨이/대상 인증을 함께 제공하는 Docker Compose Preview입니다. 이미지는 소스에서 로컬 빌드합니다. TrapDefense Cloud는 계획 단계이며 가입할 수 없습니다.
+## 0.42 시작 경로 선택
+
+- **모델 API:** [제공사 프로필](providers.md)로 OpenAI·Anthropic·Gemini·OpenRouter를 연결합니다. SDK base URL을 변경하고 제공사 키는 게이트웨이에 보관합니다.
+- **HTTP / MCP 도구:** 아래 Docker 예제로 시작한 뒤 합성 목적지를 명시적으로 매핑한 실제 서비스로 교체합니다.
+- **전체 흐름 검증:** [두 에이전트 모델 → MCP → 모델 예제](agent-workflow.md)를 실행합니다. 기본 모드는 유료 키가 필요 없으며 실호출 증거와 합성 검증·측정 한계를 구분합니다.
+
+게이트웨이 인증은 `client_key`, `agent_key`, 외부 `jwt`를 지원합니다. 로컬 Agent Registry와 agent_key를 통한 권한 통제는 선택 사항이며 대상 인증을 대체하지 않습니다. 설치별 목적지는 하나입니다. 모델과 별도 실행 도구는 각각 게이트웨이를 거쳐야 합니다. 모델 프로필의 SSE는 전체 버퍼링 후 검사·전달하며 실시간 토큰 스트리밍은 아닙니다.
+
+0.42은 어댑터·Envoy·검사기·운영 UI와 분리된 게이트웨이/대상 인증을 함께 제공하는 Docker Compose Preview입니다. 이미지는 소스에서 로컬 빌드합니다. TrapDefense Cloud는 계획 단계이며 가입할 수 없습니다.
 
 클라이언트에서 MCP/API URL을 바꾸고 `X-TD-Client-Key` 또는 OAuth Bearer JWT를 사용할 수 있어야 합니다. 설치별 목적지는 하나이며 경로·도구를 명시적으로 매핑합니다. 자세한 증거는 [호환성 표](gateway-compatibility.md)를 참고하세요.
 
@@ -18,7 +26,7 @@
 | 대상 인증 | none, 레거시 Bearer 전달, 파일 기반 고정 Bearer/API Key 주입 |
 | 미지원 | OAuth 발급·로그인 중개·DCR·OBO, 쿠키/세션, 장시간 SSE, WebSocket, stdio, 폐쇄형 SaaS 내부 호출 |
 
-관리자 비밀번호는 콘솔 로그인용입니다. 연결 키 또는 JWT는 TrapDefense 접근용입니다. JWT는 구성한 게이트웨이 audience에 대해 검증되며 대상으로 전달되지 않습니다. 대상 서비스는 별도 자격증명과 자체 권한을 검증합니다. 이는 Agent IAM 등록이나 OAuth Authorization Server 구현이 아닙니다.
+관리자 비밀번호는 콘솔 로그인용입니다. 연결 키 또는 JWT는 TrapDefense 접근용입니다. JWT는 구성한 게이트웨이 audience에 대해 검증되며 대상으로 전달되지 않습니다. 대상 서비스는 별도 자격증명과 자체 권한을 검증합니다. 연결 키나 JWT 자체가 에이전트를 자동 등록하지는 않습니다. 에이전트 등록·권한은 선택한 Access Broker 모드에서 별도로 관리하며 OAuth 토큰 발급은 외부 IdP가 맡습니다.
 
 ## Docker
 
@@ -35,7 +43,7 @@ docker compose run --rm app client-key
 
 `http://localhost:18080`에 admin으로 로그인합니다. `client-key`로 연결 키를 확인해 클라이언트의 비밀 헤더 설정에 보관하세요. 게이트웨이는 `http://localhost:18084`입니다. 합성 목적지 토큰은 `Bearer synthetic-target-token`입니다.
 
-실제 연결 시 `deployment.yaml`의 upstream·authority·경로·도구·resource를 바꾸세요. `gateway_auth`는 `client_key` 또는 `jwt`, `target_auth`는 `none`, `passthrough_bearer`, `static_bearer`, `static_api_key`를 사용합니다. JWT와 passthrough는 함께 쓸 수 없습니다. 고정 자격증명은 UID 10001이 읽을 수 있는 0600 비밀 파일로 마운트하며 충돌하는 입력은 거부합니다.
+실제 연결 시 `deployment.yaml`의 upstream·authority·경로·도구·resource를 바꾸세요. `gateway_auth`는 `client_key`, `agent_key` 또는 `jwt`, `target_auth`는 `none`, `passthrough_bearer`, `static_bearer`, `static_api_key`를 사용합니다. JWT와 passthrough는 함께 쓸 수 없습니다. 고정 자격증명은 UID 10001이 읽을 수 있는 0600 비밀 파일로 마운트하며 충돌하는 입력은 거부합니다.
 
 UI는 정책·비밀번호를 관리합니다. 매핑 변경은 백업 후 `policy-reset`으로 기존 정책을 명시적으로 초기화하고 `render`와 재생성을 수행하세요. 계정·키·이벤트는 보존됩니다. 새 요청부터 정책이 적용됩니다.
 
