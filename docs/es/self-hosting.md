@@ -1,4 +1,7 @@
-# Autoalojamiento con Docker — 0.42 Open Source Preview
+# Autoalojamiento con Docker — 0.43 Open Source Preview
+
+> **0.43:** [Espacio de operación (0.43)](operator-workspace.md)
+
 
 > [Conexiones de proveedores de modelos](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
 
@@ -6,7 +9,7 @@
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-## Elija un punto de partida para 0.42
+## Elija un punto de partida para 0.43
 
 - **API de modelos:** use un [perfil de proveedor](providers.md) para OpenAI, Anthropic, Gemini u OpenRouter. Cambie la base URL del SDK y guarde la clave del proveedor en el gateway.
 - **Herramientas HTTP / MCP:** siga el inicio Docker y sustituya el destino sintético por un servicio explícitamente mapeado.
@@ -14,7 +17,7 @@
 
 La autenticación admite `client_key`, `agent_key` y `jwt` externo. El registro local de agentes y sus permisos son opcionales y no sustituyen la autenticación del destino. Cada despliegue tiene un origen fijo; modelos y herramientas ejecutadas por separado necesitan sus propias rutas. El SSE de modelos se almacena completo y se inspecciona antes de entregarse; no es streaming de tokens en tiempo real.
 
-0.42 ofrece adaptador, Envoy, inspector, consola y autenticación separada para gateway y destino. La imagen se compila localmente desde el código fuente. TrapDefense Cloud sigue previsto.
+0.43 ofrece adaptador, Envoy, inspector, consola y autenticación separada para gateway y destino. La imagen se compila localmente desde el código fuente. TrapDefense Cloud sigue previsto.
 
 El cliente debe poder cambiar la URL MCP/API y usar `X-TD-Client-Key` o un JWT Bearer OAuth. Cada despliegue tiene un destino fijo y rutas/herramientas explícitas. Consulte la [matriz de compatibilidad](gateway-compatibility.md).
 

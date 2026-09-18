@@ -23,7 +23,7 @@ export default function DeploymentSettings({deployment, network}) {
       <p>{t(deployment.llm ? 'Native text and function calls. Files, media, provider-side tools and real-time streaming are not supported.' : 'JSON HTTP and stateless JSON MCP only. OAuth login brokering, sessions and long-lived SSE are not supported by this profile.')}</p>
       <h3>{t('Configured routes')}</h3>
       {deployment.routes.map(r=><p key={`${r.method}:${r.path}`}><code>{r.method} {r.path}</code> · {r.protocol} · {r.tools.join(', ')}</p>)}
-      <p className="td-note">{t('Edit deployment.yaml for destinations and mappings, then recreate the stack. Policies and passwords are managed here.')}</p>
+      <p className="td-note">{t('Use the connection workspace below to stage destinations and mappings. Activate them with the stack stopped.')}</p>
       <p className="td-note">{t('Listener checks do not prove destination authentication or successful inspection. Send a test request and inspect its decision record.')}</p>
     </div>
   </Panel>;

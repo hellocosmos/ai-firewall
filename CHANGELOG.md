@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.43 — Operator workspace
+
+- Connection profiles, validation, staged configuration, protected destination secrets and saved revision recovery in the Docker console.
+- Explicit stopped-stack activation; persistent active configuration and policy snapshots. No Docker socket or live reload.
+- Isolated local-policy previews and inspection-listener/request-outcome diagnostics without bypassing egress isolation.
+- First-success guidance and operator documentation in six languages.
+- Real customer MCP/account qualification remains separate from synthetic Docker verification.
+
 ## 0.42 — Two-gateway agent workflow
 
 - Align current installation, identity, compatibility and provider guides across six languages; check documentation links and current guide titles in CI. Historical migration versions and labeled screenshots retain their provenance.

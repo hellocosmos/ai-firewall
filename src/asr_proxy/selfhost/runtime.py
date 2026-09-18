@@ -29,6 +29,7 @@ class SelfhostRuntime(Runtime):
         pii_rules={key:rule.pii_action or 'inherit' for key,_,rule in entries}).model_dump())
     self.configure(self.policy())
     self.inspector_ready = False
+    self.gateway_outcomes = {}
 
   def config(self, policy):
     entries = list(self.deployment.entries())
@@ -89,3 +90,12 @@ class SelfhostRuntime(Runtime):
     except OSError:proxy=False
     return {'inspector_ready':self.inspector_ready,'proxy_ready':proxy,
             'destination_ready':None,'probe':'listener_only'}
+
+  def observe_gateway(self, phase, status):
+    from datetime import datetime, timezone
+    # Finite dimensions only: never retain request paths, bodies or credentials.
+    with self.lock:
+      key = f'{phase}:{status}'
+      record = self.gateway_outcomes.setdefault(key, {'phase': phase, 'http_status': status, 'count': 0})
+      record['count'] += 1
+      record['last_seen'] = datetime.now(timezone.utc).isoformat()

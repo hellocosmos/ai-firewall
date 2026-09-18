@@ -181,6 +181,30 @@ def create_app(directory,seed=True,*,runtime_factory=Runtime,lifespan=None,ident
   @router.get('/audit')
   def audit():return runtime.store.audits()
 
+  if deployment:
+    from asr_proxy.selfhost.operations import Operations, SettingsInput, RestoreInput, PreviewInput
+    operations = Operations(runtime)
+
+    @router.get('/operations')
+    def operation_status(): return operations.snapshot()
+
+    @router.post('/operations/validate')
+    def operation_validate(payload: SettingsInput):
+      operations.candidate(payload)
+      return {'valid': True}
+
+    @router.post('/operations/stage')
+    def operation_stage(payload: SettingsInput): return operations.stage(payload)
+
+    @router.post('/operations/restore')
+    def operation_restore(payload: RestoreInput): return operations.restore(payload)
+
+    @router.post('/operations/diagnose')
+    def operation_diagnose(): return operations.diagnose()
+
+    @router.post('/operations/preview')
+    def operation_preview(payload: PreviewInput): return operations.preview(payload)
+
   @router.get('/policy')
   def policy():return runtime.policy()
 

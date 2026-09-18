@@ -136,6 +136,40 @@ def test_package_lifecycle(tmp_path,mode):
         if c.post('/api/notes',headers=headers,json={'message':'safe'}).status_code==200:break
         time.sleep(.5)
       else:pytest.fail('Inspection path did not recover')
+      if mode=='passthrough_bearer':
+        workspace=admin.get('/demo-api/operations').json()
+        candidate=workspace['active'];candidate['max_body_bytes']=32768
+        stage=admin.post('/demo-api/operations/stage',json={'version':workspace['version'],'config':candidate})
+        assert stage.status_code==200 and stage.json()['restart_required']
+        preview=admin.post('/demo-api/operations/preview',json={
+          'route':0,'body':{'message':'Contact alex@example.com'},'policy':admin.get('/demo-api/policy').json()})
+        assert preview.status_code==200 and preview.json()['decision']=='redact'
+        diagnostic=admin.post('/demo-api/operations/diagnose',json={}).json()
+        assert diagnostic['status']=='listeners_ready' and diagnostic['authentication']=='not_tested'
+        # A second process cannot activate a new generation while the gateway serves.
+        rejected=subprocess.run([*base,'run','--rm','app','activate-config'],env=env,
+          cwd=ROOT,text=True,capture_output=True,timeout=60)
+        assert rejected.returncode!=0
+        assert admin.get('/demo-api/operations').json()['active']['max_body_bytes']==1048576
+        compose('stop','app')
+        envoy_rejected=subprocess.run([*base,'run','--rm','app','activate-config'],env=env,
+          cwd=ROOT,text=True,capture_output=True,timeout=60)
+        assert envoy_rejected.returncode!=0
+        compose('stop','envoy')
+        compose('run','--rm','app','activate-config')
+        compose('up','-d','app','envoy');wait()
+        assert admin.post('/demo-api/login',json={'username':'admin','password':password+'-changed'}).status_code==200
+        activated=admin.get('/demo-api/operations').json()
+        assert activated['active']['max_body_bytes']==32768 and not activated['restart_required']
+        # Persist across a further restart, then recover the prior configuration.
+        compose('restart','app','envoy');wait()
+        assert admin.get('/demo-api/operations').json()['active']['max_body_bytes']==32768
+        restored=admin.post('/demo-api/operations/restore',json={
+          'version':activated['version'],'revision':activated['history'][0]['revision']})
+        assert restored.status_code==200
+        compose('stop','app','envoy');compose('run','--rm','app','activate-config')
+        compose('up','-d','app','envoy');wait()
+        assert admin.get('/demo-api/operations').json()['active']['max_body_bytes']==1048576
       if mode.startswith('https'):
         ca.write_bytes((tmp_path/'untrusted.crt').read_bytes())
         compose('restart','envoy')

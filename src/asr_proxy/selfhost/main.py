@@ -63,7 +63,8 @@ async def serve(args, config):
   from .agent_credentials import AgentCredentials
   local_keys=AgentCredentials(state/'agent-credentials.sqlite',runtime.broker,runtime.broker_tenant) if config.gateway_auth.mode=='agent_key' else None
   gateway=create_gateway(config,client_key,runtime.key,target_secret=target_secret,
-    authenticator=GatewayAuthenticator(config.gateway_auth,client_key=client_key,agent_credentials=local_keys))
+    authenticator=GatewayAuthenticator(config.gateway_auth,client_key=client_key,agent_credentials=local_keys),
+    observe=runtime.observe_gateway)
   servers=[uvicorn.Server(uvicorn.Config(app,host='0.0.0.0',port=port,access_log=False,
     ws='none',timeout_graceful_shutdown=3,limit_concurrency=64)) for app,port in [(console,18080),(gateway,18084)]]
   # One signal handler coordinates both listeners and the gRPC service.
@@ -83,7 +84,7 @@ async def serve(args, config):
 
 def main():
   parser=argparse.ArgumentParser(description='TrapDefense self-hosted AI Firewall')
-  parser.add_argument('command',choices=['init','serve','client-key','render','policy-reset'])
+  parser.add_argument('command',choices=['init','serve','client-key','render','policy-reset','activate-config'])
   parser.add_argument('--config',default='/config/deployment.yaml')
   parser.add_argument('--state',default='/state')
   parser.add_argument('--generated',default='/generated')
@@ -93,11 +94,31 @@ def main():
     if args.command=='client-key':
       print(secret(Path(args.state)/'client.key'));return
     config=load(args.config)
+    if args.command in ('serve','activate-config'):
+      import fcntl
+      runtime_lock=open(Path(args.state)/'runtime.lock','a')
+      try:fcntl.flock(runtime_lock,fcntl.LOCK_EX | fcntl.LOCK_NB)
+      except BlockingIOError:raise ValueError('Stop the app before activating settings') from None
+    if args.command not in ('init',):
+      from .operations import active_config, activate
+      store=Store(Path(args.state),require_existing=True)
+      config=active_config(store,config)
     if args.command=='init':
       password=getpass.getpass('New administrator password (12+ characters): ')
       if password!=getpass.getpass('Confirm password: '):raise ValueError('Passwords did not match')
       initialize(Path(args.state),Path(args.generated),config,password)
       print('Initialized. Store your client key securely: docker compose run --rm app client-key')
+    elif args.command=='activate-config':
+      import socket
+      try:
+        connection=socket.create_connection(('envoy',18082),timeout=2)
+      except OSError:pass
+      else:
+        connection.close()
+        raise ValueError('Stop Envoy before activating settings')
+      config=activate(store,config)
+      atomic_write(Path(args.generated)/'envoy.yaml',envoy_config(config),mode=0o644)
+      print('Connection activated. Start both app and Envoy. Changed route mappings reset local route policies.')
     elif args.command=='policy-reset':
       store=Store(Path(args.state),require_existing=True)
       with store.connect() as db:db.execute("DELETE FROM settings WHERE key='policy'")

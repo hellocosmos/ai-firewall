@@ -1,8 +1,11 @@
 # TrapDefense — Open-source AI Security Gateway
 
+[0.43: Espacio de operación (0.43)](docs/es/operator-workspace.md)
+
+
 [0.42: Verificación modelo → MCP → modelo](docs/es/agent-workflow.md)
 
-**0.42:** [Conexiones de proveedores de modelos](docs/es/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
+**0.43:** [Conexiones de proveedores de modelos](docs/es/providers.md) — OpenAI · Anthropic · Gemini · OpenRouter.
 
 **Conecte API HTTP y servidores MCP remotos compatibles a través de un límite de seguridad explícito. Añada identidad para controlar cada agente.**
 
@@ -10,7 +13,7 @@
 
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-> **Open Source Preview 0.42:** todo el runtime y la consola operativa se publican con licencia MIT. El Agent Access Broker integrado está implementado y validado con datos sintéticos, pero permanece **Experimental** hasta validar IdP reales, políticas de clientes, HA y capacidad.
+> **Open Source Preview 0.43:** todo el runtime y la consola operativa se publican con licencia MIT. El Agent Access Broker integrado está implementado y validado con datos sintéticos, pero permanece **Experimental** hasta validar IdP reales, políticas de clientes, HA y capacidad.
 
 TrapDefense es un AI Firewall autoalojado para tráfico HTTP y MCP compatible. Inspecciona solicitudes y respuestas, aplica políticas de action, PII y secrets, conserva evidencia saneada y puede autorizar una acción según agent, delegation, task, resource y una aprobación humana de un solo uso.
 

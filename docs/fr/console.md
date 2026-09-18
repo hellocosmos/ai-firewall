@@ -1,5 +1,8 @@
 # Installation et utilisation de la console
 
+> **0.43:** [Espace d’exploitation (0.43)](operator-workspace.md)
+
+
 > **AISG:** [Connecter, identifier, contrôler, vérifier](aisg.md). La passerelle utilise une clé de déploiement ou un JWT vérifié. agent_key identifie un agent enregistré sans IAM externe. JWT identity_mode: agent utilise les attributs vérifiés du tenant et de l’agent ; delegated exige aussi utilisateur, tâche et délégation. Les agents existants nécessitent une délégation par défaut.
 
 > Docker 0.42 : [Auto-hébergement](self-hosting.md) · [Compatibilité de la passerelle](gateway-compatibility.md). Cette page décrit la démonstration synthétique distincte depuis les sources.

@@ -13,8 +13,15 @@ from .auth import AuthError, GatewayAuthenticator
 from .credentials import CredentialError, TargetCredentialProvider
 
 
-def create_gateway(config, client_key, signing_key, *, target_secret=None, authenticator=None, transport=None):
+def create_gateway(config, client_key, signing_key, *, target_secret=None, authenticator=None, transport=None, observe=None):
   app = FastAPI(openapi_url=None, docs_url=None, redoc_url=None)
+  if observe is not None:
+    @app.middleware('http')
+    async def record_outcome(request, call_next):
+      request.state.outcome = 'gateway_validation'
+      response = await call_next(request)
+      observe(request.state.outcome, response.status_code)
+      return response
   authority = urlsplit(config.upstream).netloc
   slots = asyncio.Semaphore(32)
   authenticator=authenticator or GatewayAuthenticator(config.gateway_auth,client_key=client_key)
@@ -42,11 +49,13 @@ def create_gateway(config, client_key, signing_key, *, target_secret=None, authe
       if query and not (config.llm.provider=='google' and query=='alt=sse'
           and request.url.path.endswith(':streamGenerateContent')):
         return JSONResponse({'error':'unsupported_provider_query'},status_code=400)
+    request.state.outcome = 'gateway_authentication'
     try:auth_result=await asyncio.to_thread(authenticator.authenticate,auth_headers)
     except AuthError as error:
       response_headers={}
       if challenge:=authenticator.challenge(error):response_headers['WWW-Authenticate']=challenge
       return JSONResponse({'error':error.code},status_code=error.status_code,headers=response_headers)
+    request.state.outcome = 'gateway_validation'
     if slots.locked(): return JSONResponse({'error':'gateway_busy'}, status_code=503)
     raw_path = request.scope.get('raw_path', b'/').decode('ascii')
     mapped_routes={(r.method,r.path) for r in config.routes}
@@ -84,7 +93,9 @@ def create_gateway(config, client_key, signing_key, *, target_secret=None, authe
           outgoing.headers['x-td-attestation'] = sign_attestation(message,
             {'source_id':'selfhost-adapter','run_id':uuid4().hex,**auth_result.identity},
             signing_key, nonce=uuid4().hex)
+          request.state.outcome = 'inspection_path_transport'
           response = await client.send(outgoing, stream=True)
+          request.state.outcome = 'inspection_path_response'
           try:
             if 300 <= response.status_code < 400:
               return JSONResponse({'error':'upstream_redirect_not_supported'}, status_code=502)

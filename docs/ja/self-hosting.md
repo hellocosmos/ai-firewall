@@ -1,4 +1,7 @@
-# Docker セルフホスティング — 0.42 Open Source Preview
+# Docker セルフホスティング — 0.43 Open Source Preview
+
+> **0.43:** [運用ワークスペース（0.43）](operator-workspace.md)
+
 
 > [モデル提供者への接続](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
 
@@ -6,7 +9,7 @@
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-## 0.42 の開始方法を選ぶ
+## 0.43 の開始方法を選ぶ
 
 - **モデル API：**[プロバイダー設定](providers.md)で OpenAI・Anthropic・Gemini・OpenRouter に接続します。SDK base URL を変更し、プロバイダーキーはゲートウェイに保存します。
 - **HTTP / MCP ツール：**以下の Docker サンプルから始め、合成宛先を明示的にマッピングしたサービスに変更します。
@@ -14,7 +17,7 @@
 
 ゲートウェイ認証は `client_key`・`agent_key`・外部 `jwt` に対応します。ローカル Agent Registry と agent_key の権限制御は任意で、宛先認証を置き換えません。導入ごとに宛先は1つです。モデルと別途実行するツールはそれぞれ経路設定が必要です。モデル SSE は全体をバッファして検査後に配信し、リアルタイムのトークン配信ではありません。
 
-0.42 はアダプター、Envoy、検査器、管理 UI と、分離したゲートウェイ/宛先認証を提供します。イメージはソースからローカルでビルドします。TrapDefense Cloud は計画段階です。
+0.43 はアダプター、Envoy、検査器、管理 UI と、分離したゲートウェイ/宛先認証を提供します。イメージはソースからローカルでビルドします。TrapDefense Cloud は計画段階です。
 
 クライアントは MCP/API URL を変更し、`X-TD-Client-Key` または OAuth Bearer JWT を使用できる必要があります。導入ごとに宛先を一つに固定し、ルートとツールを明示します。証拠は[互換性表](gateway-compatibility.md)を参照してください。
 

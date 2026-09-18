@@ -1,4 +1,7 @@
-# Docker self-hosting (0.42 Open Source Preview)
+# Docker self-hosting (0.43 Open Source Preview)
+
+> **0.43:** [Operator workspace (0.43)](operator-workspace.md)
+
 
 > [Model provider connections](providers.md) · OpenAI / Anthropic / Gemini / OpenRouter.
 
@@ -6,7 +9,7 @@
 
 [English](../en/self-hosting.md) · [한국어](../ko/self-hosting.md) · [简体中文](../zh-CN/self-hosting.md) · [日本語](../ja/self-hosting.md) · [Español](../es/self-hosting.md) · [Français](../fr/self-hosting.md)
 
-## Choose your 0.42 starting point
+## Choose your 0.43 starting point
 
 - **Model APIs:** use a [provider profile](providers.md) for OpenAI, Anthropic, Gemini or OpenRouter. Change the native SDK base URL; put the provider key on the gateway.
 - **HTTP / MCP tools:** follow the Docker quickstart below, then replace the synthetic destination with an explicitly mapped service.
